@@ -12,6 +12,12 @@ const LOCALES = [
   { code: "zh", label: "中文" },
 ] as const;
 
+const OCCASIONS = [
+  { key: "aqiqah", label: "Aqiqah" },
+  { key: "qurban", label: "Qurban" },
+  { key: "personal", label: "Personal" },
+] as const;
+
 type Product = {
   id: string;
   productType: string;
@@ -182,55 +188,63 @@ export function AdminProductsClient() {
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <p className="text-xs text-[#94a3b8]">
-                          Images per language (URL; leave empty to use global image below)
+                          Images per occasion & language (URL). Leave empty to use global image below.
                         </p>
-                        <div className="flex flex-wrap gap-3">
-                          {LOCALES.map(({ code, label }) => {
-                            const url = form.imageUrlByLocale?.[code] ?? "";
-                            return (
-                              <div key={code} className="flex flex-col items-start gap-1">
-                                <span className="text-xs text-[#64748b]">{label}</span>
-                                <input
-                                  className={inputClass}
-                                  value={url}
-                                  onChange={(e) =>
-                                    setForm((f) => ({
-                                      ...f,
-                                      imageUrlByLocale: {
-                                        ...(f.imageUrlByLocale ?? {}),
-                                        [code]: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                  placeholder="https://... or /uploads/..."
-                                />
-                                {url && (
-                                  <Image
-                                    src={url}
-                                    alt=""
-                                    width={64}
-                                    height={64}
-                                    unoptimized
-                                    className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).style.display = "none";
-                                    }}
-                                  />
-                                )}
+                        <div className="space-y-3">
+                          {OCCASIONS.map(({ key: occKey, label: occLabel }) => (
+                            <div key={occKey} className="space-y-1">
+                              <p className="text-xs font-medium text-[#e2e8f0]">{occLabel}</p>
+                              <div className="flex flex-wrap gap-3">
+                                {LOCALES.map(({ code, label }) => {
+                                  const mapKey = `${occKey}:${code}`;
+                                  const url = form.imageUrlByLocale?.[mapKey] ?? "";
+                                  return (
+                                    <div key={mapKey} className="flex flex-col items-start gap-1">
+                                      <span className="text-[11px] text-[#64748b]">{label}</span>
+                                      <input
+                                        className={inputClass}
+                                        value={url}
+                                        onChange={(e) =>
+                                          setForm((f) => ({
+                                            ...f,
+                                            imageUrlByLocale: {
+                                              ...(f.imageUrlByLocale ?? {}),
+                                              [mapKey]: e.target.value,
+                                            },
+                                          }))
+                                        }
+                                        placeholder="https://... or /uploads/..."
+                                      />
+                                      {url && (
+                                        <Image
+                                          src={url}
+                                          alt=""
+                                          width={64}
+                                          height={64}
+                                          unoptimized
+                                          className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]"
+                                          onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = "none";
+                                          }}
+                                        />
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
-                            );
-                          })}
+                            </div>
+                          ))}
                         </div>
                         <p className="text-xs text-[#64748b]">
-                          Global image URL (used when locale has no image):
+                          Global image URL (fallback for all occasions & languages):
                         </p>
                         <input
                           className={inputClass}
                           value={form.imageUrl ?? ""}
                           onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
-                          placeholder="https://... or /uploads/... (fallback for all languages)"
+                          placeholder="https://... or /uploads/..."
                         />
                       </div>
                     </td>

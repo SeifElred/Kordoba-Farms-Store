@@ -17,11 +17,24 @@ export type ProductConfig = {
   imageUrl: string;
 };
 
-function resolveImageUrl(imageUrl: string, imageUrlByLocale: string | null, locale: string): string {
+function resolveImageUrl(
+  imageUrl: string,
+  imageUrlByLocale: string | null,
+  locale: string,
+  occasion?: string,
+): string {
   if (!imageUrlByLocale) return imageUrl;
   try {
     const map = JSON.parse(imageUrlByLocale) as Record<string, string>;
-    if (map && typeof map[locale] === "string" && map[locale].trim()) return map[locale].trim();
+    const loc = locale ?? "en";
+    // Prefer most specific keys first: occasion+locale, then occasion-only, then locale-only
+    if (occasion) {
+      const occLocKey = `${occasion}:${loc}`;
+      const occKey = occasion;
+      if (map[occLocKey]?.trim()) return map[occLocKey].trim();
+      if (map[occKey]?.trim()) return map[occKey].trim();
+    }
+    if (map[loc]?.trim()) return map[loc].trim();
   } catch {
     // ignore invalid JSON
   }
@@ -29,7 +42,7 @@ function resolveImageUrl(imageUrl: string, imageUrlByLocale: string | null, loca
 }
 
 /** Get all products from DB, or fallback to static defaults. Resolves image per locale. */
-export async function getProducts(locale?: string): Promise<ProductConfig[]> {
+export async function getProducts(locale?: string, occasion?: string): Promise<ProductConfig[]> {
   try {
     const rows = await prisma.product.findMany({ orderBy: { sortOrder: "asc" } });
     if (rows.length === 0) {
@@ -41,13 +54,12 @@ export async function getProducts(locale?: string): Promise<ProductConfig[]> {
         imageUrl: p.imageUrl,
       }));
     }
-    const loc = locale ?? "en";
     return rows.map((p) => ({
       productType: p.productType,
       label: p.label,
       minPrice: p.minPrice,
       maxPrice: p.maxPrice,
-      imageUrl: resolveImageUrl(p.imageUrl, p.imageUrlByLocale, loc),
+      imageUrl: resolveImageUrl(p.imageUrl, p.imageUrlByLocale, locale ?? "en", occasion),
     }));
   } catch (err) {
     console.error("getProducts: falling back to static defaults due to DB error", err);
@@ -62,8 +74,12 @@ export async function getProducts(locale?: string): Promise<ProductConfig[]> {
 }
 
 /** Get one product config by productType. Resolves image per locale. */
-export async function getProductConfig(productType: string, locale?: string): Promise<ProductConfig | null> {
-  const products = await getProducts(locale);
+export async function getProductConfig(
+  productType: string,
+  locale?: string,
+  occasion?: string,
+): Promise<ProductConfig | null> {
+  const products = await getProducts(locale, occasion);
   return products.find((p) => p.productType === productType) ?? null;
 }
 
@@ -95,15 +111,14 @@ export async function getProductWeights(productType: string): Promise<ProductWei
 }
 
 /** Get all special cuts from DB, or fallback to static. Resolves image per locale. */
-export async function getSpecialCuts(locale?: string): Promise<SpecialCutOption[]> {
+export async function getSpecialCuts(locale?: string, occasion?: string): Promise<SpecialCutOption[]> {
   try {
     const rows = await prisma.specialCut.findMany({ orderBy: { sortOrder: "asc" } });
     if (rows.length === 0) return SPECIAL_CUTS_FALLBACK;
-    const loc = locale ?? "en";
     return rows.map((r) => ({
       id: r.cutId,
       label: r.label,
-      imageUrl: resolveImageUrl(r.imageUrl, r.imageUrlByLocale, loc),
+      imageUrl: resolveImageUrl(r.imageUrl, r.imageUrlByLocale, locale ?? "en", occasion),
       videoUrl: r.videoUrl ?? undefined,
     }));
   } catch (err) {
