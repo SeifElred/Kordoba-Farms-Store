@@ -3,10 +3,16 @@ import { PRODUCT_DEFAULTS } from "@/lib/utils";
 import type { SpecialCutOption } from "@/lib/utils";
 
 const SPECIAL_CUTS_FALLBACK: SpecialCutOption[] = [
-  { id: "leg", label: "Leg cut", imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=80", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-  { id: "shoulder", label: "Shoulder cut", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-  { id: "rack", label: "Rack / ribs", imageUrl: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
-  { id: "whole", label: "Whole (no cut)", imageUrl: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80" },
+  { id: "arabic_8", label: "تقطيع عربى 8 قطع", imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=80" },
+  { id: "arabic_4", label: "تقطيع عربى 4 قطع", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80" },
+  { id: "arabic_half_length", label: "تقطيع عربى نص طول", imageUrl: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80" },
+  { id: "fridge_medium", label: "تقطيع ثلاجه (قطع متوسطة)", imageUrl: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80" },
+  { id: "full_ghozy", label: "غوزي كامل", imageUrl: "https://images.unsplash.com/photo-1615937691194-96f16275d74c?w=400&q=80" },
+  { id: "salona_small", label: "تقطيع صالونه(قطع صغيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80" },
+  { id: "biryani_large", label: "تقطيع برياني(قطع كبيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80" },
+  { id: "hadrami_joints", label: "حضرمي مفاصل", imageUrl: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80" },
+  { id: "awlaqi_joints", label: "عولقي مفاصل", imageUrl: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80" },
+  { id: "maftah", label: "مفطح", imageUrl: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&q=80" },
 ];
 
 export type ProductConfig = {
@@ -110,7 +116,7 @@ export async function getProductWeights(productType: string): Promise<ProductWei
   }
 }
 
-/** Get all special cuts from DB, or fallback to static. Resolves image per locale. */
+/** Get all special cuts from DB, or fallback to static. Single image per cut. */
 export async function getSpecialCuts(locale?: string, occasion?: string): Promise<SpecialCutOption[]> {
   try {
     const rows = await prisma.specialCut.findMany({ orderBy: { sortOrder: "asc" } });
@@ -118,7 +124,7 @@ export async function getSpecialCuts(locale?: string, occasion?: string): Promis
     return rows.map((r) => ({
       id: r.cutId,
       label: r.label,
-      imageUrl: resolveImageUrl(r.imageUrl, r.imageUrlByLocale, locale ?? "en", occasion),
+      imageUrl: r.imageUrl,
       videoUrl: r.videoUrl ?? undefined,
     }));
   } catch (err) {

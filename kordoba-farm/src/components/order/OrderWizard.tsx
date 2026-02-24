@@ -128,6 +128,16 @@ export function OrderWizard({
   const config = product ? productConfigs[product] : null;
   const weightOptions = product ? (weightOptionsByProduct[product] ?? []) : [];
 
+  // Ensure half portions are only used for personal orders.
+  // For aqiqah and qurban, force "whole" and hide half option.
+  useEffect(() => {
+    if (state.occasion === "aqiqah" || state.occasion === "qurban") {
+      if (state.portion === "half") {
+        setState((s) => ({ ...s, portion: "whole" }));
+      }
+    }
+  }, [state.occasion, state.portion]);
+
   useEffect(() => {
     if (editItemId) {
       const item = getItemById(editItemId);
@@ -265,7 +275,10 @@ export function OrderWizard({
                 <li key={key}>
                   <button
                     type="button"
-                    onClick={() => set({ occasion: key })}
+                  onClick={() => {
+                    set({ occasion: key });
+                    setStep(2);
+                  }}
                     className={cn(
                       "w-full rounded-2xl border-2 px-5 py-4 text-start transition-all",
                       isSelected
@@ -338,7 +351,9 @@ export function OrderWizard({
       {step === 3 && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {PORTIONS.map((p) => {
+            {(
+              state.occasion === "personal" ? PORTIONS : (["whole"] as const)
+            ).map((p) => {
               const productType = `${p}_${state.animal}` as const;
               const cfg = productConfigs[productType];
               const isSelected = state.portion === p;

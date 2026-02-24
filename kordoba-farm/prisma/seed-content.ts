@@ -32,10 +32,16 @@ const PRODUCTS = [
 ];
 
 const SPECIAL_CUTS = [
-  { cutId: "leg", label: "Leg cut", imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=80", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sortOrder: 0 },
-  { cutId: "shoulder", label: "Shoulder cut", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sortOrder: 1 },
-  { cutId: "rack", label: "Rack / ribs", imageUrl: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", sortOrder: 2 },
-  { cutId: "whole", label: "Whole (no cut)", imageUrl: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80", videoUrl: null, sortOrder: 3 },
+  { cutId: "arabic_8", label: "تقطيع عربى 8 قطع", imageUrl: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=80", videoUrl: null, sortOrder: 0 },
+  { cutId: "arabic_4", label: "تقطيع عربى 4 قطع", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80", videoUrl: null, sortOrder: 1 },
+  { cutId: "arabic_half_length", label: "تقطيع عربى نص طول", imageUrl: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80", videoUrl: null, sortOrder: 2 },
+  { cutId: "fridge_medium", label: "تقطيع ثلاجه (قطع متوسطة)", imageUrl: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80", videoUrl: null, sortOrder: 3 },
+  { cutId: "full_ghozy", label: "غوزي كامل", imageUrl: "https://images.unsplash.com/photo-1615937691194-96f16275d74c?w=400&q=80", videoUrl: null, sortOrder: 4 },
+  { cutId: "salona_small", label: "تقطيع صالونه(قطع صغيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80", videoUrl: null, sortOrder: 5 },
+  { cutId: "biryani_large", label: "تقطيع برياني(قطع كبيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80", videoUrl: null, sortOrder: 6 },
+  { cutId: "hadrami_joints", label: "حضرمي مفاصل", imageUrl: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80", videoUrl: null, sortOrder: 7 },
+  { cutId: "awlaqi_joints", label: "عولقي مفاصل", imageUrl: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80", videoUrl: null, sortOrder: 8 },
+  { cutId: "maftah", label: "مفطح", imageUrl: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&q=80", videoUrl: null, sortOrder: 9 },
 ];
 
 const CITIES = [
@@ -66,16 +72,26 @@ async function main() {
     await prisma.product.upsert({
       where: { productType: p.productType },
       create: p,
-      update: { label: p.label, minPrice: p.minPrice, maxPrice: p.maxPrice, imageUrl: p.imageUrl, sortOrder: p.sortOrder },
+      // Do NOT override imageUrl on existing products; keep admin-updated images.
+      update: { label: p.label, minPrice: p.minPrice, maxPrice: p.maxPrice, sortOrder: p.sortOrder },
     });
   }
   console.log(`Seeded ${PRODUCTS.length} products`);
+
+  await prisma.specialCut.deleteMany({
+    where: {
+      cutId: {
+        notIn: SPECIAL_CUTS.map((c) => c.cutId),
+      },
+    },
+  });
 
   for (const c of SPECIAL_CUTS) {
     await prisma.specialCut.upsert({
       where: { cutId: c.cutId },
       create: { cutId: c.cutId, label: c.label, imageUrl: c.imageUrl, videoUrl: c.videoUrl, sortOrder: c.sortOrder },
-      update: { label: c.label, imageUrl: c.imageUrl, videoUrl: c.videoUrl, sortOrder: c.sortOrder },
+      // Do NOT override imageUrl/videoUrl on existing cuts; keep admin-updated media.
+      update: { label: c.label, sortOrder: c.sortOrder },
     });
   }
   console.log(`Seeded ${SPECIAL_CUTS.length} special cuts`);

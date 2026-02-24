@@ -4,19 +4,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Pencil, Loader2 } from "lucide-react";
 
-const LOCALES = [
-  { code: "en", label: "EN" },
-  { code: "ar", label: "AR" },
-  { code: "ms", label: "MS" },
-  { code: "zh", label: "中文" },
-] as const;
-
-const OCCASIONS = [
-  { key: "aqiqah", label: "Aqiqah" },
-  { key: "qurban", label: "Qurban" },
-  { key: "personal", label: "Personal" },
-] as const;
-
 type SpecialCut = {
   id: string;
   cutId: string;
@@ -27,7 +14,7 @@ type SpecialCut = {
   sortOrder: number;
 };
 
-type SpecialCutForm = Omit<Partial<SpecialCut>, "imageUrlByLocale"> & { imageUrlByLocale?: Record<string, string> };
+type SpecialCutForm = Partial<Omit<SpecialCut, "id" | "cutId" | "imageUrlByLocale">>;
 
 export function AdminSpecialCutsClient() {
   const [cuts, setCuts] = useState<SpecialCut[]>([]);
@@ -35,16 +22,6 @@ export function AdminSpecialCutsClient() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<SpecialCutForm>({});
-
-  function parseImageUrlByLocale(raw: string | null | undefined): Record<string, string> {
-    if (!raw || typeof raw !== "string") return {};
-    try {
-      const o = JSON.parse(raw) as Record<string, string>;
-      return o && typeof o === "object" ? o : {};
-    } catch {
-      return {};
-    }
-  }
 
   useEffect(() => {
     fetch("/api/admin/content/special-cuts")
@@ -61,7 +38,6 @@ export function AdminSpecialCutsClient() {
     setForm({
       label: c.label,
       imageUrl: c.imageUrl,
-      imageUrlByLocale: parseImageUrlByLocale(c.imageUrlByLocale),
       videoUrl: c.videoUrl ?? "",
       sortOrder: c.sortOrder,
     });
@@ -70,8 +46,10 @@ export function AdminSpecialCutsClient() {
   async function save() {
     if (!editing) return;
     setSaving(true);
-    const data: Record<string, unknown> = { ...form, videoUrl: (form.videoUrl as string)?.trim() || null };
-    if (data.imageUrlByLocale && Object.keys(data.imageUrlByLocale as Record<string, string>).length === 0) delete data.imageUrlByLocale;
+    const data: Record<string, unknown> = {
+      ...form,
+      videoUrl: (form.videoUrl as string)?.trim() || null,
+    };
     const res = await fetch("/api/admin/content/special-cuts", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -125,55 +103,7 @@ export function AdminSpecialCutsClient() {
                     <td className="p-4">
                       <div className="space-y-3">
                         <p className="text-xs text-[#94a3b8]">
-                          Images per occasion & language (URL). Leave empty to use global image below.
-                        </p>
-                        <div className="space-y-3">
-                          {OCCASIONS.map(({ key: occKey, label: occLabel }) => (
-                            <div key={occKey} className="space-y-1">
-                              <p className="text-xs font-medium text-[#e2e8f0]">{occLabel}</p>
-                              <div className="flex flex-wrap gap-3">
-                                {LOCALES.map(({ code, label }) => {
-                                  const mapKey = `${occKey}:${code}`;
-                                  const url = form.imageUrlByLocale?.[mapKey] ?? "";
-                                  return (
-                                    <div key={mapKey} className="flex flex-col items-start gap-1">
-                                      <span className="text-[11px] text-[#64748b]">{label}</span>
-                                      <input
-                                        className={inputClass}
-                                        value={url}
-                                        onChange={(e) =>
-                                          setForm((f) => ({
-                                            ...f,
-                                            imageUrlByLocale: {
-                                              ...(f.imageUrlByLocale ?? {}),
-                                              [mapKey]: e.target.value,
-                                            },
-                                          }))
-                                        }
-                                        placeholder="https://... or /uploads/..."
-                                      />
-                                      {url && (
-                                        <Image
-                                          src={url}
-                                          alt=""
-                                          width={64}
-                                          height={64}
-                                          unoptimized
-                                          className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]"
-                                          onError={(e) => {
-                                            (e.target as HTMLImageElement).style.display = "none";
-                                          }}
-                                        />
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="text-xs text-[#64748b]">
-                          Global image URL (fallback for all occasions & languages):
+                          Image URL (one per cut)
                         </p>
                         <input
                           className={inputClass}
@@ -181,6 +111,19 @@ export function AdminSpecialCutsClient() {
                           onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
                           placeholder="https://... or /uploads/..."
                         />
+                        {form.imageUrl && (
+                          <Image
+                            src={form.imageUrl}
+                            alt=""
+                            width={64}
+                            height={64}
+                            unoptimized
+                            className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        )}
                       </div>
                     </td>
                     <td className="p-4">
