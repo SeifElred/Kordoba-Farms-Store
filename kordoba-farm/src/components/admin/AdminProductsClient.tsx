@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import React from "react";
+import Image from "next/image";
 import { Pencil, Loader2, Upload } from "lucide-react";
 
 const LOCALES = [
@@ -22,6 +23,8 @@ type Product = {
   sortOrder: number;
 };
 
+type ProductForm = Omit<Partial<Product>, "imageUrlByLocale"> & { imageUrlByLocale?: Record<string, string> };
+
 type GlobalWeightOption = { id: string; label: string; price: number; sortOrder: number };
 
 export function AdminProductsClient() {
@@ -29,7 +32,7 @@ export function AdminProductsClient() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<Partial<Product> & { imageUrlByLocale?: Record<string, string> }>({});
+  const [form, setForm] = useState<ProductForm>({});
   const [globalWeightOptions, setGlobalWeightOptions] = useState<GlobalWeightOption[]>([]);
   const [enabledWeightIds, setEnabledWeightIds] = useState<string[]>([]);
   const [savingWeights, setSavingWeights] = useState(false);
@@ -222,7 +225,7 @@ export function AdminProductsClient() {
                                 />
                                 {url ? (
                                   <div className="relative">
-                                    <img src={url} alt="" className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                                    <Image src={url} alt="" width={64} height={64} unoptimized className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                                     <button
                                       type="button"
                                       onClick={() => setForm((f) => ({ ...f, imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), [code]: "" } }))}
@@ -287,9 +290,12 @@ export function AdminProductsClient() {
                     <td className="p-4 text-white">{p.minPrice} / {p.maxPrice}</td>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <img
+                        <Image
                           src={p.imageUrl}
                           alt=""
+                          width={56}
+                          height={56}
+                          unoptimized
                           className="h-14 w-14 rounded-lg border border-[#334155] object-cover bg-[#0f172a] shrink-0"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />

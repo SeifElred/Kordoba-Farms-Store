@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Loader2, Plus, Trash2 } from "lucide-react";
+import { Pencil, Loader2, Trash2 } from "lucide-react";
 
 type WeightOption = {
   id: string;

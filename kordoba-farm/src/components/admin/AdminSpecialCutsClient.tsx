@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { Pencil, Loader2, Upload } from "lucide-react";
 
 const LOCALES = [
@@ -20,12 +21,14 @@ type SpecialCut = {
   sortOrder: number;
 };
 
+type SpecialCutForm = Omit<Partial<SpecialCut>, "imageUrlByLocale"> & { imageUrlByLocale?: Record<string, string> };
+
 export function AdminSpecialCutsClient() {
   const [cuts, setCuts] = useState<SpecialCut[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<Partial<SpecialCut> & { imageUrlByLocale?: Record<string, string> }>({});
+  const [form, setForm] = useState<SpecialCutForm>({});
   const [uploadingLocale, setUploadingLocale] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -154,7 +157,7 @@ export function AdminSpecialCutsClient() {
                                 />
                                 {url ? (
                                   <div className="relative">
-                                    <img src={url} alt="" className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                                    <Image src={url} alt="" width={64} height={64} unoptimized className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                                     <button type="button" onClick={() => setForm((f) => ({ ...f, imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), [code]: "" } }))} className="absolute -top-1 -right-1 rounded-full bg-[#334155] p-0.5 text-[#94a3b8] hover:bg-red-600 hover:text-white text-xs" aria-label="Remove">×</button>
                                   </div>
                                 ) : (
@@ -190,9 +193,12 @@ export function AdminSpecialCutsClient() {
                     <td className="p-4 text-white">{c.label}</td>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <img
+                        <Image
                           src={c.imageUrl}
                           alt=""
+                          width={56}
+                          height={56}
+                          unoptimized
                           className="h-14 w-14 rounded-lg border border-[#334155] object-cover bg-[#0f172a] shrink-0"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />
