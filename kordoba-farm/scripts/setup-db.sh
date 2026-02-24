@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Run this once: install MySQL/MariaDB if needed, start it, then create the Kordoba Farm database.
-# You may need to enter your sudo password.
+# Legacy local MySQL/MariaDB setup script.
+# If you are using Supabase PostgreSQL (recommended for production and Vercel),
+# you do NOT need this script. Instead, set DATABASE_URL to your Supabase
+# Postgres connection string and run:
+#   DATABASE_URL=\"postgresql://...\" npx prisma db push
+#   npx prisma db seed   # if you use seed
+# You may need to enter your sudo password if you still use this for local MySQL.
 
 set -e
 echo "=== Kordoba Farm – MySQL setup ==="

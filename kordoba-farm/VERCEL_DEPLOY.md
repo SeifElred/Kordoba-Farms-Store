@@ -5,26 +5,25 @@
 - **Git**: Push your project to GitHub, GitLab, or Bitbucket.
 - **Vercel account**: [vercel.com](https://vercel.com) (sign up with Git).
 
-## 2. Database (MySQL)
+## 2. Database (PostgreSQL / Supabase)
 
-Vercel does not host MySQL. Use a cloud MySQL provider that allows connections from serverless (e.g. from Vercel’s IPs or with a public hostname):
+Vercel does not host databases. The recommended setup for this project is **PostgreSQL on Supabase**:
 
-- [PlanetScale](https://planetscale.com) (MySQL-compatible, serverless-friendly)
-- [Neon](https://neon.tech) (PostgreSQL; would require switching Prisma to `postgresql` and adjusting schema)
-- [Aiven](https://aiven.io), [Railway](https://railway.app), or any MySQL host with **public connectivity** and **SSL** if required
+- Create a project on [Supabase](https://supabase.com) (it provisions a Postgres database for you).
+- In Supabase → **Project Settings → Database**, copy the **connection string** for `psql` or `Prisma`.
 
-Create a database and get a connection string, e.g.:
+Example connection string:
 
 ```txt
-mysql://USER:PASSWORD@HOST:3306/DATABASE?sslaccept=strict
+postgresql://USER:PASSWORD@db.xxxxx.supabase.co:5432/postgres?sslmode=require
 ```
 
-Use this as `DATABASE_URL` in Vercel (see step 5).
+Use this as `DATABASE_URL` in Vercel (see step 5) and in your local `.env`.
 
-After first deploy, run migrations from your machine (or a one-off script) with the same `DATABASE_URL`:
+After first deploy (or before), run Prisma migrations/DDL from your machine with the same `DATABASE_URL`:
 
 ```bash
-DATABASE_URL="mysql://..." npx prisma db push
+DATABASE_URL="postgresql://..." npx prisma db push
 npx prisma db seed   # if you use seed
 ```
 
@@ -50,7 +49,7 @@ In the Vercel project: **Settings → Environment Variables**. Add:
 
 | Variable | Required | Notes |
 |----------|----------|--------|
-| `DATABASE_URL` | Yes | MySQL connection string (see step 2). |
+| `DATABASE_URL` | Yes | PostgreSQL/Supabase connection string (see step 2). |
 | `ADMIN_PASSWORD` | Yes | Admin login password. |
 | `ADMIN_SESSION_SECRET` | Yes | Long random string (e.g. 32+ chars) for session signing. |
 | `NEXT_PUBLIC_APP_URL` | Yes | Full app URL, e.g. `https://your-app.vercel.app` (no trailing slash). |
@@ -84,7 +83,7 @@ Use **Production**, and optionally **Preview**, as needed. Redeploy after changi
 **Summary checklist**
 
 - [ ] Repo pushed to GitHub/GitLab/Bitbucket  
-- [ ] MySQL database created and `DATABASE_URL` set on Vercel  
+- [ ] PostgreSQL (Supabase) database created and `DATABASE_URL` set on Vercel  
 - [ ] `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` set  
 - [ ] `NEXT_PUBLIC_APP_URL` set to your Vercel (or custom) URL  
 - [ ] Stripe keys and `STRIPE_WEBHOOK_SECRET` set if using checkout  
