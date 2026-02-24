@@ -34,7 +34,7 @@ export function PurposeGrid() {
           return (
             <li key={item.key} className={staggerClass}>
               <Link
-                href={`/${locale}/order?occasion=${item.slug}`}
+                href={`/${locale}/order?occasion=${item.slug}&step=2`}
                 className={`group flex min-h-[80px] items-center gap-4 rounded-2xl border-2 px-5 py-4 shadow-sm transition-all hover:shadow-md active:scale-[0.99] sm:min-h-[88px] sm:gap-5 sm:px-6 sm:py-5 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 ${styles}`}
               >
                 <span className="icon-wrap flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors sm:h-14 sm:w-14">

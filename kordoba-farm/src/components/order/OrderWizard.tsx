@@ -295,15 +295,6 @@ export function OrderWizard({
               );
             })}
           </ul>
-          <button
-            type="button"
-            disabled={!state.occasion}
-            onClick={() => setStep(2)}
-            className="btn-primary flex w-full items-center justify-center gap-2"
-          >
-            {tCommon("next")}
-            <ChevronRight className="h-5 w-5 rtl:rotate-180" />
-          </button>
         </div>
       )}
 
