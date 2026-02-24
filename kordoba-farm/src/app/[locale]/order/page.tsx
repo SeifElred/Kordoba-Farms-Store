@@ -4,6 +4,11 @@ import { OrderWizard } from "@/components/order/OrderWizard";
 
 const PRODUCT_TYPES = ["half_sheep", "half_goat", "whole_sheep", "whole_goat"] as const;
 
+const DEFAULT_SHEEP_IMAGE =
+  "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800&q=80";
+const DEFAULT_GOAT_IMAGE =
+  "https://images.unsplash.com/photo-1578645510387-c3e02018f305?w=800&q=80";
+
 export default async function OrderPage({
   params,
   searchParams,
@@ -15,9 +20,11 @@ export default async function OrderPage({
   const { step, occasion, edit, product: productParam } = await searchParams;
   setRequestLocale(locale);
 
-  const [specialCuts, deliveryTransportNote, ...rest] = await Promise.all([
+  const [specialCuts, deliveryTransportNote, sheepImageSetting, goatImageSetting, ...rest] = await Promise.all([
     getSpecialCuts(),
     getSiteSetting("delivery_transport_note"),
+    getSiteSetting("animal_image_sheep"),
+    getSiteSetting("animal_image_goat"),
     ...PRODUCT_TYPES.map((pt) => getProductConfig(pt, locale, occasion)),
     ...PRODUCT_TYPES.map((pt) => getProductWeights(pt)),
   ]);
@@ -49,6 +56,10 @@ export default async function OrderPage({
         specialCuts={specialCuts}
         productConfigs={productConfigs}
         weightOptionsByProduct={weightOptionsByProduct}
+        animalImages={{
+          sheep: (sheepImageSetting ?? "").trim() || DEFAULT_SHEEP_IMAGE,
+          goat: (goatImageSetting ?? "").trim() || DEFAULT_GOAT_IMAGE,
+        }}
         deliveryTransportNote={deliveryTransportNote ?? undefined}
         breadcrumbItems={breadcrumbItems}
       />

@@ -5,13 +5,22 @@ import { Loader2 } from "lucide-react";
 import { ORDER_TEMPLATE_PRESETS } from "@/lib/order-template-presets";
 import type { OrderTemplatePresetId } from "@/lib/order-template-presets";
 
-const KNOWN_KEYS = ["cities", "whatsapp_link", "delivery_transport_note", "order_message_template"] as const;
+const KNOWN_KEYS = [
+  "cities",
+  "whatsapp_link",
+  "delivery_transport_note",
+  "order_message_template",
+  "animal_image_sheep",
+  "animal_image_goat",
+] as const;
 
 const KEY_LABELS: Record<string, string> = {
   whatsapp_link: "WhatsApp link (used for “Complete order via WhatsApp” on cart)",
   delivery_transport_note: "Delivery note (e.g. “We use Lalamove for delivery” — shown in order step 5)",
   order_message_template: "Order message template (placeholders filled when customer completes via WhatsApp)",
   cities: "Cities (JSON array, optional — for city selector if used)",
+  animal_image_sheep: "Sheep image URL (Step 2 – animal choice)",
+  animal_image_goat: "Goat image URL (Step 2 – animal choice)",
 };
 
 const ORDER_MESSAGE_PLACEHOLDERS = "{{name}}, {{phone}}, {{address}}, {{email}}, {{productLabel}}, {{minPrice}}, {{maxPrice}}, {{priceRange}}, {{slaughterDate}}, {{distributionType}}, {{purpose}}, {{weightLine}}, {{weightSelection}}, {{specialCut}}, {{orderIncludes}}, {{videoProof}}, {{note}}";
@@ -128,7 +137,9 @@ export function AdminSettingsClient() {
                       ? "https://wa.me/..."
                       : key === "delivery_transport_note"
                         ? "We use LalaMove for transportation."
-                        : "Value"
+                        : key === "animal_image_sheep" || key === "animal_image_goat"
+                          ? "https://... (image URL for animal card)"
+                          : "Value"
                   }
                 />
               )}

@@ -87,6 +87,7 @@ export function OrderWizard({
   productConfigs,
   weightOptionsByProduct,
   deliveryTransportNote,
+  animalImages,
   breadcrumbItems = [],
 }: {
   locale: string;
@@ -97,6 +98,7 @@ export function OrderWizard({
   specialCuts: SpecialCutOption[];
   productConfigs: ProductConfigMap;
   weightOptionsByProduct: WeightOptionsMap;
+  animalImages: Record<"sheep" | "goat", string>;
   deliveryTransportNote?: string | null;
   breadcrumbItems?: BreadcrumbItem[];
 }) {
@@ -310,8 +312,6 @@ export function OrderWizard({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             {ANIMALS.map((a) => {
-              const productType = `half_${a}` as const;
-              const cfg = productConfigs[productType];
               const isSelected = state.animal === a;
               return (
                 <button
@@ -323,11 +323,9 @@ export function OrderWizard({
                     isSelected ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20" : "border-[var(--border)] hover:border-[var(--primary)]/40"
                   )}
                 >
-                  {cfg?.imageUrl && (
-                    <div className="relative aspect-[4/3] bg-[var(--muted)]">
-                      <Image src={cfg.imageUrl} alt={tWizard(a)} fill className="object-cover" sizes="50vw" />
-                    </div>
-                  )}
+                  <div className="relative aspect-[4/3] bg-[var(--muted)]">
+                    <Image src={animalImages[a]} alt={tWizard(a)} fill className="object-cover" sizes="50vw" />
+                  </div>
                   <div className="p-4">
                     <span className="text-lg font-semibold text-[var(--foreground)]">{tWizard(a)}</span>
                   </div>

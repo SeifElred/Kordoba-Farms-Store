@@ -112,6 +112,24 @@ async function main() {
     update: {},
   });
 
+  // Default images for the animal-choice step (can be overridden in admin Settings)
+  await prisma.siteSetting.upsert({
+    where: { key: "animal_image_sheep" },
+    create: {
+      key: "animal_image_sheep",
+      value: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800&q=80",
+    },
+    update: {},
+  });
+  await prisma.siteSetting.upsert({
+    where: { key: "animal_image_goat" },
+    create: {
+      key: "animal_image_goat",
+      value: "https://images.unsplash.com/photo-1578645510387-c3e02018f305?w=800&q=80",
+    },
+    update: {},
+  });
+
   const DEFAULT_ORDER_MESSAGE_TEMPLATE = `*New order – Kordoba Farm*
 
 *Customer*
