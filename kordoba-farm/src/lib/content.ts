@@ -117,9 +117,7 @@ export async function getProductWeights(productType: string): Promise<ProductWei
 }
 
 /** Get all special cuts from DB, or fallback to static. Single image per cut. */
-// Note: locale/occasion are accepted for future use (e.g. per-locale labels),
-// so we prefix with _ to avoid unused-var lint errors.
-export async function getSpecialCuts(_locale?: string, _occasion?: string): Promise<SpecialCutOption[]> {
+export async function getSpecialCuts(): Promise<SpecialCutOption[]> {
   try {
     const rows = await prisma.specialCut.findMany({ orderBy: { sortOrder: "asc" } });
     if (rows.length === 0) return SPECIAL_CUTS_FALLBACK;

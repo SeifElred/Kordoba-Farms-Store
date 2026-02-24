@@ -16,7 +16,7 @@ export default async function OrderPage({
   setRequestLocale(locale);
 
   const [specialCuts, deliveryTransportNote, ...rest] = await Promise.all([
-    getSpecialCuts(locale, occasion),
+    getSpecialCuts(),
     getSiteSetting("delivery_transport_note"),
     ...PRODUCT_TYPES.map((pt) => getProductConfig(pt, locale, occasion)),
     ...PRODUCT_TYPES.map((pt) => getProductWeights(pt)),
