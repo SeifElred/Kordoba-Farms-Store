@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Pencil, Loader2, Upload } from "lucide-react";
+import { Pencil, Loader2 } from "lucide-react";
 
 const LOCALES = [
   { code: "en", label: "EN" },
@@ -29,8 +29,6 @@ export function AdminSpecialCutsClient() {
   const [editing, setEditing] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<SpecialCutForm>({});
-  const [uploadingLocale, setUploadingLocale] = useState<string | null>(null);
-  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   function parseImageUrlByLocale(raw: string | null | undefined): Record<string, string> {
     if (!raw || typeof raw !== "string") return {};
@@ -61,23 +59,6 @@ export function AdminSpecialCutsClient() {
       videoUrl: c.videoUrl ?? "",
       sortOrder: c.sortOrder,
     });
-  }
-
-  async function handleImageUpload(locale: string, file: File) {
-    setUploadingLocale(locale);
-    const fd = new FormData();
-    fd.set("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    setUploadingLocale(null);
-    if (!res.ok) {
-      const d = await res.json().catch(() => ({}));
-      alert(d.error || "Upload failed");
-      return;
-    }
-    const { url } = await res.json();
-    if (url) {
-      setForm((f) => ({ ...f, imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), [locale]: url } }));
-    }
   }
 
   async function save() {
@@ -137,7 +118,9 @@ export function AdminSpecialCutsClient() {
                     </td>
                     <td className="p-4">
                       <div className="space-y-2">
-                        <p className="text-xs text-[#94a3b8]">Images per language (upload)</p>
+                        <p className="text-xs text-[#94a3b8]">
+                          Images per language (URL; leave empty to use global image below)
+                        </p>
                         <div className="flex flex-wrap gap-3">
                           {LOCALES.map(({ code, label }) => {
                             const url = form.imageUrlByLocale?.[code] ?? "";
@@ -145,32 +128,43 @@ export function AdminSpecialCutsClient() {
                               <div key={code} className="flex flex-col items-start gap-1">
                                 <span className="text-xs text-[#64748b]">{label}</span>
                                 <input
-                                  ref={(el) => { fileInputRefs.current[code] = el; }}
-                                  type="file"
-                                  accept="image/jpeg,image/png,image/webp,image/gif"
-                                  className="hidden"
-                                  onChange={(e) => {
-                                    const f = e.target.files?.[0];
-                                    if (f) handleImageUpload(code, f);
-                                    e.target.value = "";
-                                  }}
+                                  className={inputClass}
+                                  value={url}
+                                  onChange={(e) =>
+                                    setForm((f) => ({
+                                      ...f,
+                                      imageUrlByLocale: {
+                                        ...(f.imageUrlByLocale ?? {}),
+                                        [code]: e.target.value,
+                                      },
+                                    }))
+                                  }
+                                  placeholder="https://... or /uploads/..."
                                 />
-                                {url ? (
-                                  <div className="relative">
-                                    <Image src={url} alt="" width={64} height={64} unoptimized className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                                    <button type="button" onClick={() => setForm((f) => ({ ...f, imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), [code]: "" } }))} className="absolute -top-1 -right-1 rounded-full bg-[#334155] p-0.5 text-[#94a3b8] hover:bg-red-600 hover:text-white text-xs" aria-label="Remove">×</button>
-                                  </div>
-                                ) : (
-                                  <button type="button" disabled={uploadingLocale !== null} onClick={() => fileInputRefs.current[code]?.click()} className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-[#334155] bg-[#0f172a] text-[#64748b] hover:border-[#c8a951] hover:text-[#c8a951] disabled:opacity-50">
-                                    {uploadingLocale === code ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
-                                  </button>
+                                {url && (
+                                  <Image
+                                    src={url}
+                                    alt=""
+                                    width={64}
+                                    height={64}
+                                    unoptimized
+                                    className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = "none";
+                                    }}
+                                  />
                                 )}
                               </div>
                             );
                           })}
                         </div>
-                        <p className="text-xs text-[#64748b]">Fallback image:</p>
-                        <input className={inputClass} value={form.imageUrl ?? ""} onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))} placeholder="/uploads/... or URL" />
+                        <p className="text-xs text-[#64748b]">Global image URL (fallback for all languages):</p>
+                        <input
+                          className={inputClass}
+                          value={form.imageUrl ?? ""}
+                          onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
+                          placeholder="https://... or /uploads/..."
+                        />
                       </div>
                     </td>
                     <td className="p-4">
