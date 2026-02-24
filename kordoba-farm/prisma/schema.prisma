@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Animal {
+  id            String   @id @default(uuid())
+  tagNumber     String   @unique
+  productType   String   // half_goat, half_sheep, whole_goat, whole_sheep
+  breed         String
+  weight        Float
+  gender        String
+  age           Int
+  pricePerKg    Float
+  status        String   // available, reserved, sold
+  imageUrl      String
+  videoUrl      String?
+  readyDate     DateTime
+  healthCertUrl String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  orders        Order[]
+}
+
+model Order {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  animalId         String
+  purpose          String   // qurban, aqiqah, personal
+  city             String?
+  slaughterDate    DateTime
+  distributionType String
+  totalPrice       Float
+  paymentStatus    String   // pending, paid, failed, refunded
+  orderStatus      String   // reserved, scheduled, slaughtered, processing, completed
+  certificateUrl   String?
+  videoProofUrl    String?
+  nameTag          String?
+  videoProofOpt    Boolean  @default(false)
+  weightSelection  String?  // e.g. "as_is", "range"
+  specialCut       String?
+  includeHead      Boolean  @default(false)
+  includeStomach  Boolean  @default(false)
+  includeIntestines Boolean @default(false)
+  note             String?
+  stripePaymentId  String?
+  createdAt        DateTime @default(now())
+  animal           Animal   @relation(fields: [animalId], references: [id])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String
+  language  String   @default("en")
+  country   String
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+// Admin-editable: product types (½ Sheep, etc.) with price range and image
+model Product {
+  id                String   @id @default(uuid())
+  productType       String   @unique  // half_sheep, half_goat, whole_sheep, whole_goat
+  label             String
+  minPrice          Float    // fallback when no weight options
+  maxPrice          Float
+  imageUrl          String   // fallback when no locale-specific image
+  imageUrlByLocale  String?  @db.Text // JSON: { "en": "/uploads/...", "ar": "/uploads/..." }
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Global weight definitions (label + price). Add here, then enable/disable per product.
+model WeightOption {
+  id          String         @id @default(uuid())
+  label       String         // e.g. "12 kg", "14 kg"
+  price       Float
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  products   ProductWeight[]
+}
+
+// Which weight options are enabled for each product type (many-to-many)
+model ProductWeight {
+  id             String       @id @default(uuid())
+  productType    String       // half_sheep, half_goat, whole_sheep, whole_goat
+  weightOptionId String
+  sortOrder      Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  weightOption   WeightOption @relation(fields: [weightOptionId], references: [id], onDelete: Cascade)
+  @@unique([productType, weightOptionId])
+  @@index([productType])
+}
+
+// Admin-editable: special cut options with image and optional video URL
+model SpecialCut {
+  id                String   @id @default(uuid())
+  cutId             String   @unique  // leg, shoulder, rack, whole
+  label             String
+  imageUrl          String   // fallback when no locale-specific image
+  imageUrlByLocale  String?  @db.Text // JSON: { "en": "/uploads/...", "ar": "/uploads/..." }
+  videoUrl          String?
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Admin-editable: translations (locale, dot-notation key, value)
+model Translation {
+  id        String   @id @default(uuid())
+  locale    String   // en, ar, ms, zh
+  key       String   // e.g. welcomePopup.chooseLanguage
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([locale, key])
+  @@index([locale])
+}
+
+// Admin-editable: site settings (cities JSON, WhatsApp link, etc.)
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique  // cities, whatsapp_link, brand, etc.
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}

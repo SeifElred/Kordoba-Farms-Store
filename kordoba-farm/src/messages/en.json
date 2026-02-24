@@ -1,0 +1,203 @@
+{
+  "brand": "Kordoba Farms",
+  "welcomePopup": {
+    "chooseLanguage": "Choose your language",
+    "chooseLanguageSubtitle": "We'll show the site in your language."
+  },
+  "cityPopup": {
+    "title": "Welcome to Kordoba Farms",
+    "subtitle": "Select your city to see the best experience.",
+    "label": "Your city",
+    "placeholder": "Select city",
+    "continue": "Continue"
+  },
+  "occasion": {
+    "title": "How would you like to celebrate?",
+    "subtitle": "Qurban, Aqiqah, or family — premium halal delivered with care."
+  },
+  "productSelect": {
+    "title": "Select your product",
+    "subtitle": "Half or whole — sheep or goat"
+  },
+  "orderDetails": {
+    "title": "Order details",
+    "invalidProduct": "Invalid product. Please go back and choose a product.",
+    "delivery": "Delivery",
+    "pickup": "Pickup",
+    "donate": "Donate",
+    "notesPlaceholder": "Any special requests...",
+    "weightAsIs": "As is (standard weight)",
+    "weightRange": "Weight range (contact us)",
+    "chooseWeight": "Choose weight",
+    "chooseCut": "Choose your cut",
+    "chooseCutSubtitle": "Select one option. Tap the play icon to watch how it's done.",
+    "watchVideo": "Watch video",
+    "yourProduct": "Your product",
+    "selectDate": "Select date",
+    "deliveryOptions": "Delivery & date",
+    "orderExtras": "Order extras",
+    "notes": "Notes",
+    "completeRequiredToProceed": "Please select slaughter date, a special cut, and weight option to continue."
+  },
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "cart": "Cart",
+    "cartAriaLabel": "1 item in cart",
+    "checkout": "Checkout",
+    "liveFarm": "Live Farm",
+    "corporate": "Corporate",
+    "dashboard": "My Orders",
+    "language": "Language"
+  },
+  "cart": {
+    "title": "Your cart",
+    "subtitle": "Review, edit, or add more items — then complete your order via WhatsApp.",
+    "empty": "Your cart is empty",
+    "emptyHint": "Start by choosing a purpose to add your first item.",
+    "invalidProduct": "Invalid product.",
+    "occasion": "Occasion",
+    "orderSummary": "Order summary",
+    "changeProduct": "Change product",
+    "continueToOrderDetails": "Continue to order details",
+    "addAnotherItem": "Add another item",
+    "goToCart": "Go to cart",
+    "completeOrder": "Complete order via WhatsApp",
+    "completeOrderHint": "We'll open WhatsApp with your order. Please reply with your name, phone and delivery address.",
+    "editItem": "Edit",
+    "removeItem": "Remove",
+    "itemAdded": "Item added to cart."
+  },
+  "orderWizard": {
+    "step1Title": "Choose your occasion",
+    "step2Title": "Sheep or goat?",
+    "step3Title": "Half or whole?",
+    "step4Title": "Choose your cut",
+    "step5Title": "Date & distribution",
+    "step6Title": "Extras",
+    "step7Title": "Notes",
+    "addToCart": "Add to cart",
+    "next": "Next",
+    "back": "Back",
+    "sheep": "Sheep",
+    "goat": "Goat",
+    "half": "Half",
+    "whole": "Whole"
+  },
+  "purpose": {
+    "title": "How would you like to celebrate?",
+    "subtitle": "Qurban, Aqiqah, or family — premium halal delivered with care.",
+    "qurban": "Kurban",
+    "qurbanDesc": "Eid sacrifice with full traceability",
+    "aqiqah": "Aqiqah",
+    "aqiqahDesc": "Celebrate your newborn with halal excellence",
+    "personal": "Personal",
+    "personalDesc": "Premium meat for your family"
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "q1": "How do I place an order?",
+    "a1": "Choose your occasion (Qurban, Aqiqah, or Personal), then pick sheep or goat, half or whole, and your preferred cut. Add to cart and complete your order via WhatsApp — we'll confirm and arrange delivery.",
+    "q2": "Is the meat halal?",
+    "a2": "Yes. All our animals are slaughtered according to Islamic requirements with full traceability. We can provide video proof of slaughter on request.",
+    "q3": "How is delivery handled?",
+    "a3": "We deliver to your address on the date you choose via Lalamove. Slaughter date and distribution (delivery, pickup, or donate) are set in the order flow.",
+    "q4": "What cuts are available?",
+    "a4": "You can choose from our special cuts (e.g. leg cut, shoulder cut) or whole (no cut). Options are shown in step 4 of the order. If you have a specific request (e.g. curry cut, stew cut), add it in the notes and we'll do our best to accommodate.",
+    "q5": "What do I need for an Aqiqah order?",
+    "a5": "Aqiqah is traditionally offered on the seventh day after birth, but we're flexible with timing. You choose sheep or goat, half or whole, and your preferred cut. We handle slaughter and preparation according to your wishes; you can add any special requests in the notes.",
+    "q6": "What do I need for a Qurban order?",
+    "a6": "Qurban is for Eid al-Adha. Place your order in advance; we arrange slaughter on the designated days. You choose distribution: delivery to your address (via Lalamove), pickup, or donate. We'll confirm dates and details via WhatsApp.",
+    "q7": "Where do your sheep and goats come from?",
+    "a7": "Our sheep and goats are sourced from trusted local farms. We work with selected suppliers who meet our standards for animal welfare and halal compliance, with full traceability from farm to you.",
+    "q8": "What is the 7-step order process?",
+    "a8": "Our 7-step flow ensures a clear experience: (1) Choose occasion — Qurban, Aqiqah, or Personal. (2) Sheep or goat. (3) Half or whole. (4) Choose your cut. (5) Slaughter date and distribution. (6) Extras (e.g. name tag, video proof). (7) Notes. You confirm each step, add to cart, then complete via WhatsApp.",
+    "q9": "What payment options do you accept?",
+    "a9": "We accept bank transfer only. After you send your order via WhatsApp we'll confirm and share our bank details. Payment is arranged with you before or around the time of your order."
+  },
+  "shop": {
+    "title": "Select Your Animal",
+    "filters": "Filters",
+    "breed": "Breed",
+    "weight": "Weight (kg)",
+    "gender": "Gender",
+    "price": "Price",
+    "readyDate": "Ready Date",
+    "availability": "Availability",
+    "male": "Male",
+    "female": "Female",
+    "selectAnimal": "Select This Animal",
+    "remaining": "remaining",
+    "lowStock": "Only {count} left"
+  },
+  "animal": {
+    "tag": "Tag",
+    "breed": "Breed",
+    "weight": "Weight",
+    "pricePerKg": "Per kg",
+    "totalPrice": "Total",
+    "healthCert": "Health Certified",
+    "slaughterDate": "Slaughter Date",
+    "distribution": "Distribution",
+    "nameTag": "Add Name Tag",
+    "videoProof": "Video Proof of Slaughter",
+    "addToOrder": "Proceed to Checkout",
+    "weightSelection": "Weight selection",
+    "weightAsIs": "As is ({weight} kg)",
+    "specialCut": "Special cut (optional)",
+    "orderIncludes": "Order includes",
+    "includeHead": "Head",
+    "includeStomach": "Stomach",
+    "includeIntestines": "Intestines",
+    "note": "Note (optional)",
+    "completeRequiredToProceed": "Please select slaughter date and weight option to continue."
+  },
+  "checkout": {
+    "title": "Checkout",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "addressPlaceholder": "Street, city, postcode, state",
+    "optional": "optional",
+    "orderSummaryNote": "Order details will be sent to WhatsApp",
+    "sendToWhatsApp": "Send order to WhatsApp",
+    "placeOrder": "Place Order",
+    "guestCheckout": "Enter your details — order will be sent to WhatsApp"
+  },
+  "dashboard": {
+    "title": "My Orders",
+    "orderStatus": "Order Status",
+    "reserved": "Reserved",
+    "scheduled": "Scheduled",
+    "slaughtered": "Slaughtered",
+    "processing": "Processing",
+    "completed": "Completed",
+    "downloadCert": "Download Certificate",
+    "downloadVideo": "Download Video Proof",
+    "reorder": "Reorder"
+  },
+  "footer": {
+    "company": "Kordoba Agrotech Sdn. Bhd.",
+    "allRights": "All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "back": "Back",
+    "next": "Next",
+    "buyNow": "Buy Now"
+  },
+  "admin": {
+    "currentTheme": "Current theme",
+    "activeTheme": "Active theme",
+    "applyPreset": "Apply preset",
+    "orderTemplatePresets": {
+      "professional": "Professional",
+      "friendly": "Friendly",
+      "ramadan": "Ramadan",
+      "eid": "Eid al-Adha",
+      "minimal": "Minimal"
+    }
+  }
+}

@@ -1,0 +1,385 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== Theme animations (respect reduced motion) ========== */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes heroShimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+  }
+  @keyframes goldShimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  @keyframes starTwinkle {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50% { opacity: 0.95; transform: scale(1.1); }
+  }
+  @keyframes crescentGlow {
+    0%, 100% { opacity: 0.7; filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.4)); }
+    50% { opacity: 1; filter: drop-shadow(0 0 16px rgba(201, 162, 39, 0.6)); }
+  }
+  @keyframes lanternFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-6px) rotate(1deg); }
+  }
+}
+
+:root {
+  --primary: #0f3d2e;
+  --primary-foreground: #ffffff;
+  --primary-hover: #0a2a1f;
+  --accent: #c8a951;
+  --accent-foreground: #0f3d2e;
+  --background: #f8f7f4;
+  --foreground: #1c1c1c;
+  --muted: #ebe9e4;
+  --muted-foreground: #5c5c5c;
+  --card: #ffffff;
+  --card-foreground: #1c1c1c;
+  --border: #e0ddd8;
+  --ring: #0f3d2e;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+[data-locale="ar"] {
+  --font-sans: "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  overflow: hidden;
+  min-height: 100%;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-[var(--radius)] bg-[var(--primary)] px-5 py-3.5 text-base font-semibold text-white transition-all duration-300 active:bg-[var(--primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-[var(--radius)] bg-[var(--accent)] px-5 py-3.5 text-base font-semibold text-[var(--accent-foreground)] transition-all duration-300 active:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-accent:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+    .btn-accent:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+  .input-base {
+    @apply flex min-h-[52px] w-full min-w-0 max-w-full rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-base text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  /* Date input – prevent overflow on mobile and align with other inputs */
+  input[type="date"].input-base,
+  .date-input-constrained {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    display: block;
+  }
+  .date-input-constrained::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.75;
+    margin-inline-start: 0;
+    padding: 4px;
+    min-width: 24px;
+  }
+  [dir="rtl"] .date-input-constrained::-webkit-calendar-picker-indicator {
+    margin-inline-end: 0;
+  }
+  .date-input-constrained::-webkit-date-and-time-value {
+    text-align: inherit;
+    margin: 0;
+    padding: 0;
+  }
+  /* Mobile: keep date input within viewport */
+  @media (max-width: 640px) {
+    .date-input-constrained {
+      font-size: 16px; /* prevents iOS zoom on focus */
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+  }
+  /* Selects / dropdowns – consistent look with chevron */
+  select.input-base,
+  .select-base {
+    @apply cursor-pointer appearance-none bg-[var(--card)] pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235c5c5c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+  }
+  select.input-base:focus,
+  .select-base:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230f3d2e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+  [dir="rtl"] select.input-base,
+  [dir="rtl"] .select-base {
+    background-position: left 0.75rem center;
+    padding-left: 2.5rem;
+    padding-right: 1rem;
+  }
+  select.input-base option,
+  .select-base option {
+    @apply bg-[var(--card)] text-[var(--foreground)];
+  }
+  .card-surface {
+    @apply rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card)] shadow-sm transition-all duration-300;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .card-surface:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+
+/* RTL for Arabic */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* Hero / section color strips */
+.hero-strip {
+  background: linear-gradient(135deg, var(--primary) 0%, #1a5c45 50%, #0f3d2e 100%);
+  background-size: 200% 200%;
+  color: var(--primary-foreground);
+  transition: box-shadow 0.4s ease, transform 0.3s ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-strip {
+    animation: heroShimmer 12s ease-in-out infinite;
+  }
+}
+.hero-strip-subtle {
+  background: linear-gradient(180deg, rgba(15, 61, 46, 0.06) 0%, transparent 100%);
+}
+/* Hero content entrance (only when motion allowed) */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-strip .animate-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  .hero-strip .animate-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
+  .hero-strip .animate-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
+  .hero-strip .animate-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
+  .stagger-in {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+  }
+  .stagger-in-1 { animation-delay: 0.1s; }
+  .stagger-in-2 { animation-delay: 0.2s; }
+  .stagger-in-3 { animation-delay: 0.35s; }
+}
+
+/* ========== RAMADAN THEME – full design (night sky, gold, calm spiritual vibe) ========== */
+[data-theme="ramadan"] {
+  --primary: #1e3a5f;
+  --primary-foreground: #ffffff;
+  --primary-hover: #152a47;
+  --accent: #c9a227;
+  --accent-foreground: #1e3a5f;
+  --background: #1a2744;
+  --foreground: #e8eef5;
+  --muted: #2a3655;
+  --muted-foreground: #8fa3c4;
+  --card: rgba(255, 255, 255, 0.97);
+  --card-foreground: #1a2744;
+  --border: rgba(201, 162, 39, 0.2);
+  --ring: #c9a227;
+  background: linear-gradient(180deg, #0f1929 0%, #1a2744 35%, #1e3a5f 70%, #152a47 100%);
+  min-height: 100vh;
+  position: relative;
+}
+[data-theme="ramadan"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% 0%, rgba(201, 162, 39, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 20% 30%, rgba(201, 162, 39, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(30, 58, 95, 0.06) 0%, transparent 45%);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="ramadan"]::before {
+    animation: glowPulse 8s ease-in-out infinite;
+  }
+  [data-theme="ramadan"] .hero-strip {
+    animation: heroShimmer 14s ease-in-out infinite;
+  }
+}
+[data-theme="ramadan"] > * {
+  position: relative;
+  z-index: 1;
+}
+[data-theme="ramadan"] .hero-strip {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 40%, #1e3a5f 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(30, 58, 95, 0.25);
+}
+[data-theme="ramadan"] .hero-strip:hover {
+  box-shadow: 0 8px 32px rgba(30, 58, 95, 0.35);
+}
+[data-theme="ramadan"] .hero-strip-subtle {
+  background: linear-gradient(180deg, rgba(30, 58, 95, 0.1) 0%, rgba(201, 162, 39, 0.04) 50%, transparent 100%);
+}
+[data-theme="ramadan"] .card-surface,
+[data-theme="ramadan"] .card-primary-tint {
+  box-shadow: 0 2px 12px rgba(30, 58, 95, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="ramadan"] .card-surface:hover,
+  [data-theme="ramadan"] .card-primary-tint:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(30, 58, 95, 0.12);
+  }
+}
+[data-theme="ramadan"] header {
+  border-color: rgba(201, 162, 39, 0.15);
+  background: rgba(26, 39, 68, 0.88);
+  backdrop-filter: blur(10px);
+  transition: box-shadow 0.3s ease;
+}
+[data-theme="ramadan"] header a,
+[data-theme="ramadan"] header button {
+  color: #e8eef5;
+}
+[data-theme="ramadan"] header a:hover,
+[data-theme="ramadan"] header button:hover {
+  color: #c9a227;
+}
+
+/* ========== EID THEME – full design (green & gold, festive celebratory vibe) ========== */
+[data-theme="eid"] {
+  --primary: #0d5c3a;
+  --primary-foreground: #ffffff;
+  --primary-hover: #0a4730;
+  --accent: #b8860b;
+  --accent-foreground: #0d5c3a;
+  --background: #f5f7f0;
+  --foreground: #1a2e1f;
+  --muted: #e8ebe0;
+  --muted-foreground: #4a5c42;
+  --card: #ffffff;
+  --card-foreground: #1a2e1f;
+  --border: #d4dcc8;
+  --ring: #0d5c3a;
+  background: linear-gradient(180deg, #f5f7f0 0%, #eef2e8 40%, #f0f4eb 100%);
+  min-height: 100vh;
+  position: relative;
+}
+[data-theme="eid"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(184, 134, 11, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(13, 92, 58, 0.04) 0%, transparent 40%);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="eid"]::before {
+    animation: goldShimmer 6s ease-in-out infinite;
+  }
+  [data-theme="eid"] .hero-strip {
+    animation: heroShimmer 10s ease-in-out infinite;
+  }
+}
+[data-theme="eid"] > * {
+  position: relative;
+  z-index: 1;
+}
+[data-theme="eid"] .hero-strip {
+  background: linear-gradient(135deg, #0d5c3a 0%, #117a4d 35%, #b8860b 80%, #0d5c3a 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(13, 92, 58, 0.3);
+}
+[data-theme="eid"] .hero-strip:hover {
+  box-shadow: 0 8px 36px rgba(13, 92, 58, 0.4), 0 0 0 1px rgba(184, 134, 11, 0.2);
+}
+[data-theme="eid"] .hero-strip-subtle {
+  background: linear-gradient(180deg, rgba(13, 92, 58, 0.08) 0%, rgba(184, 134, 11, 0.06) 50%, transparent 100%);
+}
+[data-theme="eid"] .card-surface,
+[data-theme="eid"] .card-primary-tint {
+  box-shadow: 0 2px 12px rgba(13, 92, 58, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme="eid"] .card-surface:hover,
+  [data-theme="eid"] .card-primary-tint:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(13, 92, 58, 0.15);
+  }
+}
+[data-theme="eid"] header {
+  border-color: rgba(13, 92, 58, 0.15);
+  background: rgba(255, 255, 255, 0.9);
+  transition: box-shadow 0.3s ease;
+}
+
+.card-accent-border {
+  border-inline-start: 4px solid var(--accent);
+}
+.card-primary-tint {
+  background: linear-gradient(135deg, rgba(15, 61, 46, 0.04) 0%, rgba(255, 255, 255, 1) 30%);
+}
+[data-theme="ramadan"] .card-primary-tint {
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.06) 0%, rgba(255, 255, 255, 1) 30%);
+}
+[data-theme="eid"] .card-primary-tint {
+  background: linear-gradient(135deg, rgba(13, 92, 58, 0.05) 0%, rgba(255, 255, 255, 1) 30%);
+}
+
+/* Sticky CTA */
+.sticky-cta {
+  @apply fixed left-0 right-0 z-50 border-t border-[var(--border)] bg-[var(--card)] p-4 shadow-[0_-4px_24px_rgba(0,0,0,0.06)];
+  padding-bottom: max(1rem, var(--safe-bottom));
+}

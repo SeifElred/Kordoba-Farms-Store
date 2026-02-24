@@ -1,0 +1,203 @@
+{
+  "brand": "Kordoba Farms",
+  "welcomePopup": {
+    "chooseLanguage": "Pilih bahasa anda",
+    "chooseLanguageSubtitle": "Kami akan tunjuk laman dalam bahasa anda."
+  },
+  "cityPopup": {
+    "title": "Selamat datang ke Kordoba Farms",
+    "subtitle": "Pilih bandar anda untuk pengalaman terbaik.",
+    "label": "Bandar anda",
+    "placeholder": "Pilih bandar",
+    "continue": "Teruskan"
+  },
+  "occasion": {
+    "title": "Bagaimana anda ingin meraikan?",
+    "subtitle": "Korban, Aqiqah, atau keluarga — daging halal premium dengan penjagaan penuh."
+  },
+  "productSelect": {
+    "title": "Pilih produk anda",
+    "subtitle": "Separuh atau keseluruhan — kambing atau biri-biri"
+  },
+  "orderDetails": {
+    "title": "Butiran pesanan",
+    "invalidProduct": "Produk tidak sah. Sila kembali dan pilih produk.",
+    "delivery": "Penghantaran",
+    "pickup": "Ambil",
+    "donate": "Derma",
+    "notesPlaceholder": "Apa-apa permintaan khas...",
+    "weightAsIs": "Seperti ada (berat standard)",
+    "weightRange": "Julat berat (hubungi kami)",
+    "chooseWeight": "Pilih berat",
+    "chooseCut": "Pilih potongan",
+    "chooseCutSubtitle": "Pilih satu pilihan. Ketik ikon play untuk tonton video.",
+    "watchVideo": "Tonton video",
+    "yourProduct": "Produk anda",
+    "selectDate": "Pilih tarikh",
+    "deliveryOptions": "Penghantaran & tarikh",
+    "orderExtras": "Tambahan pesanan",
+    "notes": "Nota",
+    "completeRequiredToProceed": "Sila pilih tarikh sembelihan, potongan khas, dan pilihan berat untuk terus."
+  },
+  "nav": {
+    "home": "Laman Utama",
+    "shop": "Kedai",
+    "cart": "Troli",
+    "cartAriaLabel": "1 item dalam troli",
+    "checkout": "Checkout",
+    "liveFarm": "Ladang Langsung",
+    "corporate": "Korporat",
+    "dashboard": "Pesanan Saya",
+    "language": "Bahasa"
+  },
+  "cart": {
+    "title": "Troli anda",
+    "subtitle": "Semak, sunting atau tambah item — kemudian selesaikan pesanan melalui WhatsApp.",
+    "empty": "Troli anda kosong",
+    "emptyHint": "Mulakan dengan memilih acara untuk menambah item pertama.",
+    "invalidProduct": "Produk tidak sah.",
+    "occasion": "Acara",
+    "orderSummary": "Ringkasan pesanan",
+    "changeProduct": "Tukar produk",
+    "continueToOrderDetails": "Terus ke butiran pesanan",
+    "addAnotherItem": "Tambah item lain",
+    "goToCart": "Ke troli",
+    "completeOrder": "Selesaikan pesanan melalui WhatsApp",
+    "completeOrderHint": "Kami akan buka WhatsApp dengan pesanan anda. Sila balas dengan nama, telefon dan alamat penghantaran.",
+    "editItem": "Sunting",
+    "removeItem": "Buang",
+    "itemAdded": "Item telah ditambah ke troli."
+  },
+  "orderWizard": {
+    "step1Title": "Pilih acara anda",
+    "step2Title": "Kambing atau biri-biri?",
+    "step3Title": "Separuh atau keseluruhan?",
+    "step4Title": "Pilih potongan",
+    "step5Title": "Tarikh & penghantaran",
+    "step6Title": "Tambahan",
+    "step7Title": "Nota",
+    "addToCart": "Tambah ke troli",
+    "next": "Seterusnya",
+    "back": "Kembali",
+    "sheep": "Biri-biri",
+    "goat": "Kambing",
+    "half": "Separuh",
+    "whole": "Keseluruhan"
+  },
+  "purpose": {
+    "title": "Bagaimana anda ingin meraikan?",
+    "subtitle": "Korban, Aqiqah, atau keluarga — daging halal premium dengan penjagaan penuh.",
+    "qurban": "Korban",
+    "qurbanDesc": "Korban Aidiladha dengan kebolehkesanan penuh",
+    "aqiqah": "Aqiqah",
+    "aqiqahDesc": "Raikan bayi anda dengan kecemerlangan halal",
+    "personal": "Daging Peribadi",
+    "personalDesc": "Daging premium untuk keluarga anda"
+  },
+  "faq": {
+    "title": "Soalan lazim",
+    "q1": "Bagaimana saya boleh membuat pesanan?",
+    "a1": "Pilih majlis (Korban, Aqiqah, atau Peribadi), kemudian pilih biri-biri atau kambing, separuh atau keseluruhan, dan potongan pilihan. Tambah ke troli dan lengkapkan pesanan melalui WhatsApp — kami akan sahkan dan atur penghantaran.",
+    "q2": "Adakah daging ini halal?",
+    "a2": "Ya. Semua haiwan kami disembelih mengikut keperluan Islam dengan kebolehkesanan penuh. Kami boleh sediakan bukti video penyembelihan atas permintaan.",
+    "q3": "Bagaimana penghantaran diurus?",
+    "a3": "Kami hantar ke alamat anda pada tarikh yang anda pilih melalui Lalamove. Tarikh sembelihan dan pilihan pengedaran (penghantaran, ambil, atau derma) ditetapkan dalam aliran pesanan.",
+    "q4": "Apakah potongan yang tersedia?",
+    "a4": "Anda boleh pilih potongan khas (contoh potongan kaki, potongan bahu) atau keseluruhan (tanpa potong). Pilihan ditunjukkan dalam langkah 4 pesanan. Jika anda ada permintaan khas (contoh potongan kari, potongan stew), tambah dalam nota dan kami akan cuba penuhi.",
+    "q5": "Apa yang saya perlukan untuk pesanan Aqiqah?",
+    "a5": "Aqiqah lazimnya pada hari ketujuh selepas kelahiran, tetapi kami fleksibel dengan tarikh. Anda pilih biri-biri atau kambing, separuh atau keseluruhan, dan potongan pilihan. Kami urus sembelihan dan penyediaan mengikut kehendak anda; anda boleh tambah permintaan khas dalam nota.",
+    "q6": "Apa yang saya perlukan untuk pesanan Korban?",
+    "a6": "Korban untuk Eid al-Adha. Buat pesanan lebih awal; kami atur sembelihan pada hari yang ditetapkan. Anda pilih pengedaran: hantar ke alamat (melalui Lalamove), ambil, atau derma. Kami sahkan tarikh dan butiran melalui WhatsApp.",
+    "q7": "Dari mana biri-biri dan kambing anda?",
+    "a7": "Biri-biri dan kambing kami dari ladang tempatan yang dipercayai. Kami bekerjasama dengan pembekal terpilih yang memenuhi piawaian kebajikan haiwan dan halal kami, dengan kebolehkesanan penuh dari ladang ke anda.",
+    "q8": "Apakah proses pesanan 7 langkah?",
+    "a8": "Aliran 7 langkah kami memastikan pengalaman yang jelas: (1) Pilih majlis — Korban, Aqiqah, atau Peribadi. (2) Biri-biri atau kambing. (3) Separuh atau keseluruhan. (4) Pilih potongan. (5) Tarikh sembelihan dan pengedaran. (6) Tambahan (contoh name tag, bukti video). (7) Nota. Anda sahkan setiap langkah, tambah ke troli, kemudian lengkapkan melalui WhatsApp.",
+    "q9": "Apakah pilihan pembayaran yang diterima?",
+    "a9": "Kami terima pindahan bank sahaja. Selepas anda hantar pesanan melalui WhatsApp kami akan sahkan dan kongsi butiran bank kami. Pembayaran diatur dengan anda sebelum atau sekitar masa pesanan."
+  },
+  "shop": {
+    "title": "Pilih Haiwan Anda",
+    "filters": "Penapis",
+    "breed": "Baka",
+    "weight": "Berat (kg)",
+    "gender": "Jantina",
+    "price": "Harga",
+    "readyDate": "Tarikh Sedia",
+    "availability": "Ketersediaan",
+    "male": "Jantan",
+    "female": "Betina",
+    "selectAnimal": "Pilih Haiwan Ini",
+    "remaining": "tinggal",
+    "lowStock": "Hanya {count} lagi"
+  },
+  "animal": {
+    "tag": "Tag",
+    "breed": "Baka",
+    "weight": "Berat",
+    "pricePerKg": "Per kg",
+    "totalPrice": "Jumlah",
+    "healthCert": "Bersijil Kesihatan",
+    "slaughterDate": "Tarikh Sembelihan",
+    "distribution": "Agihan",
+    "nameTag": "Tambah Nama pada Tag",
+    "videoProof": "Video Bukti Sembelihan",
+    "addToOrder": "Terus ke Bayaran",
+    "weightSelection": "Pilihan berat",
+    "weightAsIs": "Seperti ada ({weight} kg)",
+    "specialCut": "Potongan khas (pilihan)",
+    "orderIncludes": "Pesanan termasuk",
+    "includeHead": "Kepala",
+    "includeStomach": "Perut",
+    "includeIntestines": "Usus",
+    "note": "Nota (pilihan)",
+    "completeRequiredToProceed": "Sila pilih tarikh sembelihan dan pilihan berat untuk terus."
+  },
+  "checkout": {
+    "title": "Bayaran",
+    "name": "Nama Penuh",
+    "email": "E-mel",
+    "phone": "Telefon",
+    "address": "Alamat",
+    "addressPlaceholder": "Jalan, bandar, poskod, negeri",
+    "optional": "pilihan",
+    "orderSummaryNote": "Butiran pesanan akan dihantar ke WhatsApp",
+    "sendToWhatsApp": "Hantar pesanan ke WhatsApp",
+    "placeOrder": "Tempat Pesanan",
+    "guestCheckout": "Masukkan butiran — pesanan akan dihantar ke WhatsApp"
+  },
+  "dashboard": {
+    "title": "Pesanan Saya",
+    "orderStatus": "Status Pesanan",
+    "reserved": "Ditempah",
+    "scheduled": "Dijadualkan",
+    "slaughtered": "Disembelih",
+    "processing": "Dalam Pemprosesan",
+    "completed": "Selesai",
+    "downloadCert": "Muat Turun Sijil",
+    "downloadVideo": "Muat Turun Video Bukti",
+    "reorder": "Pesan Semula"
+  },
+  "footer": {
+    "company": "Kordoba Agrotech Sdn. Bhd.",
+    "allRights": "Hak cipta terpelihara."
+  },
+  "common": {
+    "loading": "Memuatkan...",
+    "error": "Ralat berlaku.",
+    "back": "Kembali",
+    "next": "Seterusnya",
+    "buyNow": "Beli Sekarang"
+  },
+  "admin": {
+    "currentTheme": "Tema semasa",
+    "activeTheme": "Tema aktif",
+    "applyPreset": "Guna templat",
+    "orderTemplatePresets": {
+      "professional": "Profesional",
+      "friendly": "Mesra",
+      "ramadan": "Ramadan",
+      "eid": "Eid al-Adha",
+      "minimal": "Minimal"
+    }
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "brand": "科尔多巴农场",
+  "welcomePopup": {
+    "chooseLanguage": "选择您的语言",
+    "chooseLanguageSubtitle": "我们将以您选择的语言显示网站。"
+  },
+  "cityPopup": {
+    "title": "欢迎来到科尔多巴农场",
+    "subtitle": "选择您的城市以获得最佳体验。",
+    "label": "您的城市",
+    "placeholder": "选择城市",
+    "continue": "继续"
+  },
+  "occasion": {
+    "title": "您想怎样庆祝？",
+    "subtitle": "古尔邦、阿奇卡或家庭自用 — 优质清真，用心送达。"
+  },
+  "productSelect": {
+    "title": "选择您的产品",
+    "subtitle": "半只或整只 — 羊或山羊"
+  },
+  "orderDetails": {
+    "title": "订单详情",
+    "invalidProduct": "无效产品。请返回选择产品。",
+    "delivery": "配送",
+    "pickup": "自取",
+    "donate": "捐赠",
+    "notesPlaceholder": "任何特殊要求...",
+    "weightAsIs": "原样（标准重量）",
+    "weightRange": "重量范围（联系我们）",
+    "chooseWeight": "选择重量",
+    "chooseCut": "选择切割方式",
+    "chooseCutSubtitle": "选择一项。点击播放图标观看视频。",
+    "watchVideo": "观看视频",
+    "yourProduct": "您的产品",
+    "selectDate": "选择日期",
+    "deliveryOptions": "配送与日期",
+    "orderExtras": "订单附加",
+    "notes": "备注",
+    "completeRequiredToProceed": "请选择屠宰日期、特殊切割和重量选项以继续。"
+  },
+  "nav": {
+    "home": "首页",
+    "shop": "选购",
+    "cart": "购物车",
+    "cartAriaLabel": "购物车中有 1 件商品",
+    "checkout": "结账",
+    "liveFarm": "直播农场",
+    "corporate": "企业",
+    "dashboard": "我的订单",
+    "language": "语言"
+  },
+  "cart": {
+    "title": "您的购物车",
+    "subtitle": "查看、编辑或添加更多商品 — 然后通过 WhatsApp 完成订单。",
+    "empty": "您的购物车是空的",
+    "emptyHint": "请先选择场合以添加第一件商品。",
+    "invalidProduct": "无效商品。",
+    "occasion": "场合",
+    "orderSummary": "订单摘要",
+    "changeProduct": "更换商品",
+    "continueToOrderDetails": "继续填写订单详情",
+    "addAnotherItem": "再添加一件",
+    "goToCart": "去购物车",
+    "completeOrder": "通过 WhatsApp 完成订单",
+    "completeOrderHint": "我们将打开 WhatsApp 并附上您的订单。请回复您的姓名、电话和送货地址。",
+    "editItem": "编辑",
+    "removeItem": "删除",
+    "itemAdded": "已加入购物车。"
+  },
+  "orderWizard": {
+    "step1Title": "选择场合",
+    "step2Title": "羊还是山羊？",
+    "step3Title": "半只还是整只？",
+    "step4Title": "选择切割方式",
+    "step5Title": "日期与配送",
+    "step6Title": "附加项",
+    "step7Title": "备注",
+    "addToCart": "加入购物车",
+    "next": "下一步",
+    "back": "返回",
+    "sheep": "羊",
+    "goat": "山羊",
+    "half": "半只",
+    "whole": "整只"
+  },
+  "purpose": {
+    "title": "您想怎样庆祝？",
+    "subtitle": "古尔邦、阿奇卡或家庭自用 — 优质清真，用心送达。",
+    "qurban": "古尔邦",
+    "qurbanDesc": "开斋节献祭，全程可追溯",
+    "aqiqah": "阿奇卡",
+    "aqiqahDesc": "以清真品质庆祝新生儿",
+    "personal": "自用肉类",
+    "personalDesc": "为家人提供优质肉类"
+  },
+  "faq": {
+    "title": "常见问题",
+    "q1": "如何下单？",
+    "a1": "选择场合（古尔邦、阿奇卡或自用），然后选择羊或山羊、半只或整只及切割方式。加入购物车后通过 WhatsApp 完成订单，我们会确认并安排配送。",
+    "q2": "肉类是否清真？",
+    "a2": "是的。所有牲畜均按伊斯兰要求屠宰，可全程追溯。如需屠宰视频证明，我们可以提供。",
+    "q3": "如何配送？",
+    "a3": "我们会在您选择的日期通过 Lalamove 配送到您的地址。屠宰日期及配送方式（配送、自提或捐赠）在订单流程中设定。",
+    "q4": "有哪些切割方式？",
+    "a4": "您可选择特殊切割（如腿块、肩块）或整只（不切）。选项在订单第 4 步中显示。如有特殊要求（如咖喱块、炖肉块），请在备注中说明，我们会尽量满足。",
+    "q5": "阿奇卡订单需要什么？",
+    "a5": "阿奇卡传统上在新生儿出生第七天进行，但我们时间灵活。您选择羊或山羊、半只或整只及切割方式。我们按您的要求安排屠宰和准备；可在备注中写明特殊要求。",
+    "q6": "古尔邦订单需要什么？",
+    "a6": "古尔邦用于宰牲节。请提前下单；我们会在指定日期安排屠宰。您选择配送方式：配送到址（通过 Lalamove）、自提或捐赠。我们会通过 WhatsApp 确认日期和详情。",
+    "q7": "羊和山羊从哪里来？",
+    "a7": "我们的羊和山羊来自可信的本地农场。我们与符合动物福利和清真标准的选定供应商合作，从农场到您全程可追溯。",
+    "q8": "7 步订单流程是什么？",
+    "a8": "我们的 7 步流程确保体验清晰：(1) 选择场合 — 古尔邦、阿奇卡或自用。(2) 羊或山羊。(3) 半只或整只。(4) 选择切割。(5) 屠宰日期与配送。(6) 附加项（如姓名牌、视频证明）。(7) 备注。您确认每一步后加入购物车，再通过 WhatsApp 完成订单。",
+    "q9": "接受哪些付款方式？",
+    "a9": "我们仅接受银行转账。您通过 WhatsApp 发送订单后我们会确认并告知银行信息。付款在订单前或订单时与您安排。"
+  },
+  "shop": {
+    "title": "选择您的牲畜",
+    "filters": "筛选",
+    "breed": "品种",
+    "weight": "体重（公斤）",
+    "gender": "性别",
+    "price": "价格",
+    "readyDate": "就绪日期",
+    "availability": "库存",
+    "male": "公",
+    "female": "母",
+    "selectAnimal": "选择此牲畜",
+    "remaining": "剩余",
+    "lowStock": "仅剩 {count} 头"
+  },
+  "animal": {
+    "tag": "耳标",
+    "breed": "品种",
+    "weight": "体重",
+    "pricePerKg": "每公斤",
+    "totalPrice": "总价",
+    "healthCert": "健康认证",
+    "slaughterDate": "屠宰日期",
+    "distribution": "配送方式",
+    "nameTag": "添加名牌",
+    "videoProof": "屠宰视频证明",
+    "addToOrder": "去结账",
+    "weightSelection": "重量选择",
+    "weightAsIs": "原样（{weight} 公斤）",
+    "specialCut": "特殊切割（可选）",
+    "orderIncludes": "订单包含",
+    "includeHead": "头",
+    "includeStomach": "胃",
+    "includeIntestines": "肠",
+    "note": "备注（可选）",
+    "completeRequiredToProceed": "请选择屠宰日期和重量选项以继续。"
+  },
+  "checkout": {
+    "title": "结账",
+    "name": "姓名",
+    "email": "邮箱",
+    "phone": "电话",
+    "address": "地址",
+    "addressPlaceholder": "街道、城市、邮编、州",
+    "optional": "选填",
+    "orderSummaryNote": "订单详情将发送至 WhatsApp",
+    "sendToWhatsApp": "发送订单到 WhatsApp",
+    "placeOrder": "提交订单",
+    "guestCheckout": "填写您的信息 — 订单将发送至 WhatsApp"
+  },
+  "dashboard": {
+    "title": "我的订单",
+    "orderStatus": "订单状态",
+    "reserved": "已预留",
+    "scheduled": "已排期",
+    "slaughtered": "已屠宰",
+    "processing": "处理中",
+    "completed": "已完成",
+    "downloadCert": "下载证书",
+    "downloadVideo": "下载视频证明",
+    "reorder": "再次订购"
+  },
+  "footer": {
+    "company": "Kordoba Agrotech Sdn. Bhd.",
+    "allRights": "版权所有。"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了。",
+    "back": "返回",
+    "next": "下一步",
+    "buyNow": "立即购买"
+  },
+  "admin": {
+    "currentTheme": "当前主题",
+    "activeTheme": "当前主题",
+    "applyPreset": "应用模板",
+    "orderTemplatePresets": {
+      "professional": "专业",
+      "friendly": "友好",
+      "ramadan": "斋月",
+      "eid": "古尔邦节",
+      "minimal": "简洁"
+    }
+  }
+}
