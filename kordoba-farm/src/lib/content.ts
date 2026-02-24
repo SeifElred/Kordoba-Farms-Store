@@ -30,8 +30,27 @@ function resolveImageUrl(imageUrl: string, imageUrlByLocale: string | null, loca
 
 /** Get all products from DB, or fallback to static defaults. Resolves image per locale. */
 export async function getProducts(locale?: string): Promise<ProductConfig[]> {
-  const rows = await prisma.product.findMany({ orderBy: { sortOrder: "asc" } });
-  if (rows.length === 0) {
+  try {
+    const rows = await prisma.product.findMany({ orderBy: { sortOrder: "asc" } });
+    if (rows.length === 0) {
+      return Object.entries(PRODUCT_DEFAULTS).map(([productType, p]) => ({
+        productType,
+        label: p.label,
+        minPrice: p.minPrice,
+        maxPrice: p.maxPrice,
+        imageUrl: p.imageUrl,
+      }));
+    }
+    const loc = locale ?? "en";
+    return rows.map((p) => ({
+      productType: p.productType,
+      label: p.label,
+      minPrice: p.minPrice,
+      maxPrice: p.maxPrice,
+      imageUrl: resolveImageUrl(p.imageUrl, p.imageUrlByLocale, loc),
+    }));
+  } catch (err) {
+    console.error("getProducts: falling back to static defaults due to DB error", err);
     return Object.entries(PRODUCT_DEFAULTS).map(([productType, p]) => ({
       productType,
       label: p.label,
@@ -40,14 +59,6 @@ export async function getProducts(locale?: string): Promise<ProductConfig[]> {
       imageUrl: p.imageUrl,
     }));
   }
-  const loc = locale ?? "en";
-  return rows.map((p) => ({
-    productType: p.productType,
-    label: p.label,
-    minPrice: p.minPrice,
-    maxPrice: p.maxPrice,
-    imageUrl: resolveImageUrl(p.imageUrl, p.imageUrlByLocale, loc),
-  }));
 }
 
 /** Get one product config by productType. Resolves image per locale. */
@@ -65,30 +76,40 @@ export type ProductWeightOption = {
 
 /** Get weight options enabled for a product (from global WeightOption + ProductWeight junction). Empty if none. */
 export async function getProductWeights(productType: string): Promise<ProductWeightOption[]> {
-  const rows = await prisma.productWeight.findMany({
-    where: { productType },
-    include: { weightOption: true },
-    orderBy: { sortOrder: "asc" },
-  });
-  return rows.map((r) => ({
-    id: r.weightOption.id,
-    label: r.weightOption.label,
-    price: r.weightOption.price,
-    sortOrder: r.sortOrder,
-  }));
+  try {
+    const rows = await prisma.productWeight.findMany({
+      where: { productType },
+      include: { weightOption: true },
+      orderBy: { sortOrder: "asc" },
+    });
+    return rows.map((r) => ({
+      id: r.weightOption.id,
+      label: r.weightOption.label,
+      price: r.weightOption.price,
+      sortOrder: r.sortOrder,
+    }));
+  } catch (err) {
+    console.error("getProductWeights: returning empty weights due to DB error", err);
+    return [];
+  }
 }
 
 /** Get all special cuts from DB, or fallback to static. Resolves image per locale. */
 export async function getSpecialCuts(locale?: string): Promise<SpecialCutOption[]> {
-  const rows = await prisma.specialCut.findMany({ orderBy: { sortOrder: "asc" } });
-  if (rows.length === 0) return SPECIAL_CUTS_FALLBACK;
-  const loc = locale ?? "en";
-  return rows.map((r) => ({
-    id: r.cutId,
-    label: r.label,
-    imageUrl: resolveImageUrl(r.imageUrl, r.imageUrlByLocale, loc),
-    videoUrl: r.videoUrl ?? undefined,
-  }));
+  try {
+    const rows = await prisma.specialCut.findMany({ orderBy: { sortOrder: "asc" } });
+    if (rows.length === 0) return SPECIAL_CUTS_FALLBACK;
+    const loc = locale ?? "en";
+    return rows.map((r) => ({
+      id: r.cutId,
+      label: r.label,
+      imageUrl: resolveImageUrl(r.imageUrl, r.imageUrlByLocale, loc),
+      videoUrl: r.videoUrl ?? undefined,
+    }));
+  } catch (err) {
+    console.error("getSpecialCuts: falling back to static defaults due to DB error", err);
+    return SPECIAL_CUTS_FALLBACK;
+  }
 }
 
 /** Build nested object from flat keys (e.g. "nav.home" -> { nav: { home: "..." } }). */
@@ -111,15 +132,20 @@ function nestKeys(flat: Record<string, string>): Record<string, unknown> {
 
 /** Get all translations for a locale as nested messages object, or null if none. */
 export async function getMessagesForLocale(locale: string): Promise<Record<string, unknown> | null> {
-  const rows = await prisma.translation.findMany({
-    where: { locale },
-  });
-  if (rows.length === 0) return null;
-  const flat: Record<string, string> = {};
-  for (const r of rows) {
-    flat[r.key] = r.value;
+  try {
+    const rows = await prisma.translation.findMany({
+      where: { locale },
+    });
+    if (rows.length === 0) return null;
+    const flat: Record<string, string> = {};
+    for (const r of rows) {
+      flat[r.key] = r.value;
+    }
+    return nestKeys(flat) as Record<string, unknown>;
+  } catch (err) {
+    console.error("getMessagesForLocale: returning null due to DB error", err);
+    return null;
   }
-  return nestKeys(flat) as Record<string, unknown>;
 }
 
 /** Theme IDs for seasonal/welcoming templates (default, ramadan, eid). */
@@ -134,10 +160,15 @@ const ORDER_MESSAGE_TEMPLATE_KEYS: Record<ThemeId, string> = {
 
 /** Get the order message template for the currently active theme. */
 export async function getActiveOrderMessageTemplate(): Promise<string | null> {
-  const active = (await getSiteSetting("active_theme")) as ThemeId | null;
-  const theme: ThemeId = active && THEME_IDS.includes(active) ? active : "default";
-  const key = ORDER_MESSAGE_TEMPLATE_KEYS[theme];
-  return getSiteSetting(key);
+  try {
+    const active = (await getSiteSetting("active_theme")) as ThemeId | null;
+    const theme: ThemeId = active && THEME_IDS.includes(active) ? active : "default";
+    const key = ORDER_MESSAGE_TEMPLATE_KEYS[theme];
+    return getSiteSetting(key);
+  } catch (err) {
+    console.error("getActiveOrderMessageTemplate: returning null due to DB error", err);
+    return null;
+  }
 }
 
 const THEME_BANNER_KEYS: Record<ThemeId, string> = {
@@ -165,25 +196,40 @@ export type ActiveThemeData = {
 
 /** Get site-wide theme data for the active theme (banner, hero heading/subtitle). */
 export async function getActiveThemeData(): Promise<ActiveThemeData> {
-  const active = (await getSiteSetting("active_theme")) as ThemeId | null;
-  const themeId: ThemeId = active && THEME_IDS.includes(active) ? active : "default";
-  const [bannerText, heroHeading, heroSubtitle] = await Promise.all([
-    getSiteSetting(THEME_BANNER_KEYS[themeId]),
-    getSiteSetting(THEME_HERO_HEADING_KEYS[themeId]),
-    getSiteSetting(THEME_HERO_SUBTITLE_KEYS[themeId]),
-  ]);
-  return {
-    themeId,
-    bannerText: bannerText ?? null,
-    heroHeading: heroHeading ?? null,
-    heroSubtitle: heroSubtitle ?? null,
-  };
+  try {
+    const active = (await getSiteSetting("active_theme")) as ThemeId | null;
+    const themeId: ThemeId = active && THEME_IDS.includes(active) ? active : "default";
+    const [bannerText, heroHeading, heroSubtitle] = await Promise.all([
+      getSiteSetting(THEME_BANNER_KEYS[themeId]),
+      getSiteSetting(THEME_HERO_HEADING_KEYS[themeId]),
+      getSiteSetting(THEME_HERO_SUBTITLE_KEYS[themeId]),
+    ]);
+    return {
+      themeId,
+      bannerText: bannerText ?? null,
+      heroHeading: heroHeading ?? null,
+      heroSubtitle: heroSubtitle ?? null,
+    };
+  } catch (err) {
+    console.error("getActiveThemeData: falling back to default theme due to DB error", err);
+    return {
+      themeId: "default",
+      bannerText: null,
+      heroHeading: null,
+      heroSubtitle: null,
+    };
+  }
 }
 
 /** Get a site setting by key, or null. */
 export async function getSiteSetting(key: string): Promise<string | null> {
-  const row = await prisma.siteSetting.findUnique({ where: { key } });
-  return row?.value ?? null;
+  try {
+    const row = await prisma.siteSetting.findUnique({ where: { key } });
+    return row?.value ?? null;
+  } catch (err) {
+    console.error("getSiteSetting: returning null due to DB error", err);
+    return null;
+  }
 }
 
 /** Get cities list (JSON array string) from settings, or null. */
