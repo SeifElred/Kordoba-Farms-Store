@@ -36,12 +36,10 @@ const SPECIAL_CUTS = [
   { cutId: "arabic_4", label: "تقطيع عربى 4 قطع", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=80", videoUrl: null, sortOrder: 1 },
   { cutId: "arabic_half_length", label: "تقطيع عربى نص طول", imageUrl: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=80", videoUrl: null, sortOrder: 2 },
   { cutId: "fridge_medium", label: "تقطيع ثلاجه (قطع متوسطة)", imageUrl: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&q=80", videoUrl: null, sortOrder: 3 },
-  { cutId: "full_ghozy", label: "غوزي كامل", imageUrl: "https://images.unsplash.com/photo-1615937691194-96f16275d74c?w=400&q=80", videoUrl: null, sortOrder: 4 },
-  { cutId: "salona_small", label: "تقطيع صالونه(قطع صغيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80", videoUrl: null, sortOrder: 5 },
-  { cutId: "biryani_large", label: "تقطيع برياني(قطع كبيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80", videoUrl: null, sortOrder: 6 },
-  { cutId: "hadrami_joints", label: "حضرمي مفاصل", imageUrl: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80", videoUrl: null, sortOrder: 7 },
-  { cutId: "awlaqi_joints", label: "عولقي مفاصل", imageUrl: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80", videoUrl: null, sortOrder: 8 },
-  { cutId: "maftah", label: "مفطح", imageUrl: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&q=80", videoUrl: null, sortOrder: 9 },
+  { cutId: "salona_small", label: "تقطيع صالونه (قطع صغيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80", videoUrl: null, sortOrder: 4 },
+  { cutId: "biryani_large", label: "تقطيع برياني (قطع كبيرة)", imageUrl: "https://images.unsplash.com/photo-1615937691172-6119668cae97?w=400&q=80", videoUrl: null, sortOrder: 5 },
+  { cutId: "hadrami_joints", label: "حضرمي مفاصل", imageUrl: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80", videoUrl: null, sortOrder: 6 },
+  { cutId: "maftah", label: "مفطح", imageUrl: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&q=80", videoUrl: null, sortOrder: 7 },
 ];
 
 const CITIES = [

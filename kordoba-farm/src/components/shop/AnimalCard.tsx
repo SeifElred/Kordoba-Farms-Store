@@ -26,12 +26,12 @@ export function AnimalCard({
   return (
     <article className="card-surface group overflow-hidden transition-colors hover:shadow-md">
       <Link href={`/${locale}/animal/${encodeURIComponent(animal.tagNumber)}${q}`} className="block">
-        <div className="relative aspect-[4/3] bg-[var(--muted)]">
+        <div className="relative aspect-square bg-[var(--muted)]">
           <Image
             src={animal.imageUrl}
             alt={animal.tagNumber}
             fill
-            className="object-cover transition-transform group-hover:scale-105"
+            className="object-contain transition-transform group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           {lowStock && (

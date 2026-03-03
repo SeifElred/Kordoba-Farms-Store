@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
 import type { CartLineItem } from "@/contexts/CartContext";
-import { formatPriceRange } from "@/lib/utils";
-import { ShoppingBag, Pencil, Trash2 } from "lucide-react";
+import { formatPriceRange, formatPrice } from "@/lib/utils";
+import { getWeightBandDisplayLabel } from "@/lib/weight-bands";
+import { ShoppingBag, Pencil, Trash2, CreditCard, ShieldCheck, Lock } from "lucide-react";
 
 const WHATSAPP_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_LINK ?? "https://wa.me/60123456789";
 
@@ -58,6 +59,7 @@ export function CartPageClient({
   const tPurpose = useTranslations("purpose");
   const tOrder = useTranslations("orderDetails");
   const tWizard = useTranslations("orderWizard");
+  const tAnimal = useTranslations("animal");
   const searchParams = useSearchParams();
   const added = searchParams.get("added") === "1";
 
@@ -129,6 +131,17 @@ export function CartPageClient({
                   {item.slaughterDate && `${item.slaughterDate} · `}
                   {distLabels[item.distribution] ?? item.distribution}
                 </p>
+                {(item.weightLabel || item.weightSelection) && (
+                  <p className="mt-0.5 text-sm text-[var(--muted-foreground)]">
+                    <span className="font-medium text-[var(--foreground)]">{t("weightAndAge")}:</span>{" "}
+                    {item.weightLabel || getWeightBandDisplayLabel(item.weightSelection, item.occasion, locale) || item.weightSelection}
+                  </p>
+                )}
+                {(item.occasion === "qurban" || item.occasion === "aqiqah") && (
+                  <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
+                    {tAnimal("weightAgeNote")}
+                  </p>
+                )}
                 <p className="mt-1 text-base font-semibold text-[var(--foreground)]">
                   {formatPriceRange(item.minPrice, item.maxPrice)}
                 </p>
@@ -157,23 +170,67 @@ export function CartPageClient({
         ))}
       </ul>
 
+      {/* Order total */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5">
+        <div className="flex justify-between text-lg font-bold text-[var(--foreground)]">
+          <span>{t("orderSummary")}</span>
+          <span className="text-[var(--primary)]">
+            {formatPrice(items.reduce((s, i) => s + i.minPrice, 0))}
+          </span>
+        </div>
+      </div>
+
+      {/* Trust badges */}
+      <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--muted)]/20 px-4 py-3 text-xs text-[var(--muted-foreground)]">
+        <span className="flex items-center gap-1.5">
+          <Lock className="h-4 w-4 text-[var(--primary)]" aria-hidden />
+          Secure payment
+        </span>
+        <span className="flex items-center gap-1.5">
+          <ShieldCheck className="h-4 w-4 text-[var(--primary)]" aria-hidden />
+          100% Halal
+        </span>
+        <span className="flex items-center gap-1.5">
+          <CreditCard className="h-4 w-4 text-[var(--primary)]" aria-hidden />
+          Card & FPX
+        </span>
+      </div>
+
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link
           href={`/${locale}/order`}
-          className="flex flex-1 justify-center rounded-[var(--radius)] border-2 border-[var(--primary)] bg-transparent px-4 py-3.5 font-semibold text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          className="flex flex-1 justify-center rounded-[var(--radius)] border-2 border-[var(--border)] bg-[var(--background)] px-4 py-3.5 font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
         >
           {t("addAnotherItem")}
         </Link>
-        <button
-          type="button"
-          onClick={handleCompleteOrder}
-          className="btn-primary flex flex-1 justify-center"
+        <Link
+          href={`/${locale}/checkout`}
+          className="btn-primary flex flex-1 items-center justify-center gap-2"
         >
-          {t("completeOrder")}
-        </button>
+          <CreditCard className="h-5 w-5" aria-hidden />
+          {t("proceedToCheckout")}
+        </Link>
       </div>
+      <p className="text-center text-sm text-[var(--muted-foreground)]">
+        {t("payOnlineHint")}
+      </p>
 
-      <p className="text-center text-sm text-[var(--muted-foreground)]">{t("completeOrderHint")}</p>
+      <div className="relative py-2">
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[var(--background)] px-2 text-xs text-[var(--muted-foreground)]">
+          {t("orCompleteViaWhatsApp")}
+        </span>
+        <hr className="border-[var(--border)]" />
+      </div>
+      <button
+        type="button"
+        onClick={handleCompleteOrder}
+        className="w-full rounded-[var(--radius)] border-2 border-[var(--primary)]/50 bg-transparent px-4 py-3 font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+      >
+        {t("completeOrder")}
+      </button>
+      <p className="text-center text-xs text-[var(--muted-foreground)]">
+        {t("completeOrderHint")}
+      </p>
     </div>
   );
 }

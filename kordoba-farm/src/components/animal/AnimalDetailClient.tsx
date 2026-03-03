@@ -17,6 +17,7 @@ export function AnimalDetailClient({
   occasion?: string;
 }) {
   const t = useTranslations("animal");
+  const tOrder = useTranslations("orderDetails");
   const total = animal.weight * animal.pricePerKg;
   const [slaughterDate, setSlaughterDate] = useState("");
   const [distribution, setDistribution] = useState("delivery");
@@ -37,12 +38,12 @@ export function AnimalDetailClient({
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="space-y-4">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[var(--muted)]">
+          <div className="relative aspect-square overflow-hidden rounded-xl bg-[var(--muted)]">
             <Image
               src={animal.imageUrl}
               alt={animal.tagNumber}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 1024px) 100vw, 50vw"
               priority
             />
@@ -106,9 +107,9 @@ export function AnimalDetailClient({
                 value={distribution}
                 onChange={(e) => setDistribution(e.target.value)}
               >
-                <option value="delivery">Delivery</option>
-                <option value="pickup">Pickup</option>
-                <option value="donate">Donate</option>
+                <option value="delivery">{tOrder("delivery")}</option>
+                <option value="pickup">{tOrder("pickup")}</option>
+                <option value="donate">{tOrder("donate")}</option>
               </select>
             </div>
             <div>

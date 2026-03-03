@@ -1,31 +1,41 @@
-import { useTranslations } from "next-intl";
-import { BRAND_NAME } from "@/lib/constants";
+"use client";
 
-const COMPANY_NAME = "Kordoba Agrotech Sdn. Bhd.";
+import { useTranslations, useLocale } from "next-intl";
+import Link from "next/link";
+import { BRAND_NAME } from "@/lib/constants";
 
 export function Footer() {
   const t = useTranslations("footer");
+  const locale = useLocale();
+  const base = `/${locale}`;
 
   return (
     <footer
-      className="mt-auto shrink-0 border-t border-[var(--border)] bg-[var(--card)]"
-      style={{ paddingBottom: "var(--safe-bottom)" }}
+      className="mt-auto shrink-0 border-t border-[var(--border)] bg-[var(--card)] py-4 text-[var(--muted-foreground)]"
+      style={{ paddingBottom: "max(1rem, var(--safe-bottom))" }}
+      role="contentinfo"
     >
       <div
-        className="mx-auto max-w-3xl px-4 py-5 sm:px-6 sm:py-6"
+        className="mx-auto flex max-w-3xl flex-col items-center gap-2 px-4 text-center sm:flex-row sm:justify-between sm:items-center sm:gap-4 sm:text-left"
         style={{
           paddingInlineStart: "max(1rem, var(--safe-left))",
           paddingInlineEnd: "max(1rem, var(--safe-right))",
         }}
       >
-        <div className="flex flex-col items-center gap-2 text-center">
-          <span className="text-sm font-semibold text-[var(--primary)]">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:justify-start">
+          <Link href={base} className="font-semibold text-[var(--primary)] hover:opacity-90">
             {BRAND_NAME}
-          </span>
-          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-            © {new Date().getFullYear()} {COMPANY_NAME}. {t("allRights")}
-          </p>
+          </Link>
+          <span className="text-[var(--border)]" aria-hidden>·</span>
+          <Link href={`${base}/order`} className="hover:text-[var(--foreground)]">{t("order")}</Link>
+          <span className="text-[var(--border)]" aria-hidden>·</span>
+          <Link href={`${base}/faq`} className="hover:text-[var(--foreground)]">{t("faq")}</Link>
+          <span className="text-[var(--border)]" aria-hidden>·</span>
+          <Link href={`${base}/about`} className="hover:text-[var(--foreground)]">{t("about")}</Link>
         </div>
+        <p className="text-xs">
+          © {new Date().getFullYear()} {t("company")}
+        </p>
       </div>
     </footer>
   );

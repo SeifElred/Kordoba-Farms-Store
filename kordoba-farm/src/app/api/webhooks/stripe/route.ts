@@ -28,13 +28,26 @@ export async function POST(req: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const orderId = session.metadata?.orderId ?? session.client_reference_id;
-    if (orderId) {
+    const cartOrderId = session.metadata?.cartOrderId ?? null;
+    const orderId = session.metadata?.orderId ?? (cartOrderId ? null : session.client_reference_id);
+
+    if (cartOrderId) {
+      await prisma.cartOrder.update({
+        where: { id: cartOrderId },
+        data: {
+          paymentStatus: "paid",
+          stripeSessionId: session.id,
+          stripePaymentId:
+            (session.payment_intent as string | null) ?? session.id,
+        },
+      });
+    } else if (orderId) {
       await prisma.order.update({
         where: { id: orderId },
         data: {
           paymentStatus: "paid",
-          stripePaymentId: session.payment_intent as string | undefined ?? session.id,
+          stripePaymentId:
+            (session.payment_intent as string | undefined) ?? session.id,
         },
       });
       const order = await prisma.order.findUnique({

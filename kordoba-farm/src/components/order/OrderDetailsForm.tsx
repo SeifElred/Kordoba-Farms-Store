@@ -155,12 +155,12 @@ export function OrderDetailsForm({
                     : "border-[var(--border)] hover:border-[var(--primary)]/40"
                 )}
               >
-                <div className="relative aspect-[4/3] bg-[var(--muted)]">
+                <div className="relative aspect-square bg-[var(--muted)]">
                   <Image
                     src={cut.imageUrl}
                     alt={cut.label}
                     fill
-                    className="object-cover transition-transform group-hover:scale-105"
+                    className="object-contain transition-transform group-hover:scale-105"
                     sizes="(max-width: 640px) 50vw, 200px"
                   />
                   {cut.videoUrl && (

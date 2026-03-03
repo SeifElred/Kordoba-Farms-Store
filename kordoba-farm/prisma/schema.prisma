@@ -128,6 +128,24 @@ model Translation {
   @@index([locale])
 }
 
+// Cart-based orders (wizard flow): no specific animal; payment via Stripe.
+model CartOrder {
+  id                String   @id @default(uuid())
+  name              String
+  email             String
+  phone             String
+  address           String?
+  country           String   @default("MY")
+  locale            String   @default("en")
+  totalCents        Int      // total in MYR * 100 for Stripe
+  paymentStatus     String   @default("pending") // pending, paid, failed, refunded
+  stripeSessionId   String?
+  stripePaymentId   String?
+  items             Json     // array of cart line item snapshots
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
 // Admin-editable: site settings (cities JSON, WhatsApp link, etc.)
 model SiteSetting {
   id        String   @id @default(uuid())

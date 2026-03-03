@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import type { CartLineItem } from "@/contexts/CartContext";
 import { formatPrice, formatPriceRange, getLocalDateString } from "@/lib/utils";
+import { getWeightBandDisplayLabel } from "@/lib/weight-bands";
 import type { ProductWeightOption } from "@/lib/content";
 import type { SpecialCutOption } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,73 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const PURPOSES = ["qurban", "aqiqah", "personal"] as const;
 const ANIMALS = ["sheep", "goat"] as const;
-const PORTIONS = ["half", "whole"] as const;
+// Half carcass selection is temporarily disabled; only whole portion is available.
+const PORTIONS = ["whole"] as const;
+
+// Fixed weight/price bands for whole carcass.
+// We distinguish between personal "لحم ضاني" pricing and Qurban/Aqiqah pricing.
+// Labels are rendered per-locale (Arabic uses Arabic wording/digits).
+const QURBAN_AQIQAH_BANDS = [
+  { id: "whole_28_30", minKg: 28, maxKg: 30, price: 1020 },
+  { id: "whole_31_33", minKg: 31, maxKg: 33, price: 1120 },
+  { id: "whole_34_36", minKg: 34, maxKg: 36, price: 1250 },
+  { id: "whole_37_40", minKg: 37, maxKg: 40, price: 1350 },
+  { id: "whole_41_45", minKg: 41, maxKg: 45, price: 1500 },
+  { id: "whole_46_50", minKg: 46, maxKg: 50, price: 1675 },
+  { id: "whole_51_55", minKg: 51, maxKg: 55, price: 1850 },
+  { id: "whole_56_60", minKg: 56, maxKg: 60, price: 1950 },
+  { id: "whole_61_65", minKg: 61, maxKg: 65, price: 2050 },
+  { id: "whole_66_70", minKg: 66, maxKg: 70, price: 2200 },
+  { id: "whole_71_75", minKg: 71, maxKg: 75, price: 2400 },
+  { id: "whole_76_80", minKg: 76, maxKg: 80, price: 2550 },
+] as const;
+
+// Personal "لحم ضاني" pricing bands (with age info).
+const PERSONAL_BANDS = [
+  // 45–55 days
+  { id: "personal_17_20", minKg: 17, maxKg: 20, price: 750, minAgeDays: 45, maxAgeDays: 55 },
+  // 60–80 days
+  { id: "personal_21_26", minKg: 21, maxKg: 26, price: 825, minAgeDays: 60, maxAgeDays: 80 },
+  // 3–5 months
+  { id: "personal_28_30", minKg: 28, maxKg: 30, price: 1000, minAgeMonths: 3, maxAgeMonths: 5 },
+  { id: "personal_31_33", minKg: 31, maxKg: 33, price: 1120, minAgeMonths: 3, maxAgeMonths: 5 },
+  { id: "personal_34_36", minKg: 34, maxKg: 36, price: 1220, minAgeMonths: 3, maxAgeMonths: 5 },
+  { id: "personal_37_40", minKg: 37, maxKg: 40, price: 1320, minAgeMonths: 3, maxAgeMonths: 5 },
+] as const;
+
+function formatKgRangeLabel(locale: string, minKg: number, maxKg: number): string {
+  const nf = new Intl.NumberFormat(locale === "ar" ? "ar" : locale);
+  if (locale === "ar") return `${nf.format(minKg)} إلى ${nf.format(maxKg)} كغ`;
+  return `${nf.format(minKg)} – ${nf.format(maxKg)} kg`;
+}
+
+function formatPersonalBandLabel(
+  locale: string,
+  band: (typeof PERSONAL_BANDS)[number],
+): string {
+  const nf = new Intl.NumberFormat(locale === "ar" ? "ar" : locale);
+  const weightPart =
+    locale === "ar"
+      ? `${nf.format(band.minKg)} إلى ${nf.format(band.maxKg)} كغ`
+      : `${nf.format(band.minKg)} – ${nf.format(band.maxKg)} kg`;
+  if ("minAgeDays" in band && band.minAgeDays && band.maxAgeDays) {
+    if (locale === "ar") {
+      return `عمر ${nf.format(band.minAgeDays)} إلى ${nf.format(
+        band.maxAgeDays,
+      )} يوم · ${weightPart}`;
+    }
+    return `Age ${band.minAgeDays}–${band.maxAgeDays} days · ${weightPart}`;
+  }
+  if ("minAgeMonths" in band && band.minAgeMonths && band.maxAgeMonths) {
+    if (locale === "ar") {
+      return `عمر ${nf.format(band.minAgeMonths)} إلى ${nf.format(
+        band.maxAgeMonths,
+      )} شهر · ${weightPart}`;
+    }
+    return `Age ${band.minAgeMonths}–${band.maxAgeMonths} months · ${weightPart}`;
+  }
+  return weightPart;
+}
 
 type ProductConfigMap = Record<string, { label: string; minPrice: number; maxPrice: number; imageUrl: string }>;
 type WeightOptionsMap = Record<string, ProductWeightOption[]>;
@@ -67,10 +134,18 @@ function getPriceRange(
 ): { minPrice: number; maxPrice: number; productLabel: string } {
   const config = productConfigs[product];
   if (!config) return { minPrice: 0, maxPrice: 0, productLabel: product };
-  const weights = weightOptionsByProduct[product] ?? [];
-  if (weights.length > 0 && state.weightSelection) {
-    const w = weights.find((x) => x.id === state.weightSelection);
-    if (w) return { minPrice: w.price, maxPrice: w.price, productLabel: config.label };
+  // Whole carcass: use fixed bands (ignore DB weight options for now).
+  if (state.portion === "whole" && state.weightSelection) {
+    const bands =
+      state.occasion === "personal" ? PERSONAL_BANDS : QURBAN_AQIQAH_BANDS;
+    const band = bands.find((b) => b.id === state.weightSelection);
+    if (band) return { minPrice: band.price, maxPrice: band.price, productLabel: config.label };
+  } else {
+    const weights = weightOptionsByProduct[product] ?? [];
+    if (weights.length > 0 && state.weightSelection) {
+      const w = weights.find((x) => x.id === state.weightSelection);
+      if (w) return { minPrice: w.price, maxPrice: w.price, productLabel: config.label };
+    }
   }
   return { minPrice: config.minPrice, maxPrice: config.maxPrice, productLabel: config.label };
 }
@@ -110,13 +185,16 @@ export function OrderWizard({
   const router = useRouter();
   const { addItem, updateItem, getItemById } = useCart();
 
+  const hasInitialOccasion = !!initialOccasion && !editItemId;
+
   const startStep =
     initialProduct && (initialProduct === "half_sheep" || initialProduct === "half_goat" || initialProduct === "whole_sheep" || initialProduct === "whole_goat")
       ? 4
-      : initialOccasion && !editItemId
+      : hasInitialOccasion
         ? 2
         : initialStep ?? 1;
   const [step, setStep] = useState(Math.min(7, Math.max(1, startStep)));
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [state, setState] = useState<WizardState>(() => {
     const s: WizardState = { ...defaultState, occasion: initialOccasion ?? "" };
     if (initialProduct === "half_sheep" || initialProduct === "half_goat" || initialProduct === "whole_sheep" || initialProduct === "whole_goat") {
@@ -128,7 +206,27 @@ export function OrderWizard({
 
   const product = stateToProduct(state);
   const config = product ? productConfigs[product] : null;
-  const weightOptions = product ? (weightOptionsByProduct[product] ?? []) : [];
+  const wholeBandsLabelById = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const b of QURBAN_AQIQAH_BANDS) {
+      out[b.id] = formatKgRangeLabel(locale, b.minKg, b.maxKg);
+    }
+    for (const b of PERSONAL_BANDS) {
+      out[b.id] = formatPersonalBandLabel(locale, b);
+    }
+    return out;
+  }, [locale]);
+
+  // For half carcass, only allow a limited set of cutting options.
+  const visibleSpecialCuts = useMemo(() => {
+    if (state.portion !== "half") return specialCuts;
+    const allowedIds = new Set<SpecialCutOption["id"]>([
+      "fridge_medium",  // تقطيع ثلاجه (قطع متوسطة)
+      "salona_small",   // تقطيع صالونه (قطع صغيرة)
+      "biryani_large",  // تقطيع برياني (قطع كبيرة)
+    ]);
+    return specialCuts.filter((cut) => allowedIds.has(cut.id));
+  }, [specialCuts, state.portion]);
 
   // Ensure half portions are only used for personal orders.
   // For aqiqah and qurban, force "whole" and hide half option.
@@ -193,7 +291,8 @@ export function OrderWizard({
 
   const handleAddToCart = useCallback(() => {
     const productType = stateToProduct(state);
-    if (!productType || !state.occasion || !state.specialCutId) return;
+    if (!productType || !state.occasion || !state.specialCutId || isAddingToCart) return;
+    setIsAddingToCart(true);
     const { minPrice, maxPrice, productLabel } = getPriceRange(
       productType,
       state,
@@ -208,7 +307,7 @@ export function OrderWizard({
       slaughterDate: state.slaughterDate,
       distribution: state.distribution,
       weightSelection: state.weightSelection || "as_is",
-      weightLabel: state.weightLabel || undefined,
+      weightLabel: state.weightLabel || getWeightBandDisplayLabel(state.weightSelection, state.occasion, locale) || undefined,
       videoProof: state.videoProof,
       includeHead: state.includeHead,
       includeStomach: state.includeStomach,
@@ -224,7 +323,7 @@ export function OrderWizard({
       addItem(lineItem);
     }
     router.push(`/${locale}/cart?added=1`);
-  }, [state, productConfigs, weightOptionsByProduct, editItemId, addItem, updateItem, router, locale]);
+  }, [state, productConfigs, weightOptionsByProduct, editItemId, addItem, updateItem, router, locale, isAddingToCart]);
 
   const stepTitles = [
     tWizard("step1Title"),
@@ -258,7 +357,15 @@ export function OrderWizard({
         {step > 1 && (
           <button
             type="button"
-            onClick={() => setStep((s) => s - 1)}
+            onClick={() => {
+              // If user came from homepage with an occasion, going "back" from step 2
+              // should return them to the homepage instead of showing the hidden step 1.
+              if (hasInitialOccasion && step === 2) {
+                router.push(`/${locale}`);
+              } else {
+                setStep((s) => s - 1);
+              }
+            }}
             className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
           >
             <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
@@ -268,7 +375,7 @@ export function OrderWizard({
       </div>
 
       {/* Step 1: Purpose */}
-      {step === 1 && (
+      {!hasInitialOccasion && step === 1 && (
         <div className="space-y-4">
           <ul className="flex flex-col gap-3" role="list">
             {PURPOSES.map((key) => {
@@ -314,8 +421,8 @@ export function OrderWizard({
                     isSelected ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20" : "border-[var(--border)] hover:border-[var(--primary)]/40"
                   )}
                 >
-                  <div className="relative aspect-[4/3] bg-[var(--muted)]">
-                    <Image src={animalImages[a]} alt={tWizard(a)} fill className="object-cover" sizes="50vw" />
+                  <div className="relative aspect-square bg-[var(--muted)]">
+                    <Image src={animalImages[a]} alt={tWizard(a)} fill className="object-contain" sizes="50vw" />
                   </div>
                   <div className="p-4">
                     <span className="text-lg font-semibold text-[var(--foreground)]">{tWizard(a)}</span>
@@ -357,25 +464,82 @@ export function OrderWizard({
                   )}
                 >
                   {cfg?.imageUrl && (
-                    <div className="relative aspect-[4/3] bg-[var(--muted)]">
-                      <Image src={cfg.imageUrl} alt={tWizard(p)} fill className="object-cover" sizes="50vw" />
+                    <div className="relative aspect-square bg-[var(--muted)]">
+                      <Image src={cfg.imageUrl} alt={tWizard(p)} fill className="object-contain" sizes="50vw" />
                     </div>
                   )}
                   <div className="p-4">
                     <span className="text-lg font-semibold text-[var(--foreground)]">{tWizard(p)}</span>
-                    {cfg && (
-                      <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                        {formatPriceRange(cfg.minPrice, cfg.maxPrice)}
-                      </p>
-                    )}
                   </div>
                 </button>
               );
             })}
           </div>
+          {state.portion === "whole" && (
+            <div className="space-y-2">
+              <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                {tAnimal("weightSelection")}
+              </label>
+              {state.occasion !== "personal" && (
+                <p className="mb-1 text-xs text-[var(--muted-foreground)]">
+                  {tAnimal("weightAgeNote")}
+                </p>
+              )}
+              {/* Weight band selector differs for personal vs qurban/aqiqah */}
+              {state.occasion && (
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-xs sm:text-sm text-[var(--muted-foreground)]">
+                  <p className="mb-1 font-medium text-[var(--foreground)]">
+                    {state.occasion === "personal"
+                      ? locale === "ar"
+                        ? "أسعار لحم الضاني (للاستخدام الشخصي)"
+                        : "Personal lamb pricing"
+                      : locale === "ar"
+                        ? "أسعار الغنم في الأضحية والعقيقة"
+                        : "Sheep prices for Qurban & Aqiqah"}
+                  </p>
+                  <ul className="space-y-0.5">
+                    {(state.occasion === "personal"
+                      ? PERSONAL_BANDS
+                      : QURBAN_AQIQAH_BANDS
+                    ).map((b) => (
+                      <li key={b.id} className="flex items-center justify-between gap-2">
+                        <span>{wholeBandsLabelById[b.id]}</span>
+                        <span className="font-semibold text-[var(--primary)]">
+                          {formatPrice(b.price)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <select
+                className="input-base w-full"
+                value={state.weightSelection}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  set({
+                    weightSelection: selectedId,
+                    weightLabel: wholeBandsLabelById[selectedId] ?? "",
+                  });
+                }}
+              >
+                <option value="">{tOrder("chooseWeight")}</option>
+                {(state.occasion === "personal"
+                  ? PERSONAL_BANDS
+                  : QURBAN_AQIQAH_BANDS
+                ).map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {(wholeBandsLabelById[b.id] ?? "")} — {formatPrice(b.price)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <button
             type="button"
-            disabled={!state.portion}
+            disabled={
+              !state.portion || (state.portion === "whole" && !state.weightSelection)
+            }
             onClick={() => setStep(4)}
             className="btn-primary flex w-full items-center justify-center gap-2"
           >
@@ -390,7 +554,7 @@ export function OrderWizard({
         <div className="space-y-4">
           <p className="text-sm text-[var(--muted-foreground)]">{tOrder("chooseCutSubtitle")}</p>
           <div className="grid grid-cols-2 gap-3">
-            {specialCuts.map((cut) => {
+            {visibleSpecialCuts.map((cut) => {
               const isSelected = state.specialCutId === cut.id;
               return (
                 <button
@@ -402,8 +566,8 @@ export function OrderWizard({
                     isSelected ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20" : "border-[var(--border)] hover:border-[var(--primary)]/40"
                   )}
                 >
-                  <div className="relative aspect-[4/3] bg-[var(--muted)]">
-                    <Image src={cut.imageUrl} alt={cut.label} fill className="object-cover" sizes="50vw" />
+                  <div className="relative aspect-square bg-[var(--muted)]">
+                    <Image src={cut.imageUrl} alt={cut.label} fill className="object-contain" sizes="50vw" />
                   </div>
                   <p className="p-2.5 text-center text-sm font-medium text-[var(--foreground)]">{cut.label}</p>
                 </button>
@@ -493,33 +657,50 @@ export function OrderWizard({
                 />
                 <span className="text-sm font-medium">{tAnimal("videoProof")}</span>
               </label>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">{tAnimal("weightSelection")}</label>
-                <select
-                  className="input-base w-full"
-                  value={state.weightSelection}
-                  onChange={(e) => {
-                    const opt = weightOptions.find((w) => w.id === e.target.value);
-                    set({ weightSelection: e.target.value, weightLabel: opt?.label ?? "" });
-                  }}
-                >
-                  {weightOptions.length > 0 ? (
-                    <>
-                      <option value="">{tOrder("chooseWeight")}</option>
-                      {weightOptions.map((w) => (
-                        <option key={w.id} value={w.id}>
-                          {w.label} — {formatPrice(w.price)}
-                        </option>
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      <option value="as_is">{tOrder("weightAsIs")}</option>
-                      <option value="range">{tOrder("weightRange")}</option>
-                    </>
-                  )}
-                </select>
-              </div>
+              {state.portion === "whole" ? (
+                <div>
+                  <p className="mb-1 text-sm font-medium text-[var(--foreground)]">
+                    {tAnimal("weightSelection")}
+                  </p>
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    {state.weightLabel || tOrder("chooseWeight")}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">{tAnimal("weightSelection")}</label>
+                  <select
+                    className="input-base w-full"
+                    value={state.weightSelection}
+                    onChange={(e) => {
+                      const product = stateToProduct(state);
+                      const opts = weightOptionsByProduct[product] ?? [];
+                      const opt = opts.find((w) => w.id === e.target.value);
+                      set({ weightSelection: e.target.value, weightLabel: opt?.label ?? "" });
+                    }}
+                  >
+                    {(() => {
+                      const product = stateToProduct(state);
+                      const opts = weightOptionsByProduct[product] ?? [];
+                      return opts.length > 0 ? (
+                        <>
+                          <option value="">{tOrder("chooseWeight")}</option>
+                          {opts.map((w) => (
+                            <option key={w.id} value={w.id}>
+                              {w.label} — {formatPrice(w.price)}
+                            </option>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          <option value="as_is">{tOrder("weightAsIs")}</option>
+                          <option value="range">{tOrder("weightRange")}</option>
+                        </>
+                      );
+                    })()}
+                  </select>
+                </div>
+              )}
               <div>
                 <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{tAnimal("orderIncludes")}</p>
                 <div className="flex flex-wrap gap-3">
@@ -550,9 +731,67 @@ export function OrderWizard({
         </div>
       )}
 
-      {/* Step 7: Notes + Add to cart */}
+      {/* Step 7: Order summary + Notes + Add to cart */}
       {step === 7 && (
         <div className="space-y-6">
+          {/* Order summary before adding to cart */}
+          <section className="rounded-2xl border-2 border-[var(--primary)]/20 bg-[var(--card)] p-4 sm:p-5">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--primary)]">
+              {tOrder("summaryTitle")}
+            </h2>
+            <dl className="space-y-2.5 text-sm">
+              <div className="flex justify-between gap-3">
+                <dt className="text-[var(--muted-foreground)]">{tOrder("occasionLabel")}</dt>
+                <dd className="font-medium text-[var(--foreground)] text-end">{state.occasion ? (t(state.occasion as "qurban" | "aqiqah" | "personal") ?? state.occasion) : "—"}</dd>
+              </div>
+              {config && (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[var(--muted-foreground)]">{tOrder("yourProduct")}</dt>
+                  <dd className="font-medium text-[var(--foreground)] text-end">{config.label}</dd>
+                </div>
+              )}
+              {(state.weightLabel || state.weightSelection) && (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[var(--muted-foreground)]">{tOrder("weightAndAge")}</dt>
+                  <dd className="font-medium text-[var(--foreground)] text-end">
+                    {state.weightLabel || getWeightBandDisplayLabel(state.weightSelection, state.occasion, locale) || state.weightSelection}
+                  </dd>
+                </div>
+              )}
+              {(state.occasion === "qurban" || state.occasion === "aqiqah") && (
+                <p className="rounded-lg bg-[var(--muted)]/40 px-3 py-2 text-xs text-[var(--muted-foreground)]">
+                  {tAnimal("weightAgeNote")}
+                </p>
+              )}
+              {state.specialCutLabel && (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[var(--muted-foreground)]">{tOrder("chooseCut")}</dt>
+                  <dd className="font-medium text-[var(--foreground)] text-end">{state.specialCutLabel}</dd>
+                </div>
+              )}
+              {state.slaughterDate && (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-[var(--muted-foreground)]">{tAnimal("slaughterDate")}</dt>
+                  <dd className="font-medium text-[var(--foreground)] text-end">{state.slaughterDate}</dd>
+                </div>
+              )}
+              <div className="flex justify-between gap-3">
+                <dt className="text-[var(--muted-foreground)]">{tAnimal("distribution")}</dt>
+                <dd className="font-medium text-[var(--foreground)] text-end">{tOrder(state.distribution)}</dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-[var(--muted-foreground)]">{tAnimal("videoProof")}</dt>
+                <dd className="font-medium text-[var(--foreground)] text-end">{state.videoProof ? "Yes" : "No"}</dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-[var(--muted-foreground)]">{tAnimal("orderIncludes")}</dt>
+                <dd className="font-medium text-[var(--foreground)] text-end">
+                  {[state.includeHead && tAnimal("includeHead"), state.includeStomach && tAnimal("includeStomach"), state.includeIntestines && tAnimal("includeIntestines")].filter(Boolean).join(", ") || "—"}
+                </dd>
+              </div>
+            </dl>
+          </section>
+
           <section className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--primary)]">{tOrder("notes")}</h2>
             <textarea
@@ -566,17 +805,39 @@ export function OrderWizard({
             <div className="rounded-xl border-2 border-[var(--primary)]/20 bg-[var(--card)] p-4">
               <p className="text-sm font-medium text-[var(--foreground)]">{config.label}</p>
               <p className="mt-1 text-xl font-bold text-[var(--primary)]">
-                {weightOptions.length > 0 && state.weightSelection
-                  ? (() => {
-                      const w = weightOptions.find((x) => x.id === state.weightSelection);
-                      return w ? formatPrice(w.price) : formatPriceRange(config.minPrice, config.maxPrice);
-                    })()
-                  : formatPriceRange(config.minPrice, config.maxPrice)}
+                {(() => {
+                  // Use the same pricing logic as the cart item (bands for whole, DB weights otherwise).
+                  if (!product) {
+                    return formatPriceRange(config.minPrice, config.maxPrice);
+                  }
+                  const { minPrice, maxPrice } = getPriceRange(
+                    product,
+                    state,
+                    productConfigs,
+                    weightOptionsByProduct,
+                  );
+                  return minPrice === maxPrice
+                    ? formatPrice(minPrice)
+                    : formatPriceRange(minPrice, maxPrice);
+                })()}
               </p>
             </div>
           )}
-          <button type="button" onClick={handleAddToCart} className="btn-primary w-full">
-            {editItemId ? tWizard("addToCart") : tWizard("addToCart")}
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={isAddingToCart}
+            className="btn-primary flex w-full items-center justify-center gap-2"
+            aria-busy={isAddingToCart}
+          >
+            {isAddingToCart ? (
+              <>
+                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden />
+                {tWizard("addingToCart")}
+              </>
+            ) : (
+              tWizard("addToCart")
+            )}
           </button>
         </div>
       )}

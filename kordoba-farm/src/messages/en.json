@@ -22,9 +22,9 @@
   "orderDetails": {
     "title": "Order details",
     "invalidProduct": "Invalid product. Please go back and choose a product.",
-    "delivery": "Delivery",
-    "pickup": "Pickup",
-    "donate": "Donate",
+    "delivery": "Delivery to my address",
+    "pickup": "I'll collect myself",
+    "donate": "Donate to charity (we distribute)",
     "notesPlaceholder": "Any special requests...",
     "weightAsIs": "As is (standard weight)",
     "weightRange": "Weight range (contact us)",
@@ -37,7 +37,10 @@
     "deliveryOptions": "Delivery & date",
     "orderExtras": "Order extras",
     "notes": "Notes",
-    "completeRequiredToProceed": "Please select slaughter date, a special cut, and weight option to continue."
+    "completeRequiredToProceed": "Please select slaughter date, a special cut, and weight option to continue.",
+    "summaryTitle": "Order summary",
+    "weightAndAge": "Weight / age",
+    "occasionLabel": "Occasion"
   },
   "nav": {
     "home": "Home",
@@ -52,7 +55,7 @@
   },
   "cart": {
     "title": "Your cart",
-    "subtitle": "Review, edit, or add more items — then complete your order via WhatsApp.",
+    "subtitle": "Review your items. Pay securely online or complete via WhatsApp.",
     "empty": "Your cart is empty",
     "emptyHint": "Start by choosing a purpose to add your first item.",
     "invalidProduct": "Invalid product.",
@@ -64,9 +67,13 @@
     "goToCart": "Go to cart",
     "completeOrder": "Complete order via WhatsApp",
     "completeOrderHint": "We'll open WhatsApp with your order. Please reply with your name, phone and delivery address.",
+    "proceedToCheckout": "Proceed to checkout",
+    "payOnlineHint": "Pay securely with card or FPX. We'll confirm your order by email and WhatsApp.",
+    "orCompleteViaWhatsApp": "Or complete via WhatsApp",
     "editItem": "Edit",
     "removeItem": "Remove",
-    "itemAdded": "Item added to cart."
+    "itemAdded": "Item added to cart.",
+    "weightAndAge": "Weight / age"
   },
   "orderWizard": {
     "step1Title": "Choose your occasion",
@@ -77,6 +84,7 @@
     "step6Title": "Extras",
     "step7Title": "Notes",
     "addToCart": "Add to cart",
+    "addingToCart": "Adding to cart…",
     "next": "Next",
     "back": "Back",
     "sheep": "Sheep",
@@ -113,7 +121,7 @@
     "q8": "What is the 7-step order process?",
     "a8": "Our 7-step flow ensures a clear experience: (1) Choose occasion — Qurban, Aqiqah, or Personal. (2) Sheep or goat. (3) Half or whole. (4) Choose your cut. (5) Slaughter date and distribution. (6) Extras (e.g. name tag, video proof). (7) Notes. You confirm each step, add to cart, then complete via WhatsApp.",
     "q9": "What payment options do you accept?",
-    "a9": "We accept bank transfer only. After you send your order via WhatsApp we'll confirm and share our bank details. Payment is arranged with you before or around the time of your order."
+    "a9": "You can pay securely online by card or FPX when you proceed to checkout from your cart. We also accept bank transfer — after you send your order via WhatsApp we'll confirm and share our bank details if you prefer that option."
   },
   "shop": {
     "title": "Select Your Animal",
@@ -143,6 +151,7 @@
     "videoProof": "Video Proof of Slaughter",
     "addToOrder": "Proceed to Checkout",
     "weightSelection": "Weight selection",
+    "weightAgeNote": "Sheep: more than 6 months. Goat: more than one year.",
     "weightAsIs": "As is ({weight} kg)",
     "specialCut": "Special cut (optional)",
     "orderIncludes": "Order includes",
@@ -163,7 +172,22 @@
     "orderSummaryNote": "Order details will be sent to WhatsApp",
     "sendToWhatsApp": "Send order to WhatsApp",
     "placeOrder": "Place Order",
-    "guestCheckout": "Enter your details — order will be sent to WhatsApp"
+    "guestCheckout": "Enter your details — order will be sent to WhatsApp",
+    "emptyCart": "Your cart is empty.",
+    "backToCart": "Back to cart",
+    "orderSummary": "Order summary",
+    "total": "Total",
+    "securePayment": "Pay securely with card or FPX. Your payment is protected.",
+    "payNow": "Pay securely now",
+    "processing": "Redirecting to payment…",
+    "secureNote": "Payment is processed by Stripe. We never store your card details.",
+    "thankYou": "Thank you for your order",
+    "paymentSuccess": "Your payment was successful. We've received your order.",
+    "whatHappensNext": "What happens next?",
+    "nextStep1": "We'll confirm your order by email and WhatsApp within 24 hours.",
+    "nextStep2": "Slaughter and preparation will follow the dates you chose for each item.",
+    "nextStep3": "Delivery, pickup or donation will be arranged as per your selection.",
+    "backToHome": "Back to home"
   },
   "dashboard": {
     "title": "My Orders",
@@ -179,7 +203,16 @@
   },
   "footer": {
     "company": "Kordoba Agrotech Sdn. Bhd.",
-    "allRights": "All rights reserved."
+    "companySection": "Company",
+    "allRights": "All rights reserved.",
+    "tagline": "Qurban, Aqiqah & premium halal lamb — from farm to your table with full traceability.",
+    "quickLinks": "Quick links",
+    "home": "Home",
+    "order": "Order",
+    "faq": "FAQ",
+    "about": "About",
+    "halalNote": "Halal slaughter in accordance with Shariah. Full traceability & optional video proof.",
+    "madeWith": "Halal with care"
   },
   "common": {
     "loading": "Loading...",

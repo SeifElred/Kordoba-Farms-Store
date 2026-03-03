@@ -1,8 +1,45 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { getProductConfig, getProductWeights, getSpecialCuts, getSiteSetting } from "@/lib/content";
 import { OrderWizard } from "@/components/order/OrderWizard";
+import { HowItWorks } from "@/components/layout/HowItWorks";
 
-const PRODUCT_TYPES = ["half_sheep", "half_goat", "whole_sheep", "whole_goat"] as const;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (locale === "ar") {
+    return {
+      title: "إتمام الطلب – أضحية، عقيقة أو لحم ضاني",
+      description:
+        "إختر المناسبة، الوزن، طريقة التقطيع، وتاريخ الذبح لإنهاء طلب الأضحية أو العقيقة أو لحم الضاني مع مزارع قرطبة.",
+    };
+  }
+  if (locale === "ms") {
+    return {
+      title: "Buat pesanan – Korban, Aqiqah atau daging peribadi",
+      description:
+        "Pilih acara, julat berat, jenis potongan dan tarikh sembelihan untuk melengkapkan pesanan Korban, Aqiqah atau daging kambing peribadi anda.",
+    };
+  }
+  if (locale === "zh") {
+    return {
+      title: "提交订单 – 古尔邦、阿奇卡或自用羊肉",
+      description:
+        "选择场合、重量区间、切割方式和屠宰日期，完成您的古尔邦、阿奇卡或家庭自用清真羊肉订单。",
+    };
+  }
+  return {
+    title: "Complete your order – Qurban, Aqiqah or personal lamb",
+    description:
+      "Choose occasion, weight band, cut style and slaughter date to complete your Qurban, Aqiqah or personal lamb order with Kordoba Farms.",
+  };
+}
+
+// Half carcass products are temporarily disabled (only whole products are loaded).
+const PRODUCT_TYPES = ["whole_sheep", "whole_goat"] as const;
 
 const DEFAULT_SHEEP_IMAGE =
   "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800&q=80";
@@ -39,12 +76,6 @@ export default async function OrderPage({
     weightOptionsByProduct[pt] = Array.isArray(weights) ? weights : [];
   });
 
-  const t = await getTranslations("nav");
-  const breadcrumbItems = [
-    { label: t("home"), href: "/" },
-    { label: t("shop"), href: "/order" },
-  ];
-
   return (
     <div className="min-h-[60vh]">
       <OrderWizard
@@ -61,8 +92,8 @@ export default async function OrderPage({
           goat: (goatImageSetting ?? "").trim() || DEFAULT_GOAT_IMAGE,
         }}
         deliveryTransportNote={deliveryTransportNote ?? undefined}
-        breadcrumbItems={breadcrumbItems}
       />
+      <HowItWorks locale={locale} />
     </div>
   );
 }

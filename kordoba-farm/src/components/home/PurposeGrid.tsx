@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { Baby, Beef, User, ChevronRight } from "lucide-react";
@@ -22,7 +21,6 @@ const accentStyles: Record<AccentKey, string> = {
 export function PurposeGrid() {
   const t = useTranslations("purpose");
   const locale = useLocale();
-  const [loadingKey, setLoadingKey] = useState<"aqiqah" | "qurban" | "personal" | null>(null);
 
   return (
     <div className="space-y-1">
@@ -36,10 +34,7 @@ export function PurposeGrid() {
             <li key={item.key} className={staggerClass}>
               <Link
                 href={`/${locale}/order?occasion=${item.slug}&step=2`}
-                onClick={() => setLoadingKey(item.key)}
-                className={`group flex min-h-[80px] items-center gap-4 rounded-2xl border-2 px-5 py-4 shadow-sm transition-all hover:shadow-md active:scale-[0.99] sm:min-h-[88px] sm:gap-5 sm:px-6 sm:py-5 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 ${styles} ${
-                  loadingKey === item.key ? "opacity-70 pointer-events-none" : ""
-                }`}
+                className={`group flex min-h-[80px] items-center gap-4 rounded-2xl border-2 px-5 py-4 shadow-sm transition-all hover:shadow-md active:scale-[0.99] sm:min-h-[88px] sm:gap-5 sm:px-6 sm:py-5 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 ${styles}`}
               >
                 <span className="icon-wrap flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors sm:h-14 sm:w-14">
                   <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2} />
@@ -52,10 +47,7 @@ export function PurposeGrid() {
                     {t(`${item.key}Desc`)}
                   </span>
                 </div>
-                <span className="flex items-center gap-1 text-xs sm:text-sm text-[var(--muted-foreground)]">
-                  {loadingKey === item.key ? "Loading..." : null}
-                  <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)] transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 sm:h-6 sm:w-6" aria-hidden />
-                </span>
+                <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)] transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 sm:h-6 sm:w-6" aria-hidden />
               </Link>
             </li>
           );

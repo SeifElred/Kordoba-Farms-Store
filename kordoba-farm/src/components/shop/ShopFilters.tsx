@@ -3,10 +3,9 @@
 import { useTranslations } from "next-intl";
 import { useRouter, usePathname } from "next/navigation";
 
+// Half carcass products are temporarily disabled.
 const PRODUCT_OPTIONS = [
   { value: "", label: "All products" },
-  { value: "half_goat", label: "Half Goat" },
-  { value: "half_sheep", label: "Half Sheep" },
   { value: "whole_goat", label: "Whole Goat" },
   { value: "whole_sheep", label: "Whole Sheep" },
 ];

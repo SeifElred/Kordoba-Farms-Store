@@ -22,9 +22,9 @@
   "orderDetails": {
     "title": "Butiran pesanan",
     "invalidProduct": "Produk tidak sah. Sila kembali dan pilih produk.",
-    "delivery": "Penghantaran",
-    "pickup": "Ambil",
-    "donate": "Derma",
+    "delivery": "Penghantaran ke alamat saya",
+    "pickup": "Saya ambil sendiri",
+    "donate": "Derma untuk kebajikan (kami agih)",
     "notesPlaceholder": "Apa-apa permintaan khas...",
     "weightAsIs": "Seperti ada (berat standard)",
     "weightRange": "Julat berat (hubungi kami)",
@@ -37,7 +37,10 @@
     "deliveryOptions": "Penghantaran & tarikh",
     "orderExtras": "Tambahan pesanan",
     "notes": "Nota",
-    "completeRequiredToProceed": "Sila pilih tarikh sembelihan, potongan khas, dan pilihan berat untuk terus."
+    "completeRequiredToProceed": "Sila pilih tarikh sembelihan, potongan khas, dan pilihan berat untuk terus.",
+    "summaryTitle": "Ringkasan pesanan",
+    "weightAndAge": "Berat / umur",
+    "occasionLabel": "Acara"
   },
   "nav": {
     "home": "Laman Utama",
@@ -52,7 +55,7 @@
   },
   "cart": {
     "title": "Troli anda",
-    "subtitle": "Semak, sunting atau tambah item — kemudian selesaikan pesanan melalui WhatsApp.",
+    "subtitle": "Semak item anda. Bayar dengan selamat dalam talian atau selesaikan melalui WhatsApp.",
     "empty": "Troli anda kosong",
     "emptyHint": "Mulakan dengan memilih acara untuk menambah item pertama.",
     "invalidProduct": "Produk tidak sah.",
@@ -64,9 +67,13 @@
     "goToCart": "Ke troli",
     "completeOrder": "Selesaikan pesanan melalui WhatsApp",
     "completeOrderHint": "Kami akan buka WhatsApp dengan pesanan anda. Sila balas dengan nama, telefon dan alamat penghantaran.",
+    "proceedToCheckout": "Terus ke bayaran",
+    "payOnlineHint": "Bayar dengan selamat menggunakan kad atau FPX. Kami akan sahkan pesanan melalui e-mel dan WhatsApp.",
+    "orCompleteViaWhatsApp": "Atau selesaikan melalui WhatsApp",
     "editItem": "Sunting",
     "removeItem": "Buang",
-    "itemAdded": "Item telah ditambah ke troli."
+    "itemAdded": "Item telah ditambah ke troli.",
+    "weightAndAge": "Berat / umur"
   },
   "orderWizard": {
     "step1Title": "Pilih acara anda",
@@ -77,6 +84,7 @@
     "step6Title": "Tambahan",
     "step7Title": "Nota",
     "addToCart": "Tambah ke troli",
+    "addingToCart": "Menambah ke troli…",
     "next": "Seterusnya",
     "back": "Kembali",
     "sheep": "Biri-biri",
@@ -113,7 +121,7 @@
     "q8": "Apakah proses pesanan 7 langkah?",
     "a8": "Aliran 7 langkah kami memastikan pengalaman yang jelas: (1) Pilih majlis — Korban, Aqiqah, atau Peribadi. (2) Biri-biri atau kambing. (3) Separuh atau keseluruhan. (4) Pilih potongan. (5) Tarikh sembelihan dan pengedaran. (6) Tambahan (contoh name tag, bukti video). (7) Nota. Anda sahkan setiap langkah, tambah ke troli, kemudian lengkapkan melalui WhatsApp.",
     "q9": "Apakah pilihan pembayaran yang diterima?",
-    "a9": "Kami terima pindahan bank sahaja. Selepas anda hantar pesanan melalui WhatsApp kami akan sahkan dan kongsi butiran bank kami. Pembayaran diatur dengan anda sebelum atau sekitar masa pesanan."
+    "a9": "Anda boleh bayar dengan selamat dalam talian dengan kad atau FPX apabila anda terus ke bayaran dari troli. Kami juga terima pindahan bank — selepas anda hantar pesanan melalui WhatsApp kami akan sahkan dan kongsi butiran bank jika anda pilih pilihan itu."
   },
   "shop": {
     "title": "Pilih Haiwan Anda",
@@ -143,6 +151,7 @@
     "videoProof": "Video Bukti Sembelihan",
     "addToOrder": "Terus ke Bayaran",
     "weightSelection": "Pilihan berat",
+    "weightAgeNote": "Biri-biri: lebih 6 bulan. Kambing: lebih satu tahun.",
     "weightAsIs": "Seperti ada ({weight} kg)",
     "specialCut": "Potongan khas (pilihan)",
     "orderIncludes": "Pesanan termasuk",
@@ -163,7 +172,22 @@
     "orderSummaryNote": "Butiran pesanan akan dihantar ke WhatsApp",
     "sendToWhatsApp": "Hantar pesanan ke WhatsApp",
     "placeOrder": "Tempat Pesanan",
-    "guestCheckout": "Masukkan butiran — pesanan akan dihantar ke WhatsApp"
+    "guestCheckout": "Masukkan butiran — pesanan akan dihantar ke WhatsApp",
+    "emptyCart": "Troli anda kosong.",
+    "backToCart": "Kembali ke troli",
+    "orderSummary": "Ringkasan pesanan",
+    "total": "Jumlah",
+    "securePayment": "Bayar dengan selamat menggunakan kad atau FPX. Pembayaran anda dilindungi.",
+    "payNow": "Bayar dengan selamat sekarang",
+    "processing": "Mengalihkan ke pembayaran…",
+    "secureNote": "Pembayaran diproses oleh Stripe. Kami tidak menyimpan maklumat kad anda.",
+    "thankYou": "Terima kasih atas pesanan anda",
+    "paymentSuccess": "Pembayaran anda berjaya. Kami telah menerima pesanan anda.",
+    "whatHappensNext": "Apa yang seterusnya?",
+    "nextStep1": "Kami akan mengesahkan pesanan anda melalui e-mel dan WhatsApp dalam 24 jam.",
+    "nextStep2": "Sembelihan dan penyediaan mengikut tarikh yang anda pilih untuk setiap item.",
+    "nextStep3": "Penghantaran, ambilan atau derma akan diatur mengikut pilihan anda.",
+    "backToHome": "Kembali ke laman utama"
   },
   "dashboard": {
     "title": "Pesanan Saya",
@@ -179,7 +203,16 @@
   },
   "footer": {
     "company": "Kordoba Agrotech Sdn. Bhd.",
-    "allRights": "Hak cipta terpelihara."
+    "companySection": "Syarikat",
+    "allRights": "Hak cipta terpelihara.",
+    "tagline": "Korban, Aqiqah & daging kambing halal premium — dari ladang ke meja anda dengan kebolehkesanan penuh.",
+    "quickLinks": "Pautan pantas",
+    "home": "Laman utama",
+    "order": "Pesanan",
+    "faq": "Soalan lazim",
+    "about": "Tentang kami",
+    "halalNote": "Sembelihan halal mengikut syariah. Kebolehkesanan penuh & pilihan video bukti.",
+    "madeWith": "Halal dengan penuh prihatin"
   },
   "common": {
     "loading": "Memuatkan...",

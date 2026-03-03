@@ -5,7 +5,8 @@ import Image from "next/image";
 import { getProductConfig, formatPriceRange } from "@/lib/utils";
 import type { ProductConfig } from "@/lib/content";
 
-const PRODUCT_TYPES = ["half_sheep", "half_goat", "whole_sheep", "whole_goat"] as const;
+// Half carcass products are temporarily disabled (UI only shows whole carcass).
+const PRODUCT_TYPES = ["whole_sheep", "whole_goat"] as const;
 
 export function ProductSelectGrid({
   locale,
@@ -30,12 +31,12 @@ export function ProductSelectGrid({
               href={`/${locale}/order?occasion=${occasion}&product=${config.productType}`}
               className="group block overflow-hidden rounded-xl border-2 border-[var(--border)] bg-[var(--card)] shadow-sm transition-all hover:border-[var(--primary)]/30 hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2"
             >
-              <div className="relative aspect-[4/3] overflow-hidden bg-[var(--muted)]">
+              <div className="relative aspect-square overflow-hidden bg-[var(--muted)]">
                 <Image
                   src={imageUrl}
                   alt={label}
                   fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
