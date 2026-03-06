@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, ShoppingBag, X, Home, HelpCircle } from "lucide-react";
+import { Menu, ShoppingBag, X, Home, HelpCircle, BookOpen } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useCart } from "@/contexts/CartContext";
 import { BRAND_NAME } from "@/lib/constants";
@@ -110,6 +110,7 @@ export function Header({ bannerText }: { bannerText?: string }) {
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-[var(--foreground)] hover:bg-[var(--muted)]"
                 onClick={() => setMenuOpen(false)}
               >
+                <BookOpen className="h-4 w-4 text-[var(--muted-foreground)]" aria-hidden />
                 <span>{t("blog")}</span>
               </Link>
               <Link
