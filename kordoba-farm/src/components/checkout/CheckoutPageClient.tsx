@@ -261,9 +261,9 @@ export function CheckoutPageClient({
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("phone")} *
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2" dir="ltr">
               <select
-                className="input-base w-32 shrink-0"
+                className="input-base w-32 shrink-0 text-left"
                 value={form.country}
                 onChange={(e) =>
                   setForm((f) => ({
@@ -281,7 +281,8 @@ export function CheckoutPageClient({
               <input
                 type="tel"
                 required
-                className="input-base w-full"
+                className="input-base w-full text-left"
+                dir="ltr"
                 value={form.phone}
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               />
