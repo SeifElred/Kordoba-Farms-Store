@@ -148,6 +148,10 @@ export function OrderWizard({
     Math.min(7, Math.max(1, resolvedStartStep))
   );
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  useEffect(() => {
+    if (step >= 5) router.prefetch(`/${locale}/cart`);
+  }, [step, locale, router]);
   const [draftReady, setDraftReady] = useState(false);
   const [state, setState] = useState<WizardState>(() => {
     const s: WizardState = { ...defaultState, occasion: initialOccasion ?? "" };
@@ -404,6 +408,7 @@ export function OrderWizard({
     }
     clearDraft();
     router.push(`/${locale}/cart?added=1`);
+    setTimeout(() => setIsAddingToCart(false), 3000);
   }, [state, productConfigs, weightOptionsByProduct, editItemId, addItem, updateItem, clearDraft, router, locale, isAddingToCart]);
 
   const stepTitles = [

@@ -182,7 +182,7 @@ export async function POST(req: Request) {
 
     if (stripeKey) {
       const stripe = new Stripe(stripeKey, {
-        apiVersion: "2026-01-28.clover",
+        timeout: 15000,
       });
       const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
       const cartItems = items as CartLineItemPayload[];
@@ -231,8 +231,12 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     console.error("Cart checkout error:", e);
+    const message =
+      e instanceof Error && e.message?.includes("timeout")
+        ? "Payment request timed out. Please try again or order via WhatsApp."
+        : "Checkout failed. Please try again or order via WhatsApp.";
     return NextResponse.json(
-      { error: "Checkout failed" },
+      { error: message },
       { status: 500 }
     );
   }

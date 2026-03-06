@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (stripeKey) {
-      const stripe = new Stripe(stripeKey, { apiVersion: "2026-01-28.clover" });
+      const stripe = new Stripe(stripeKey, { timeout: 15000 });
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card", "fpx"],
         line_items: [

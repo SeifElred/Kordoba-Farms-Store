@@ -13,6 +13,7 @@ import { toast } from "sonner";
 const WHATSAPP_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_LINK ?? "https://wa.me/60123456789";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_ALLOWED_REGEX = /^[0-9\s\-()]+$/;
+const CHECKOUT_FETCH_TIMEOUT_MS = 25000;
 
 function normalizeLocalPhoneInput(phone: string) {
   return phone.replace(/\D/g, "").slice(0, 15);
@@ -130,6 +131,8 @@ export function CheckoutPageClient({
     const phoneWithDial = `${countryMeta.dial} ${normalizedPhone}`;
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), CHECKOUT_FETCH_TIMEOUT_MS);
       const res = await fetch("/api/checkout/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -143,7 +146,9 @@ export function CheckoutPageClient({
           locale,
           items: cartToPayload(items),
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error ?? "Could not create order. Please try again.");
@@ -182,8 +187,13 @@ export function CheckoutPageClient({
       clearCart();
       toast.success("Order created. We'll confirm via WhatsApp.");
       window.location.href = `/${locale}/cart`;
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      const isAbort = err instanceof Error && err.name === "AbortError";
+      setError(
+        isAbort
+          ? "Request took too long. Please check your connection and try again."
+          : "Something went wrong. Please try again."
+      );
     }
     setLoading(false);
   }
@@ -218,6 +228,8 @@ export function CheckoutPageClient({
     const normalizedPhone = normalizeLocalPhoneInput(form.phone);
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), CHECKOUT_FETCH_TIMEOUT_MS);
       const res = await fetch("/api/checkout/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -230,10 +242,12 @@ export function CheckoutPageClient({
           locale,
           items: cartToPayload(items),
         }),
+        signal: controller.signal,
       });
-      const data = await res.json();
+      clearTimeout(timeoutId);
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error ?? "Checkout failed");
+        setError(data.error ?? "Checkout failed. Please try again or order via WhatsApp.");
         setLoading(false);
         return;
       }
@@ -242,8 +256,13 @@ export function CheckoutPageClient({
         return;
       }
       setError(data.message ?? "Payment not configured");
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      const isAbort = err instanceof Error && err.name === "AbortError";
+      setError(
+        isAbort
+          ? "Request took too long. Please check your connection and try again, or order via WhatsApp."
+          : "Something went wrong. Please try again or order via WhatsApp."
+      );
     }
     setLoading(false);
   }
