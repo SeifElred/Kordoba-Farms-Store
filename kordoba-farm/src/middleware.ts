@@ -1,4 +1,5 @@
 import createMiddleware from "next-intl/middleware";
+import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 
@@ -13,9 +14,18 @@ export default function middleware(request: NextRequest) {
     : routing.defaultLocale;
   const dir = locale === "ar" ? "rtl" : "ltr";
 
-  response.headers.set("x-locale", locale);
-  response.headers.set("x-dir", dir);
-  return response;
+  // Pass locale to server so root layout can set <html lang dir> (request headers are visible in RSC; response headers are not)
+  if (response.status >= 300 && response.status < 400) {
+    return response;
+  }
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-locale", locale);
+  requestHeaders.set("x-dir", dir);
+  const next = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  response.headers.forEach((value, key) => next.headers.set(key, value));
+  return next;
 }
 
 export const config = {
