@@ -184,6 +184,8 @@
     "emailRequired": "请输入您的邮箱地址。",
     "invalidEmail": "请输入有效的邮箱地址。",
     "phone": "电话",
+    "phoneRequired": "请输入您的电话号码。",
+    "invalidPhone": "请输入有效的电话号码。",
     "address": "地址",
     "addressPlaceholder": "街道、城市、邮编、州",
     "optional": "选填",

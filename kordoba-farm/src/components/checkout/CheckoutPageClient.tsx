@@ -11,6 +11,19 @@ import { Lock, ShieldCheck, CreditCard, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const WHATSAPP_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_LINK ?? "https://wa.me/60123456789";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_ALLOWED_REGEX = /^[0-9\s\-()]+$/;
+
+function normalizeLocalPhoneInput(phone: string) {
+  return phone.replace(/\D/g, "").slice(0, 15);
+}
+
+function isValidLocalPhone(phone: string) {
+  const trimmed = normalizeLocalPhoneInput(phone);
+  if (!trimmed || !PHONE_ALLOWED_REGEX.test(trimmed)) return false;
+  const digits = trimmed.replace(/\D/g, "");
+  return digits.length >= 6 && digits.length <= 15;
+}
 
 type CartPayloadItem = {
   product: string;
@@ -94,14 +107,27 @@ export function CheckoutPageClient({
     e.preventDefault();
     setError(null);
     if (items.length === 0) return;
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+    if (!form.name.trim() || !form.address.trim()) {
       setError(t("addressRequired"));
+      return;
+    }
+    if (!form.phone.trim()) {
+      setError(t("phoneRequired"));
+      return;
+    }
+    if (!isValidLocalPhone(form.phone)) {
+      setError(t("invalidPhone"));
+      return;
+    }
+    if (form.email.trim() && !EMAIL_REGEX.test(form.email.trim())) {
+      setError(t("invalidEmail"));
       return;
     }
     const countryMeta =
       COUNTRY_DIAL_LIST.find((c) => c.code === form.country) ??
       COUNTRY_DIAL_LIST.find((c) => c.code === "MY")!;
-    const phoneWithDial = `${countryMeta.dial} ${form.phone.trim()}`;
+    const normalizedPhone = normalizeLocalPhoneInput(form.phone);
+    const phoneWithDial = `${countryMeta.dial} ${normalizedPhone}`;
     setLoading(true);
     try {
       const res = await fetch("/api/checkout/cart", {
@@ -166,21 +192,30 @@ export function CheckoutPageClient({
     e.preventDefault();
     setError(null);
     if (items.length === 0) return;
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+    if (!form.name.trim() || !form.address.trim()) {
       setError(t("addressRequired"));
+      return;
+    }
+    if (!form.phone.trim()) {
+      setError(t("phoneRequired"));
       return;
     }
     if (!form.email.trim()) {
       setError(t("emailRequired"));
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+    if (!isValidLocalPhone(form.phone)) {
+      setError(t("invalidPhone"));
+      return;
+    }
+    if (!EMAIL_REGEX.test(form.email.trim())) {
       setError(t("invalidEmail"));
       return;
     }
     const countryMeta =
       COUNTRY_DIAL_LIST.find((c) => c.code === form.country) ??
       COUNTRY_DIAL_LIST.find((c) => c.code === "MY")!;
+    const normalizedPhone = normalizeLocalPhoneInput(form.phone);
     setLoading(true);
     try {
       const res = await fetch("/api/checkout/cart", {
@@ -189,7 +224,7 @@ export function CheckoutPageClient({
         body: JSON.stringify({
           name: form.name.trim(),
           email: form.email.trim(),
-          phone: `${countryMeta.dial} ${form.phone.trim()}`,
+          phone: `${countryMeta.dial} ${normalizedPhone}`,
           address: form.address.trim(),
           country: form.country,
           locale,
@@ -203,7 +238,6 @@ export function CheckoutPageClient({
         return;
       }
       if (data.url) {
-        clearCart();
         window.location.href = data.url;
         return;
       }
@@ -283,8 +317,16 @@ export function CheckoutPageClient({
                 required
                 className="input-base w-full text-left"
                 dir="ltr"
+                inputMode="tel"
+                autoComplete="tel-national"
+                maxLength={15}
                 value={form.phone}
-                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    phone: normalizeLocalPhoneInput(e.target.value),
+                  }))
+                }
               />
             </div>
           </div>

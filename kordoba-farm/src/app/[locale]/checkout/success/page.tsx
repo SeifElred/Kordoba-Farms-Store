@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { CheckoutSuccessClient } from "@/components/checkout/CheckoutSuccessClient";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 
 export default async function CheckoutSuccessPage({
@@ -17,6 +18,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="min-h-[60vh]">
+      <CheckoutSuccessClient />
       <div className="mx-auto max-w-xl px-4 py-12 sm:py-16">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 shadow-sm sm:p-10">
           <div className="flex justify-center">

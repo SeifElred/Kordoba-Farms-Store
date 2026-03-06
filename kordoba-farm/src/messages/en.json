@@ -184,6 +184,8 @@
     "emailRequired": "Please enter your email address.",
     "invalidEmail": "Please enter a valid email address.",
     "phone": "Phone",
+    "phoneRequired": "Please enter your phone number.",
+    "invalidPhone": "Please enter a valid phone number.",
     "address": "Address",
     "addressPlaceholder": "Street, city, postcode, state",
     "optional": "optional",

@@ -8,6 +8,15 @@ import {
   type CartLineItemPayload,
 } from "@/lib/cart-price";
 
+const checkoutEmailSchema = z.string().trim().email();
+
+function isValidCheckoutPhone(phone: string) {
+  const trimmed = phone.trim();
+  if (!trimmed || !/^\+?[0-9\s\-()]+$/.test(trimmed)) return false;
+  const digits = trimmed.replace(/\D/g, "");
+  return digits.length >= 7 && digits.length <= 15;
+}
+
 const cartItemSchema = z.object({
   product: z.string().min(1),
   occasion: z.string().min(1),
@@ -40,30 +49,87 @@ const bodySchema = z
     locale: z.string().max(10).optional(),
     items: z.array(cartItemSchema).min(1).max(20),
   })
-  .refine(
-    (data) => {
-      if (data.channel === "whatsapp") return true;
-      const name = (data.name ?? "").trim();
-      const email = (data.email ?? "").trim();
-      const phone = (data.phone ?? "").trim();
-      const address = (data.address ?? "").trim();
-      if (name.length < 1 || phone.length < 1 || address.length < 1)
-        return false;
-      return email.length >= 1 && z.string().email().safeParse(email).success;
-    },
-    {
-      message:
-        "name, email, phone, and address are required when not completing via WhatsApp",
+  .superRefine((data, ctx) => {
+    const name = (data.name ?? "").trim();
+    const email = (data.email ?? "").trim();
+    const phone = (data.phone ?? "").trim();
+    const address = (data.address ?? "").trim();
+
+    if (data.channel !== "whatsapp") {
+      if (name.length < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["name"],
+          message: "Name is required",
+        });
+      }
+      if (address.length < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["address"],
+          message: "Address is required",
+        });
+      }
+      if (email.length < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["email"],
+          message: "Email is required",
+        });
+      } else if (!checkoutEmailSchema.safeParse(email).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["email"],
+          message: "Please enter a valid email address",
+        });
+      }
+      if (phone.length < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["phone"],
+          message: "Phone is required",
+        });
+      } else if (!isValidCheckoutPhone(phone)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["phone"],
+          message: "Please enter a valid phone number",
+        });
+      }
+      return;
     }
-  );
+
+    if (email.length > 0 && !checkoutEmailSchema.safeParse(email).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["email"],
+        message: "Please enter a valid email address",
+      });
+    }
+    if (phone.length > 0 && !isValidCheckoutPhone(phone)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["phone"],
+        message: "Please enter a valid phone number",
+      });
+    }
+  });
 
 export async function POST(req: Request) {
   try {
     const raw = await req.json();
     const parsed = bodySchema.safeParse(raw);
     if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      const errorMessage =
+        fieldErrors.email?.[0] ??
+        fieldErrors.phone?.[0] ??
+        fieldErrors.name?.[0] ??
+        fieldErrors.address?.[0] ??
+        parsed.error.issues[0]?.message ??
+        "Invalid input";
       return NextResponse.json(
-        { error: "Invalid input", details: parsed.error.flatten() },
+        { error: errorMessage, details: parsed.error.flatten() },
         { status: 400 }
       );
     }

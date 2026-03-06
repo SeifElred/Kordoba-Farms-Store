@@ -184,6 +184,8 @@
     "emailRequired": "Sila masukkan alamat e-mel anda.",
     "invalidEmail": "Sila masukkan alamat e-mel yang sah.",
     "phone": "Telefon",
+    "phoneRequired": "Sila masukkan nombor telefon anda.",
+    "invalidPhone": "Sila masukkan nombor telefon yang sah.",
     "address": "Alamat",
     "addressPlaceholder": "Jalan, bandar, poskod, negeri",
     "optional": "pilihan",
