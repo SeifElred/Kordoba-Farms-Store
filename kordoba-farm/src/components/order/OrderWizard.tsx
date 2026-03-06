@@ -175,6 +175,27 @@ export function OrderWizard({
     const scope = state.occasion === "personal" ? "personal" : "qurban_aqiqah";
     return list.filter((o) => o.occasionScope === scope);
   }, [product, state.occasion, weightOptionsByProduct]);
+  const selectedWeightDisplay = useMemo(() => {
+    if (!state.weightSelection) return "";
+    const selectedOption = (weightOptionsByProduct[product] ?? []).find(
+      (option) => option.id === state.weightSelection
+    );
+    if (selectedOption) {
+      return getLocalizedWeightOptionLabel(selectedOption, state.occasion, locale);
+    }
+    return (
+      getWeightBandDisplayLabel(state.weightSelection, state.occasion, locale) ||
+      state.weightLabel ||
+      state.weightSelection
+    );
+  }, [
+    locale,
+    product,
+    state.occasion,
+    state.weightLabel,
+    state.weightSelection,
+    weightOptionsByProduct,
+  ]);
 
   // For half carcass, only allow a limited set of cutting options.
   const visibleSpecialCuts = useMemo(() => {
@@ -838,12 +859,12 @@ export function OrderWizard({
 
             {/* Detail rows — direction-safe alignment */}
             <dl className="divide-y divide-[var(--border)]/80 text-sm">
-              {(state.weightLabel || state.weightSelection) && (
+              {selectedWeightDisplay && (
                 <div className="flex flex-wrap items-center justify-between gap-2 py-3">
                   <dt className="shrink-0 text-start text-[var(--muted-foreground)]">{tOrder("weightAndAge")}</dt>
                   <dd className="flex min-w-0 flex-wrap justify-end gap-1.5 text-end">
                     <span className="rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
-                      {state.weightLabel || getWeightBandDisplayLabel(state.weightSelection, state.occasion, locale) || state.weightSelection}
+                      {selectedWeightDisplay}
                     </span>
                     {(state.occasion === "qurban" || state.occasion === "aqiqah") && state.animal === "sheep" && (
                       <span className="rounded-md border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-2 py-0.5 text-xs text-[var(--primary)]">

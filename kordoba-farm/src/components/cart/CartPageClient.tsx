@@ -9,6 +9,8 @@ import { getWeightBandDisplayLabel } from "@/lib/weight-bands";
 import { getSpecialCutDisplayLabel } from "@/lib/special-cut-labels";
 import { ShoppingBag, Pencil, Trash2, CreditCard, ShieldCheck, Lock } from "lucide-react";
 
+const ORDER_WIZARD_DRAFT_KEY = "kordoba_order_draft";
+
 function getCartWeightDisplay(
   weightLabel: string | undefined,
   weightSelection: string | undefined,
@@ -30,6 +32,14 @@ function getCartWeightDisplay(
   }
 
   return selection;
+}
+
+function clearOrderDraft() {
+  try {
+    window.sessionStorage.removeItem(ORDER_WIZARD_DRAFT_KEY);
+  } catch {
+    // ignore storage errors
+  }
 }
 
 export function CartPageClient({
@@ -72,7 +82,11 @@ export function CartPageClient({
         <ShoppingBag className="mx-auto h-12 w-12 text-[var(--muted-foreground)]" />
         <h2 className="mt-4 text-lg font-semibold text-[var(--foreground)]">{t("empty")}</h2>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">{t("emptyHint")}</p>
-        <Link href={`/${locale}/order`} className="btn-primary mt-6 inline-flex justify-center">
+        <Link
+          href={`/${locale}/order`}
+          onClick={clearOrderDraft}
+          className="btn-primary mt-6 inline-flex justify-center"
+        >
           {tWizard("step1Title")}
         </Link>
       </div>
@@ -198,6 +212,7 @@ export function CartPageClient({
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link
           href={`/${locale}/order`}
+          onClick={clearOrderDraft}
           className="flex flex-1 justify-center rounded-[var(--radius)] border-2 border-[var(--border)] bg-[var(--background)] px-4 py-3.5 font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
         >
           {t("addAnotherItem")}

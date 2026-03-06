@@ -65,14 +65,16 @@
 html {
   -webkit-tap-highlight-color: transparent;
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
   margin: 0;
   font-feature-settings: "rlig" 1, "calt" 1;
-  overflow: hidden;
   min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 @layer base {
