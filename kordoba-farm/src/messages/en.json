@@ -49,6 +49,7 @@
   },
   "nav": {
     "home": "Home",
+    "blog": "Blog",
     "shop": "Shop",
     "cart": "Cart",
     "cartAriaLabel": "1 item in cart",
@@ -230,6 +231,7 @@
     "quickLinks": "Quick links",
     "home": "Home",
     "order": "Order",
+    "blog": "Blog",
     "faq": "FAQ",
     "about": "About",
     "halalNote": "Halal slaughter in accordance with Shariah. Full traceability & optional video proof.",

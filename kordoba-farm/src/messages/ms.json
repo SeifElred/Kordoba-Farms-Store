@@ -49,6 +49,7 @@
   },
   "nav": {
     "home": "Laman Utama",
+    "blog": "Blog",
     "shop": "Kedai",
     "cart": "Troli",
     "cartAriaLabel": "1 item dalam troli",
@@ -230,6 +231,7 @@
     "quickLinks": "Pautan pantas",
     "home": "Laman utama",
     "order": "Pesanan",
+    "blog": "Blog",
     "faq": "Soalan lazim",
     "about": "Tentang kami",
     "halalNote": "Sembelihan halal mengikut syariah. Kebolehkesanan penuh & pilihan video bukti.",

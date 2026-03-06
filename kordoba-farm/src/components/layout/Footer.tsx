@@ -29,6 +29,8 @@ export function Footer() {
           <span className="text-[var(--border)]" aria-hidden>·</span>
           <Link href={`${base}/order`} className="hover:text-[var(--foreground)]">{t("order")}</Link>
           <span className="text-[var(--border)]" aria-hidden>·</span>
+          <Link href={`${base}/blog`} className="hover:text-[var(--foreground)]">{t("blog")}</Link>
+          <span className="text-[var(--border)]" aria-hidden>·</span>
           <Link href={`${base}/faq`} className="hover:text-[var(--foreground)]">{t("faq")}</Link>
           <span className="text-[var(--border)]" aria-hidden>·</span>
           <Link href={`${base}/about`} className="hover:text-[var(--foreground)]">{t("about")}</Link>
