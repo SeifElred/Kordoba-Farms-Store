@@ -10,6 +10,10 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/admin",
           "/api",
+          "/ar/animal",
+          "/en/animal",
+          "/ms/animal",
+          "/zh/animal",
           "/ar/shop",
           "/en/shop",
           "/ms/shop",

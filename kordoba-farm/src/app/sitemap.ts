@@ -1,6 +1,5 @@
 import { MetadataRoute } from "next";
-import { prisma } from "@/lib/prisma";
-import { SEO_BASE_URL, SEO_LOCALES, getAlternates, getLocalizedUrl } from "@/lib/seo";
+import { SEO_LOCALES, getAlternates, getLocalizedUrl } from "@/lib/seo";
 
 const SITEMAP_REVALIDATE_SECONDS = 60 * 60;
 
@@ -36,27 +35,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  let animals: { tagNumber: string; updatedAt: Date }[] = [];
-  try {
-    animals = await prisma.animal.findMany({
-      where: { status: "available" },
-      select: { tagNumber: true, updatedAt: true },
-    });
-  } catch {
-    // DB not connected
-  }
-
-  const animalPaths: MetadataRoute.Sitemap = animals.flatMap((a) =>
-    SEO_LOCALES.map((locale) => ({
-      url: `${SEO_BASE_URL}/${locale}/animal/${encodeURIComponent(a.tagNumber)}`,
-      lastModified: a.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-      alternates: {
-        languages: getAlternates(`/animal/${encodeURIComponent(a.tagNumber)}`).languages as Record<string, string>,
-      },
-    }))
-  );
-
-  return [...staticPaths, ...animalPaths];
+  return staticPaths;
 }

@@ -76,6 +76,7 @@ export async function generateMetadata({
               ? "查看可选牲畜详情。"
               : "View the available animal details.",
       keywords: getCoreSeoKeywords(locale),
+      robots: { index: false, follow: false },
     });
   }
 
@@ -101,5 +102,6 @@ export async function generateMetadata({
             ? `${breedLabel}。编号 ${animal.tagNumber}，重量 ${animal.weight} 公斤，服务覆盖马来西亚与吉隆坡。`
             : `${breedLabel}. Tag ${animal.tagNumber}. ${animal.weight} kg with service across Malaysia and Kuala Lumpur.`,
     keywords: getCoreSeoKeywords(locale),
+    robots: { index: false, follow: false },
   });
 }
