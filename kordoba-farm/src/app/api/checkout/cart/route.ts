@@ -3,8 +3,7 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import {
-  getCartLinePrice,
-  getCartTotalMYR,
+  getCartLinePrices,
   type CartLineItemPayload,
 } from "@/lib/cart-price";
 
@@ -136,7 +135,8 @@ export async function POST(req: Request) {
     const { channel, name, email, phone, address, country, locale, items } =
       parsed.data;
 
-    const totalMYR = await getCartTotalMYR(items, prisma);
+    const linePrices = await getCartLinePrices(items, prisma);
+    const totalMYR = linePrices.reduce((total, price) => total + price, 0);
     if (totalMYR <= 0) {
       return NextResponse.json(
         { error: "Invalid cart: unable to compute total" },
@@ -185,8 +185,10 @@ export async function POST(req: Request) {
         apiVersion: "2026-01-28.clover",
       });
       const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-      for (const item of items as CartLineItemPayload[]) {
-        const priceMYR = await getCartLinePrice(item, prisma);
+      const cartItems = items as CartLineItemPayload[];
+      for (let index = 0; index < cartItems.length; index += 1) {
+        const item = cartItems[index];
+        const priceMYR = linePrices[index] ?? 0;
         lineItems.push({
           price_data: {
             currency: "myr",

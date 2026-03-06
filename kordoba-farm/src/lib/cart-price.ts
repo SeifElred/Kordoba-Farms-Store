@@ -47,19 +47,7 @@ export type CartLineItemPayload = {
   productLabel: string;
 };
 
-/**
- * Returns price in MYR for a cart line item. Uses DB when weightOptionId present; else legacy bands.
- */
-export async function getCartLinePrice(
-  item: CartLineItemPayload,
-  prisma: PrismaClient
-): Promise<number> {
-  if (item.weightOptionId) {
-    const opt = await prisma.weightOption.findUnique({
-      where: { id: item.weightOptionId },
-    });
-    if (opt) return opt.price;
-  }
+function getLegacyCartLinePrice(item: CartLineItemPayload): number {
   const isWhole =
     item.product === "whole_sheep" || item.product === "whole_goat";
   const sel = item.weightSelection;
@@ -70,13 +58,54 @@ export async function getCartLinePrice(
   return band ? band.price : 0;
 }
 
+export async function getCartLinePrices(
+  items: CartLineItemPayload[],
+  prisma: PrismaClient
+): Promise<number[]> {
+  const uniqueWeightOptionIds = Array.from(
+    new Set(
+      items
+        .map((item) => item.weightOptionId)
+        .filter((id): id is string => typeof id === "string" && id.length > 0)
+    )
+  );
+
+  const weightOptionPriceMap =
+    uniqueWeightOptionIds.length > 0
+      ? new Map(
+          (
+            await prisma.weightOption.findMany({
+              where: { id: { in: uniqueWeightOptionIds } },
+              select: { id: true, price: true },
+            })
+          ).map((option) => [option.id, option.price])
+        )
+      : new Map<string, number>();
+
+  return items.map((item) => {
+    if (item.weightOptionId) {
+      const dbPrice = weightOptionPriceMap.get(item.weightOptionId);
+      if (dbPrice != null) return dbPrice;
+    }
+    return getLegacyCartLinePrice(item);
+  });
+}
+
+/**
+ * Returns price in MYR for a cart line item. Uses DB when weightOptionId present; else legacy bands.
+ */
+export async function getCartLinePrice(
+  item: CartLineItemPayload,
+  prisma: PrismaClient
+): Promise<number> {
+  const [price] = await getCartLinePrices([item], prisma);
+  return price ?? 0;
+}
+
 export async function getCartTotalMYR(
   items: CartLineItemPayload[],
   prisma: PrismaClient
 ): Promise<number> {
-  let total = 0;
-  for (const item of items) {
-    total += await getCartLinePrice(item, prisma);
-  }
-  return total;
+  const prices = await getCartLinePrices(items, prisma);
+  return prices.reduce((total, price) => total + price, 0);
 }
