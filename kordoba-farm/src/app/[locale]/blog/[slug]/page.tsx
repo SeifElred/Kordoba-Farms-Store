@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { buildPageMetadata, getCoreSeoKeywords } from "@/lib/seo";
+import { buildPageMetadata, getCoreSeoKeywords, getLocalizedUrl, SEO_BASE_URL } from "@/lib/seo";
 import { getBlogPost, getPostContent } from "@/lib/blog";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
@@ -79,9 +79,36 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const c = getPostContent(post, locale);
+  const postUrl = getLocalizedUrl(locale, `/blog/${slug}`);
+  const blogUrl = getLocalizedUrl(locale, "/blog");
+  const homeUrl = SEO_BASE_URL;
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: c.title,
+    description: c.description,
+    url: postUrl,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { "@type": "Organization", name: "Kordoba Farms", url: SEO_BASE_URL },
+    publisher: { "@type": "Organization", name: "Kordoba Farms", logo: { "@type": "ImageObject", url: `${SEO_BASE_URL}/icon.png` } },
+    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
+  };
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: homeUrl },
+      { "@type": "ListItem", position: 2, name: locale === "ar" ? "المدونة" : locale === "ms" ? "Blog" : locale === "zh" ? "博客" : "Blog", item: blogUrl },
+      { "@type": "ListItem", position: 3, name: c.title, item: postUrl },
+    ],
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <nav aria-label="Breadcrumb" className="mb-6 text-sm text-[var(--muted-foreground)]">
         <Link href={`/${locale}/blog`} className="hover:text-[var(--foreground)] hover:underline">
           {locale === "ar" ? "المدونة" : locale === "ms" ? "Blog" : locale === "zh" ? "博客" : "Blog"}

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { buildPageMetadata, getCoreSeoKeywords } from "@/lib/seo";
+import { buildPageMetadata, getCoreSeoKeywords, getLocalizedUrl, SEO_BASE_URL } from "@/lib/seo";
 import { getAllBlogPosts } from "@/lib/blog";
 
 export async function generateMetadata({
@@ -47,9 +47,19 @@ export default async function BlogIndexPage({
 
   const posts = getAllBlogPosts();
   const contentByLocale = (post: (typeof posts)[0]) => post[locale === "ar" ? "ar" : locale === "ms" ? "ms" : locale === "zh" ? "zh" : "en"];
+  const blogUrl = getLocalizedUrl(locale, "/blog");
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SEO_BASE_URL },
+      { "@type": "ListItem", position: 2, name: locale === "ar" ? "المدونة" : locale === "ms" ? "Blog" : locale === "zh" ? "博客" : "Blog", item: blogUrl },
+    ],
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <h1 className="text-2xl font-bold text-[var(--foreground)] sm:text-3xl">
         {locale === "ar"
           ? "المدونة"

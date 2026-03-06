@@ -82,12 +82,15 @@ export function buildPageMetadata({
     ? locale
     : "en") as SeoLocale;
   const url = getLocalizedUrl(safeLocale, pathname);
+  const alternates = getAlternates(pathname);
+  // Self-canonical: each locale version is canonical for its own URL (best for multilingual).
+  const alternatesWithCanonical = { ...alternates, canonical: url };
 
   return {
     title,
     description,
     keywords,
-    alternates: getAlternates(pathname),
+    alternates: alternatesWithCanonical,
     robots,
     openGraph: {
       title,
@@ -96,6 +99,14 @@ export function buildPageMetadata({
       siteName: "Kordoba Farms",
       locale: OG_LOCALE_BY_LOCALE[safeLocale],
       type: "website",
+      images: [
+        {
+          url: `${SEO_BASE_URL}/${safeLocale}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: "Kordoba Farms – Aqiqah & Qurban Malaysia (Goat & Sheep)",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",

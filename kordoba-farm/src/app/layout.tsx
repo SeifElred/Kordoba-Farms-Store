@@ -29,6 +29,11 @@ export const metadata: Metadata = {
   openGraph: { type: "website", siteName: "Kordoba Farms" },
   twitter: { card: "summary_large_image" },
   metadataBase: new URL(SEO_BASE_URL),
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 };
 
 export default function RootLayout({
@@ -48,6 +53,7 @@ export default function RootLayout({
     name: "Kordoba Farms",
     alternateName: "KORDOBA AGROTECH SDN. BHD.",
     url: SEO_BASE_URL,
+    logo: `${SEO_BASE_URL}/icon.png`,
     description:
       "Kordoba Farms: Aqiqah and Qurban in Malaysia. Halal goat and sheep for Aqiqah, Qurban and personal meat. Delivery to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
     areaServed: [
@@ -64,6 +70,7 @@ export default function RootLayout({
               contactType: "customer support",
               url: SEO_WHATSAPP_URL,
               availableLanguage: ["en", "ms", "ar", "zh"],
+              areaServed: "MY",
             },
           ],
         }
@@ -103,6 +110,7 @@ export default function RootLayout({
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning className="h-full" data-locale={locale}>
       <head>
+        <meta name="theme-color" content="#0F3D2E" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
