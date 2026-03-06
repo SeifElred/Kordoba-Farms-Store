@@ -13,9 +13,9 @@ export async function generateMetadata({
     return buildPageMetadata({
       locale,
       pathname: "/corporate",
-      title: "كوردوبا أغروتيك – حلول أضاحي وعقائق للشركات في ماليزيا",
+      title: "KORDOBA AGROTECH SND. BHD. – حلول أضاحي وعقائق للشركات في ماليزيا",
       description:
-        "حلول أضاحي وعقائق وبرامج توزيع مؤسسية من كوردوبا أغروتيك في ماليزيا وكوالالمبور، مع تغطية موثوقة لشيراس وأمبانغ وتامان ملاواتي وسردانغ وسري كمبانغان وسيبرجايا وبوتراجايا.",
+        "حلول أضاحي وعقائق وبرامج توزيع مؤسسية من KORDOBA AGROTECH SND. BHD. في ماليزيا وكوالالمبور، مع تغطية موثوقة لشيراس وأمبانغ وتامان ملاواتي وسردانغ وسري كمبانغان وسيبرجايا وبوتراجايا.",
       keywords: getCoreSeoKeywords(locale),
     });
   }
@@ -64,7 +64,7 @@ export default async function CorporatePage({
     <div className="mx-auto max-w-2xl py-12 sm:py-16">
       <h1 className="text-3xl font-bold text-[var(--primary)]">
         {isAr
-          ? "كوردوبا أغروتيك ش.ذ.م.م"
+          ? "KORDOBA AGROTECH SND. BHD."
           : isMs
             ? "KORDOBA AGROTECH SDN. BHD."
             : isZh
@@ -116,12 +116,12 @@ export default async function CorporatePage({
           </h2>
           <p className="mt-2 text-[var(--muted-foreground)]">
             {isAr
-              ? "مرافق حديثة وسلسلة تبريد وشراكات توزيع تضمن وصول الطلب بحالة ممتازة إلى كوالالمبور والمناطق المحيطة."
+              ? "مرافقنا الحديثة وسلسلة التبريد وشبكة التوزيع لدينا تضمن وصول الطلب بحالة ممتازة إلى كوالالمبور والمناطق المحيطة."
               : isMs
-                ? "Kemudahan ladang moden, rantaian sejuk dan rakan pengedaran untuk memastikan pesanan anda sampai dalam keadaan terbaik ke Kuala Lumpur dan kawasan sekitarnya."
+                ? "Kemudahan ladang moden kami, rantaian sejuk dan rangkaian pengedaran kami memastikan pesanan sampai dalam keadaan terbaik ke Kuala Lumpur dan kawasan sekitarnya."
                 : isZh
-                  ? "现代化农场设施、冷链与配送合作网络，确保订单以最佳状态送达吉隆坡及周边区域。"
-                  : "Modern farm facilities, cold-chain handling, and distribution partnerships to ensure your order reaches Kuala Lumpur and surrounding areas in excellent condition."}
+                  ? "我们的现代化农场设施、冷链与自有配送网络，确保订单以最佳状态送达吉隆坡及周边区域。"
+                  : "Our modern farm facilities, cold-chain handling, and our own distribution network ensure your order reaches Kuala Lumpur and surrounding areas in excellent condition."}
           </p>
         </div>
         <div>

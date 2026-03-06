@@ -10,11 +10,14 @@ export const metadata: Metadata = {
     template: "%s | Kordoba Farms",
   },
   description:
-    "Book Aqiqah and Qurban in Malaysia. Halal goat and sheep for Aqiqah, Qurban & personal meat. Delivery to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya. Traceable, Shariah-compliant.",
+    "Book Aqiqah and Qurban in Malaysia. Halal goat and sheep for Aqiqah, Qurban & personal meat. We own our farms, import from Australia and Thailand, raise locally. Delivery to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya. Traceable, Shariah-compliant.",
   keywords: [
+    "Kordoba Farms",
     "aqiqah Malaysia",
     "qurban Malaysia",
     "korban Malaysia",
+    "book aqiqah Malaysia",
+    "book qurban Malaysia",
     "halal goat Malaysia",
     "halal sheep Malaysia",
     "book aqiqah",
@@ -55,7 +58,8 @@ export default function RootLayout({
     url: SEO_BASE_URL,
     logo: `${SEO_BASE_URL}/icon.png`,
     description:
-      "Kordoba Farms: Aqiqah and Qurban in Malaysia. Halal goat and sheep for Aqiqah, Qurban and personal meat. Delivery to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
+      "Kordoba Farms: Aqiqah and Qurban in Malaysia. Halal goat and sheep for Aqiqah, Qurban and personal meat. We own our farms, import from Australia and Thailand, and raise locally. Delivery to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
+    knowsAbout: ["Aqiqah", "Qurban", "Korban", "Halal goat", "Halal sheep", "Halal meat Malaysia"],
     areaServed: [
       { "@type": "Country", name: "Malaysia" },
       { "@type": "City", name: "Kuala Lumpur" },
@@ -93,7 +97,7 @@ export default function RootLayout({
       name: "KORDOBA AGROTECH SDN. BHD.",
     },
     url: SEO_BASE_URL,
-    description: "Aqiqah and Qurban Malaysia. Goat and sheep for Aqiqah, Qurban and personal meat. Serving Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
+    description: "Aqiqah and Qurban Malaysia. We own our farms; we import goat and sheep from Australia and Thailand and raise locally. Halal, traceable. Serving Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
     serviceArea: [
       { "@type": "AdministrativeArea", name: "Kuala Lumpur" },
       ...PRIORITY_SERVICE_AREAS.map((name) => ({

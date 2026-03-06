@@ -3,7 +3,7 @@ import type { BlogPost } from "@/lib/blog";
 export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "how-to-book-aqiqah-malaysia",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "How to Book Aqiqah in Malaysia: Step-by-Step Guide",
       description:
@@ -39,7 +39,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h3", text: "Step 4: Delivery or donation" },
         {
           type: "p",
-          text: "Choose whether to have the meat delivered to your address, collect it yourself, or have us distribute it as charity on your behalf. We work with trusted partners for delivery across our service areas.",
+          text: "Choose whether to have the meat delivered to your address, collect it yourself, or have us distribute it as charity on your behalf. We deliver across our service areas.",
         },
         { type: "h2", text: "Why Book Aqiqah with Kordoba Farms?" },
         {
@@ -89,7 +89,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h3", text: "الخطوة 4: التوصيل أو التبرع" },
         {
           type: "p",
-          text: "اختر إما توصيل اللحم إلى عنوانك، أو استلامه بنفسك، أو أن نوزّعه نيابة عنك كصدقة. نتعامل مع شركاء موثوقين للتوصيل في مناطق خدمتنا.",
+          text: "اختر إما توصيل اللحم إلى عنوانك، أو استلامه بنفسك، أو أن نوزّعه نيابة عنك كصدقة. نوصّل في مناطق خدمتنا.",
         },
         { type: "h2", text: "لماذا تحجز العقيقة مع مزارع قرطبة؟" },
         {
@@ -139,7 +139,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h3", text: "Langkah 4: Penghantaran atau derma" },
         {
           type: "p",
-          text: "Pilih sama ada daging dihantar ke alamat anda, anda ambil sendiri, atau kami agihkan sebagai derma bagi pihak anda. Kami bekerjasama dengan rakan penghantaran yang dipercayai di kawasan servis kami.",
+          text: "Pilih sama ada daging dihantar ke alamat anda, anda ambil sendiri, atau kami agihkan sebagai derma bagi pihak anda. Kami hantar di kawasan servis kami.",
         },
         { type: "h2", text: "Mengapa Tempah Aqiqah dengan Kordoba Farms?" },
         {
@@ -189,7 +189,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h3", text: "第四步：配送或捐赠" },
         {
           type: "p",
-          text: "选择送货上门、自提，或由我们代您捐赠给有需要的人。我们与可信赖的配送伙伴合作，覆盖服务区域。",
+          text: "选择送货上门、自提，或由我们代您捐赠给有需要的人。我们在服务区域内配送。",
         },
         { type: "h2", text: "为什么在科尔多巴农场预订阿奇卡？" },
         {
@@ -208,7 +208,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 2: How to book Qurban
   {
     slug: "how-to-book-qurban-korban-malaysia",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "How to Book Qurban (Korban) in Malaysia",
       description:
@@ -413,7 +413,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 3: Aqiqah vs Qurban
   {
     slug: "aqiqah-vs-qurban-difference",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "Aqiqah vs Qurban: What Is the Difference?",
       description:
@@ -562,7 +562,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 4: When to do Aqiqah
   {
     slug: "when-to-do-aqiqah-timing",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "When Should You Do Aqiqah? Timing and Flexibility",
       description:
@@ -659,7 +659,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 5: Goat or sheep
   {
     slug: "goat-or-sheep-for-aqiqah-qurban",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "Goat or Sheep for Aqiqah and Qurban? How to Choose",
       description:
@@ -789,10 +789,327 @@ export const BLOG_POSTS: BlogPost[] = [
       ],
     },
   },
+  // Post: Conditions of Aqiqah and Qurban (شروط العقيقة والقربان)
+  {
+    slug: "conditions-of-aqiqah-and-qurban",
+    date: "2026-03-06",
+    en: {
+      title: "Conditions of Aqiqah and Qurban: A Technical Guide (Shuroot)",
+      description:
+        "Fiqh conditions (shuroot) for Aqiqah and Qurban: who, when, which animals, age, defects, intention. Technical reference for Malaysia. Book with Kordoba Farms—KL, Cheras, Ampang, Serdang, Putrajaya.",
+      excerpt:
+        "A detailed technical guide to the Islamic conditions (shuroot) for valid Aqiqah and Qurban: animals, age, defects, timing, and intention.",
+      body: [
+        { type: "h2", text: "What Are “Conditions” (Shuroot) in Islamic Rulings?" },
+        {
+          type: "p",
+          text: "In Islamic jurisprudence (fiqh), “conditions” (shuroot, singular sharṭ) are the requirements that must be met for an act of worship to be valid. For Aqiqah and Qurban (udhiyah), scholars have defined conditions regarding the person performing the act, the animal, the time, and the intention. Meeting these ensures your sacrifice is accepted according to the Shariah.",
+        },
+        { type: "h2", text: "Conditions of Aqiqah (Shuroot Al-Aqiqah)" },
+        {
+          type: "p",
+          text: "Aqiqah is the Sunnah of sacrificing an animal on behalf of a newborn. The following conditions are widely agreed upon or commonly applied by the schools of law (Hanafi, Maliki, Shafiʿi, Hanbali), with Shafiʿi and the local practice in Malaysia often taken as reference.",
+        },
+        { type: "h3", text: "Who Is Aqiqah For?" },
+        {
+          type: "p",
+          text: "Aqiqah is performed for a newborn child. It is a Sunnah upon the guardian (wali)—usually the father—who is responsible for providing for the child. The cost is borne by the guardian. If the guardian did not perform it, some scholars allow the person themselves to do it later in life (as a voluntary act to fulfil the missed Sunnah).",
+        },
+        { type: "h3", text: "Number of Animals" },
+        {
+          type: "p",
+          text: "The predominant view (e.g. Shafiʿi, Hanbali) is: two sheep or two goats for a boy, and one sheep or one goat for a girl. One sheep may be offered for a boy if two are not affordable—scholars differ on whether one suffices for a boy, but one is certainly valid for a girl. Each animal must meet the same type and age conditions as for Qurban (see below).",
+        },
+        { type: "h3", text: "Type and Age of Animal" },
+        {
+          type: "p",
+          text: "The same animals valid for Qurban are valid for Aqiqah: sheep (including lamb), goat, and in some opinions cow and camel. For sheep: the animal should have completed six months (or, in stricter views, one year). For goat: one full year (two for some). The animal must be free from serious defects: not blind, severely lame, obviously sick, or with a significant part of the ear or horn missing. These defect rules align with the well-known hadith on udhiyah.",
+        },
+        { type: "h3", text: "Intention (Niyyah) and Timing" },
+        {
+          type: "p",
+          text: "The slaughter must be done with the intention of Aqiqah for that specific child. The preferred time is the seventh day after birth (with naming and shaving the head). If that is not possible, it may be done on the 14th, 21st, or later—even in adulthood according to some scholars. The slaughter must be halal: performed by a Muslim, with the name of Allah pronounced, and in the prescribed manner.",
+        },
+        { type: "h2", text: "Conditions of Qurban (Shuroot Al-Udhiyah)" },
+        {
+          type: "p",
+          text: "Qurban (udhiyah) is the sacrifice offered during the days of Eid al-Adha. The conditions below are derived from the Qur’an, Sunnah, and consensus of the scholars, with minor differences between madhahib.",
+        },
+        { type: "h3", text: "Who Must or May Perform Qurban?" },
+        {
+          type: "p",
+          text: "There is a difference of opinion: some scholars hold Qurban to be wajib (obligatory) for every adult Muslim who has the means (beyond basic needs); others hold it as a strong Sunnah (Sunnah mu’akkadah). In Malaysia, the common position follows the view that it is Sunnah mu’akkadah. The sacrifice can be per person or per household—one sheep or goat suffices for one person or for a household in the view that allows sharing. The intention must be for udhiyah (Eid sacrifice).",
+        },
+        { type: "h3", text: "Valid Animals and Shares" },
+        {
+          type: "p",
+          text: "Valid animals are: sheep (including lamb), goat, cow, and camel. One sheep or one goat counts as one share (one person’s Qurban). One cow or one camel can be shared by up to seven people, provided each has the intention of Qurban. Mixing different acts (e.g. some for Qurban, some for Aqiqah) in one cow is a matter of detailed fiqh and should be clarified with a scholar.",
+        },
+        { type: "h3", text: "Age and Defects" },
+        {
+          type: "p",
+          text: "Minimum age: for sheep, six months completed (and looking like a one-year-old in size, in strict view); for goat, one full year; for cow, two years; for camel, five years. The animal must be free from defects that invalidate the sacrifice: blindness, obvious illness, severe lameness, emaciation, or significant loss of ear, horn, or tail. Minor defects may be disliked (makruh) but do not necessarily invalidate. Scholars detail further; when in doubt, choose a healthy, well-formed animal.",
+        },
+        { type: "h3", text: "Time Period for Slaughter" },
+        {
+          type: "p",
+          text: "Slaughter must take place after the Eid prayer on the 10th of Dhul Hijjah until sunset of the 13th of Dhul Hijjah (the days of Tashreeq). Slaughter before the Eid prayer does not count as Qurban; it is considered ordinary meat. The exact start time is when the Imam finishes the Eid prayer in your locality (or when the time for that prayer has passed if you do not pray Eid).",
+        },
+        { type: "h3", text: "Intention (Niyyah) for Qurban" },
+        {
+          type: "p",
+          text: "The person offering the sacrifice must have the intention of udhiyah (Qurban for Eid). If someone delegates the slaughter (e.g. to an agent or a farm), the intention of the owner is what counts; the slaughterer performs the act on their behalf. The animal must have been acquired (or designated) for the purpose of Qurban before slaughter.",
+        },
+        { type: "h2", text: "Summary and Practical Tips" },
+        {
+          type: "ul",
+          items: [
+            "Aqiqah: for the newborn, usually two animals for a boy and one for a girl (sheep or goat); preferred on the 7th day; intention and halal slaughter required.",
+            "Qurban: valid animals are sheep, goat, cow, camel; one sheep/goat per person or share in cow/camel (up to 7); slaughter only after Eid prayer until 13th Dhul Hijjah; animal must meet age and be free from serious defects.",
+            "At Kordoba Farms we provide goat and sheep that meet age and health standards, with Shariah-compliant halal slaughter and optional video proof. We deliver to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, and Putrajaya.",
+          ],
+        },
+      ],
+    },
+    ar: {
+      title: "شروط العقيقة والقربان: دليل فني (شروط العقيقة والأضحية)",
+      description:
+        "شروط العقيقة والأضحية في الفقه: لمن، متى، أي حيوان، العمر، العيوب، النية. مرجع تقني لماليزيا. احجز مع مزارع قرطبة—كوالالمبور، شيراس، أمبانغ، سردانغ، بوتراجايا.",
+      excerpt:
+        "دليل تقني مفصل لشروط العقيقة والأضحية في الإسلام: الحيوان، العمر، العيوب، التوقيت، والنية.",
+      body: [
+        { type: "h2", text: "ما المقصود بـ «الشروط» في الأحكام الشرعية؟" },
+        {
+          type: "p",
+          text: "في الفقه الإسلامي، «الشروط» هي المتطلبات التي يجب أن تتحقق لصحة العبادة. للعقيقة والأضحية (الذبيحة) حدد العلماء شروطاً تتعلق بالفاعل والحيوان والزمان والنية. استيفاؤها يضمن قبول الذبيحة وفق الشريعة.",
+        },
+        { type: "h2", text: "شروط العقيقة" },
+        {
+          type: "p",
+          text: "العقيقة سنة بذبح حيوان عن المولود. الشروط التالية متفق عليها أو معمول بها في المذاهب (الحنفي، المالكي، الشافعي، الحنبلي)، مع اعتبار الشافعي والعادة المحلية في ماليزيا مرجعاً غالباً.",
+        },
+        { type: "h3", text: "لمن تُقام العقيقة؟" },
+        {
+          type: "p",
+          text: "تُقام العقيقة عن المولود. وهي سنة على ولي الأمر—عادة الأب—المكلف بنفقة الطفل. التكلفة على الولي. إن لم يقم بها الولي، بعض العلماء يجيز للشخص أن يقيمها عن نفسه لاحقاً (كفعل اختياري لاستدراك السنة).",
+        },
+        { type: "h3", text: "عدد الحيوانات" },
+        {
+          type: "p",
+          text: "المشهور (الشافعي، الحنبلي): شاتان أو ماعزان للذكر، وشاة أو ماعز للأنثى. يجوز للذكر شاة واحدة إن لم يتيسر اثنان—والعلماء يختلفون في كفاية الواحدة للذكر، أما للأنثى فواحدة كافية. كل حيوان يجب أن يستوفي شروط النوع والعمر كما في الأضحية (انظر أدناه).",
+        },
+        { type: "h3", text: "نوع الحيوان وعمره" },
+        {
+          type: "p",
+          text: "ما يصلح للأضحية يصلح للعقيقة: الغنم (بما فيه الحمل) والماعز، وفي بعض الأقوال البقر والإبل. للغنم: إتمام ستة أشهر (أو سنة في قول أشدد). للماعز: سنة كاملة (سنتان في قول). يجب أن يكون الحيوان سليماً من العيوب الفادحة: لا أعمى ولا أعرج شديد ولا مريض ظاهر ولا مقطوع جزء كبير من الأذن أو القرن. هذه أحكام العيوب مطابقة للحديث المعروف في الأضحية.",
+        },
+        { type: "h3", text: "النية والتوقيت" },
+        {
+          type: "p",
+          text: "يجب أن يُذبح بنية العقيقة عن ذلك المولود تحديداً. المستحب اليوم السابع مع التسمية وحلق الرأس. إن لم يتيسر ففي الرابع عشر أو الحادي والعشرين أو لاحقاً—وحتى في الكبر عند بعض العلماء. الذبح يجب أن يكون حلالاً: بيد مسلم وذكر اسم الله والطريقة الشرعية.",
+        },
+        { type: "h2", text: "شروط الأضحية (القرابين)" },
+        {
+          type: "p",
+          text: "الأضحية هي الذبيحة في أيام عيد الأضحى. الشروط أدناه مأخوذة من القرآن والسنة وإجماع العلماء مع اختلاف يسير بين المذاهب.",
+        },
+        { type: "h3", text: "من يجب أو يستحب عليه الأضحية؟" },
+        {
+          type: "p",
+          text: "ثمة خلاف: قول بوجوبها على كل مسلم بالغ قادر (فاضلاً عن حوائجه)، وقول بأنها سنة مؤكدة. في ماليزيا الغالب أن الأضحية سنة مؤكدة. الذبيحة تكون عن شخص أو عن أهل بيت—شاة أو ماعز تكفي عن شخص أو عن أهل البيت في القول الذي يجيز المشاركة. النية يجب أن تكون لأضحية العيد.",
+        },
+        { type: "h3", text: "الحيوانات الجائزة والأجزاء" },
+        {
+          type: "p",
+          text: "الجائز: الغنم والماعز والبقر والإبل. شاة أو ماعز = جزء واحد (أضحية شخص واحد). بقرة أو بعير يُشرك فيها حتى سبعة أشخاص بشرط نية كل واحد أضحية. الجمع بين نيات مختلفة (مثلاً أضحية وعقيقة) في بقرة واحدة مسألة فقهية تفصيلية يُرجع فيها للعالم.",
+        },
+        { type: "h3", text: "العمر والعيوب" },
+        {
+          type: "p",
+          text: "أقل عمر: للغنم ستة أشهر تامة (وأن يكون في حجم السنة في قول أشدد)، للماعز سنة، للبقر سنتان، للإبل خمس. يجب خلوه من العيوب الفادحة: عمى أو مرض ظاهر أو عرج شديد أو هزال أو نقص كبير في الأذن أو القرن أو الذيل. العيوب اليسيرة قد تكون مكروهة ولا تبطل بالضرورة. للعلماء تفصيل؛ عند الشك فاختر حيواناً سليماً كامل الخلقة.",
+        },
+        { type: "h3", text: "وقت الذبح" },
+        {
+          type: "p",
+          text: "يجب أن يكون الذبح بعد صلاة العيد يوم العاشر من ذي الحجة حتى غروب اليوم الثالث عشر (أيام التشريق). الذبح قبل صلاة العيد لا يُحسب أضحية بل لحم عادي. بداية الوقت عند انتهاء إمام العيد من الصلاة في بلدك (أو عند خروج وقتها إن لم تصلّ العيد).",
+        },
+        { type: "h3", text: "نية الأضحية" },
+        {
+          type: "p",
+          text: "يجب أن ينوي المضحّي أضحية العيد. إن وكّل غيره بالذبح (وكيل أو مزرعة) فنية المالك هي المعتبرة والذابح ينفذ عنه. الحيوان يجب أن يكون مملوكاً (أو معيّناً) للأضحية قبل الذبح.",
+        },
+        { type: "h2", text: "خلاصة ونصائح عملية" },
+        {
+          type: "ul",
+          items: [
+            "العقيقة: عن المولود، عادة شاتان للذكر وشاة للأنثى (غنم أو ماعز)، مستحب اليوم السابع، وشرط النية والذبح الحلال.",
+            "الأضحية: الجائز الغنم والماعز والبقر والإبل؛ شاة/ماعز عن شخص أو جزء في بقرة/بعير (حتى 7)، والذبح فقط بعد صلاة العيد حتى 13 ذو الحجة، والحيوان يستوفي العمر ويكون سالماً من العيوب الفادحة.",
+            "في مزارع قرطبة نقدّم ماعزاً وغنماً تستوفي معايير العمر والصحة، مع ذبح حلال وفق الشريعة وإمكانية فيديو الإثبات. نوصّل إلى كوالالمبور، شيراس، أمبانغ، تامان ملاواتي، سردانغ، سري كمبانغان، سيبرجايا وبوتراجايا.",
+          ],
+        },
+      ],
+    },
+    ms: {
+      title: "Syarat Aqiqah dan Korban: Panduan Teknikal (Shuroot)",
+      description:
+        "Syarat fiqh Aqiqah dan Korban: siapa, bila, haiwan apa, umur, kecacatan, niat. Rujukan teknikal untuk Malaysia. Tempah dengan Kordoba Farms—KL, Cheras, Ampang, Serdang, Putrajaya.",
+      excerpt:
+        "Panduan teknikal terperinci syarat Aqiqah dan Korban dalam Islam: haiwan, umur, kecacatan, masa, dan niat.",
+      body: [
+        { type: "h2", text: "Apa Maksud «Syarat» (Shuroot) dalam Hukum Islam?" },
+        {
+          type: "p",
+          text: "Dalam fiqh Islam, «syarat» (shuroot) ialah keperluan yang mesti dipenuhi supaya sesuatu ibadah sah. Bagi Aqiqah dan Korban (udhiyah), ulama menetapkan syarat berkaitan orang yang berkorban, haiwan, masa, dan niat. Memenuhi syarat ini memastikan sembelihan diterima menurut syariah.",
+        },
+        { type: "h2", text: "Syarat Aqiqah" },
+        {
+          type: "p",
+          text: "Aqiqah ialah sunnah menyembelih haiwan bagi pihak bayi. Syarat berikut dipersetujui atau diamalkan dalam mazhab (Hanafi, Maliki, Shafiʿi, Hanbali), dengan Shafiʿi dan amalan tempatan di Malaysia sering dijadikan rujukan.",
+        },
+        { type: "h3", text: "Aqiqah Untuk Siapa?" },
+        {
+          type: "p",
+          text: "Aqiqah dilakukan bagi pihak bayi. Ia sunnah ke atas wali—biasanya bapa—yang bertanggungjawab memberi nafkah. Kos ditanggung wali. Jika wali tidak melakukannya, sesetengah ulama membenarkan orang itu melakukannya kemudian (sebagai amalan sunnah yang tertinggal).",
+        },
+        { type: "h3", text: "Bilangan Haiwan" },
+        {
+          type: "p",
+          text: "Pandangan utama (Shafiʿi, Hanbali): dua biri-biri atau dua kambing untuk anak lelaki, satu biri-biri atau satu kambing untuk anak perempuan. Satu biri-biri boleh untuk anak lelaki jika dua tidak mampu—ulama berbeza sama ada satu mencukupi untuk lelaki; untuk perempuan satu sudah memadai. Setiap haiwan mesti memenuhi syarat jenis dan umur seperti Korban (lihat bawah).",
+        },
+        { type: "h3", text: "Jenis dan Umur Haiwan" },
+        {
+          type: "p",
+          text: "Haiwan yang sah untuk Korban sah untuk Aqiqah: biri-biri (termasuk anak), kambing, dan dalam sesetengah pendapat lembu dan unta. Biri-biri: sekurang-kurangnya enam bulan (atau setahun dalam pendapat ketat). Kambing: satu tahun penuh (dua dalam sesetengah pendapat). Haiwan mesti bebas daripada kecacatan serius: tidak buta, tempang teruk, sakit ketara, atau kehilangan sebahagian telinga/tanduk. Peraturan kecacatan ini selari dengan hadis udhiyah.",
+        },
+        { type: "h3", text: "Niat dan Masa" },
+        {
+          type: "p",
+          text: "Sembelihan mesti dengan niat Aqiqah untuk bayi tersebut. Masa terpilih hari ketujuh selepas lahir (dengan naming dan cukur kepala). Jika tidak mungkin, boleh pada hari ke-14, ke-21 atau lewat—bahkan ketika dewasa menurut sesetengah ulama. Sembelihan mesti halal: oleh Muslim, sebut nama Allah, dan mengikut cara yang ditetapkan.",
+        },
+        { type: "h2", text: "Syarat Korban (Udhiyah)" },
+        {
+          type: "p",
+          text: "Korban (udhiyah) ialah sembelihan pada hari-hari Eid al-Adha. Syarat di bawah diambil daripada al-Quran, Sunnah dan ijmaʿ ulama, dengan perbezaan kecil antara mazhab.",
+        },
+        { type: "h3", text: "Siapa Wajib atau Sunat Berkorban?" },
+        {
+          type: "p",
+          text: "Ada khilaf: ada yang mewajibkan ke atas setiap Muslim dewasa yang berkemampuan; ada yang mengatakannya sunnah mu’akkadah. Di Malaysia lazim mengikut sunnah mu’akkadah. Satu biri-biri atau kambing boleh untuk satu orang atau satu rumah dalam pendapat yang membenarkan perkongsian. Niat mesti untuk udhiyah (korban Raya).",
+        },
+        { type: "h3", text: "Haiwan Sah dan Bahagian" },
+        {
+          type: "p",
+          text: "Haiwan sah: biri-biri, kambing, lembu, unta. Satu biri-biri atau satu kambing = satu bahagian (satu orang). Satu lembu atau satu unta boleh dikongsi sehingga tujuh orang dengan niat Korban setiap seorang. Mencampur niat (misalnya Korban dan Aqiqah) dalam satu lembu ialah persoalan fiqh terperinci—rujuk ulama.",
+        },
+        { type: "h3", text: "Umur dan Kecacatan" },
+        {
+          type: "p",
+          text: "Umur minimum: biri-biri enam bulan genap (dan saiz seperti setahun dalam pendapat ketat); kambing setahun; lembu dua tahun; unta lima tahun. Haiwan mesti bebas daripada kecacatan yang membatalkan: buta, sakit ketara, tempang teruk, kurus, atau kehilangan besar telinga/tanduk/ekor. Kecacatan kecil mungkin makruh tetapi tidak semestinya batal. Ulama ada perincian; bila ragu pilih haiwan sihat dan sempurna.",
+        },
+        { type: "h3", text: "Tempoh Masa Sembelihan" },
+        {
+          type: "p",
+          text: "Sembelihan mesti selepas solat Raya pada 10 Zulhijjah sehingga maghrib 13 Zulhijjah (hari Tashreeq). Sembelihan sebelum solat Raya tidak dikira Korban—hanya daging biasa. Masa mula apabila Imam selesai solat Raya di tempat anda (atau apabila waktu solat Raya keluar jika tidak solat Raya).",
+        },
+        { type: "h3", text: "Niat Korban" },
+        {
+          type: "p",
+          text: "Orang yang berkorban mesti berniat udhiyah. Jika diwakilkan (e.g. ejen atau ladang), niat pemilik yang dikira; penyembelih melaksanakan bagi pihaknya. Haiwan mesti telah dimiliki (atau ditentukan) untuk Korban sebelum disembelih.",
+        },
+        { type: "h2", text: "Ringkasan dan Tips Praktikal" },
+        {
+          type: "ul",
+          items: [
+            "Aqiqah: untuk bayi, lazimnya dua haiwan untuk lelaki dan satu untuk perempuan (biri-biri/kambing); sunnah hari ketujuh; niat dan sembelihan halal diperlukan.",
+            "Korban: haiwan sah biri-biri, kambing, lembu, unta; satu biri-biri/kambing per orang atau satu bahagian lembu/unta (hingga 7); sembelihan hanya selepas solat Raya hingga 13 Zulhijjah; haiwan mesti cukup umur dan bebas kecacatan serius.",
+            "Di Kordoba Farms kami sediakan kambing dan biri-biri yang memenuhi piawaian umur dan kesihatan, dengan sembelihan halal ikut syariah dan pilihan video bukti. Kami hantar ke KL, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya dan Putrajaya.",
+          ],
+        },
+      ],
+    },
+    zh: {
+      title: "阿奇卡与古尔邦的条件：技术指南（شروط）",
+      description:
+        "阿奇卡与古尔邦的教法条件：对象、时间、牲畜种类、年龄、缺陷、举意。马来西亚技术参考。在科尔多巴农场预订—吉隆坡、蕉赖、安邦、沙登、布城。",
+      excerpt:
+        "阿奇卡与古尔邦伊斯兰条件的详细技术指南：牲畜、年龄、缺陷、时间与举意。",
+      body: [
+        { type: "h2", text: "什么是教法中的「条件」（شروط）？" },
+        {
+          type: "p",
+          text: "在伊斯兰教法中，「条件」（shuroot）是指崇拜行为有效所必须满足的要求。对于阿奇卡和古尔邦（献牲），学者规定了与行为者、牲畜、时间和举意有关的条件。满足这些条件可确保献牲按教法被接受。",
+        },
+        { type: "h2", text: "阿奇卡的条件" },
+        {
+          type: "p",
+          text: "阿奇卡是为新生儿宰牲的逊奈。以下条件在各学派（哈乃斐、马立克、沙斐仪、罕百里）中普遍认同或采用，马来西亚本地常以沙斐仪为参照。",
+        },
+        { type: "h3", text: "阿奇卡为谁做？" },
+        {
+          type: "p",
+          text: "阿奇卡是为新生儿做的。它是监护人（通常为父亲）的逊奈，监护人负责抚养孩子。费用由监护人承担。若监护人未做，有学者允许本人日后补做（作为履行未做逊奈的志愿行为）。",
+        },
+        { type: "h3", text: "牲畜数量" },
+        {
+          type: "p",
+          text: "主流观点（如沙斐仪、罕百里）：男孩两只羊或两只山羊，女孩一只羊或一只山羊。若负担不起两只，男孩可一只——学者对一只是否足够有分歧，女孩则一只即可。每只牲畜须满足与古尔邦相同的种类与年龄条件（见下）。",
+        },
+        { type: "h3", text: "牲畜种类与年龄" },
+        {
+          type: "p",
+          text: "古尔邦有效的牲畜对阿奇卡也有效：羊（含羔羊）、山羊，部分观点包括牛和骆驼。羊：须满六个月（或更严观点为一年）。山羊：满一岁（部分观点两岁）。牲畜须无严重缺陷：非盲、非严重跛、非明显病、无耳或角的大部缺失。缺陷规则与著名的献牲圣训一致。",
+        },
+        { type: "h3", text: "举意与时间" },
+        {
+          type: "p",
+          text: "宰杀须以该新生儿的阿奇卡为举意。最佳时间为出生后第七天（取名、剃发）。若不可行，可在第十四、二十一天或之后——有学者允许成年后补做。宰杀须符合清真：由穆斯林执行、诵安拉之名、按 prescribed 方式。",
+        },
+        { type: "h2", text: "古尔邦（献牲）的条件" },
+        {
+          type: "p",
+          text: "古尔邦是宰牲节期间的献牲。以下条件源自古兰经、逊奈与学者共识，学派间有细微差异。",
+        },
+        { type: "h3", text: "谁必须或可以献牲？" },
+        {
+          type: "p",
+          text: "有分歧：有学者主张对有能力之成年穆斯林为 wajib（义务），有主张为强调的逊奈（sunnah mu’akkadah）。马来西亚常见立场为强调的逊奈。献牲可按人或按户——一只羊或山羊可满足一人或一户（在允许共用的观点中）。举意须为古尔邦（节日献牲）。",
+        },
+        { type: "h3", text: "有效牲畜与份额" },
+        {
+          type: "p",
+          text: "有效牲畜：羊、山羊、牛、骆驼。一只羊或一只山羊计一份（一人古尔邦）。一头牛或一峰骆驼可由最多七人共享，每人须有古尔邦举意。在一头牛中混合不同举意（如部分古尔邦、部分阿奇卡）属细部教法问题，应向学者确认。",
+        },
+        { type: "h3", text: "年龄与缺陷" },
+        {
+          type: "p",
+          text: "最低年龄：羊满六个月（严格观点中体型如满一岁）；山羊一岁；牛两岁；骆驼五岁。牲畜须无使献牲无效的缺陷：盲、明显病、严重跛、消瘦、耳/角/尾大部缺失。轻微缺陷可能为可憎但不一定无效。学者有更细规定；有疑问时选健康、体形完整的牲畜。",
+        },
+        { type: "h3", text: "宰杀时间" },
+        {
+          type: "p",
+          text: "宰杀须在宰牲节当日（伊历12月10日）会礼之后至12月13日日落（晒肉日）之间。会礼前宰杀不算古尔邦，仅作普通肉。开始时间以当地伊玛目完成会礼为准（或不礼会礼时以会礼时间过为准）。",
+        },
+        { type: "h3", text: "古尔邦举意" },
+        {
+          type: "p",
+          text: "献牲者须有古尔邦举意。若委托他人宰杀（如代理或农场），以委托人的举意为准；宰杀者代其执行。牲畜须在宰杀前已为古尔邦而拥有或指定。",
+        },
+        { type: "h2", text: "总结与实用建议" },
+        {
+          type: "ul",
+          items: [
+            "阿奇卡：为新生儿，通常男孩两只、女孩一只（羊或山羊）；最佳第七天；须有举意与清真宰杀。",
+            "古尔邦：有效牲畜为羊、山羊、牛、骆驼；一人一只羊/山羊或共牛/骆驼一份（最多7人）；仅会礼后至12月13日宰杀；牲畜须达龄且无严重缺陷。",
+            "科尔多巴农场提供符合年龄与健康标准的山羊和羊，按教法清真屠宰，可选视频证明。我们配送到吉隆坡、蕉赖、安邦、塔曼美拉瓦蒂、沙登、史里肯邦安、赛城和布城。",
+          ],
+        },
+      ],
+    },
+  },
   // Post 6: Where we deliver
   {
     slug: "where-we-deliver-cheras-ampang-kl",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "Where We Deliver: Kuala Lumpur, Cheras, Ampang & More",
       description:
@@ -820,7 +1137,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "Delivery or Collection" },
         {
           type: "p",
-          text: "You can choose to have the meat delivered to your door, collect it from our partner location, or have us distribute it as charity on your behalf. We work with trusted logistics partners so your order reaches you in good condition.",
+          text: "You can choose to have the meat delivered to your door, collect it from our collection point, or have us distribute it as charity on your behalf. We deliver so your order reaches you in good condition.",
         },
         {
           type: "p",
@@ -855,7 +1172,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "التوصيل أو الاستلام" },
         {
           type: "p",
-          text: "يمكنك اختيار توصيل اللحم إلى بابك، أو استلامه من موقع شريكنا، أو نوزّعه نيابة عنك كصدقة. نعمل مع شركاء لوجستيين موثوقين ليصل طلبك بحالة جيدة.",
+          text: "يمكنك اختيار توصيل اللحم إلى بابك، أو استلامه من نقطة الاستلام لدينا، أو نوزّعه نيابة عنك كصدقة. نوصّل طلبك إليك بحالة جيدة.",
         },
         {
           type: "p",
@@ -890,7 +1207,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "Penghantaran atau Ambil Sendiri" },
         {
           type: "p",
-          text: "Anda boleh pilih daging dihantar ke pintu, ambil dari lokasi rakan kami, atau kami agihkan sebagai derma. Kami bekerjasama dengan rakan logistik yang dipercayai supaya pesanan sampai dalam keadaan baik.",
+          text: "Anda boleh pilih daging dihantar ke pintu, ambil dari titik kutipan kami, atau kami agihkan sebagai derma. Kami hantar supaya pesanan sampai dalam keadaan baik.",
         },
         {
           type: "p",
@@ -925,7 +1242,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "配送或自提" },
         {
           type: "p",
-          text: "您可选择送货上门、到合作点自提，或由我们代您捐赠。我们与可信赖的物流合作，确保订单完好送达。",
+          text: "您可选择送货上门、到我们自提点取货，或由我们代您捐赠。我们负责配送，确保订单完好送达。",
         },
         {
           type: "p",
@@ -937,7 +1254,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 7: Halal slaughter
   {
     slug: "halal-slaughter-process-video-proof",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "Our Halal Slaughter Process and Video Proof",
       description:
@@ -957,7 +1274,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "From Farm to You" },
         {
           type: "p",
-          text: "We work with trusted farms that prioritise animal welfare. Each animal is traceable from selection through slaughter, processing, and delivery to Kuala Lumpur, Cheras, Ampang, Serdang, Sri Kembangan, Cyberjaya, and Putrajaya.",
+          text: "We own and raise animals on our own farms and also source goats and sheep from Australia, Thailand, and local raising—all available. We prioritise animal welfare. Each animal is traceable from selection through slaughter, processing, and delivery to Kuala Lumpur, Cheras, Ampang, Serdang, Sri Kembangan, Cyberjaya, and Putrajaya.",
         },
       ],
     },
@@ -980,7 +1297,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "من المزرعة إليك" },
         {
           type: "p",
-          text: "نعمل مع مزارع موثوقة تهتم برفاهية الحيوان. كل حيوان قابل للتتبع من الاختيار حتى الذبح والمعالجة والتوصيل إلى كوالالمبور، شيراس، أمبانغ، سردانغ، سري كمبانغان، سيبرجايا وبوتراجايا.",
+          text: "نملك ونربي الحيوانات في مزارعنا ونوفر أيضاً الماعز والخروف من أستراليا وتايلاند وتربية محلية—الكل متوفر. نراعي رفاهية الحيوان. كل حيوان قابل للتتبع من الاختيار حتى الذبح والمعالجة والتوصيل إلى كوالالمبور، شيراس، أمبانغ، سردانغ، سري كمبانغان، سيبرجايا وبوتراجايا.",
         },
       ],
     },
@@ -1003,7 +1320,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "Dari Ladang ke Anda" },
         {
           type: "p",
-          text: "Kami bekerjasama dengan ladang yang dipercayai dan mengutamakan kebajikan haiwan. Setiap haiwan boleh dijejak dari pilihan hingga sembelihan, pemprosesan dan penghantaran ke KL, Cheras, Ampang, Serdang, Sri Kembangan, Cyberjaya dan Putrajaya.",
+          text: "Kami memiliki dan menternak haiwan di ladang kami sendiri dan juga mendapatkan kambing serta biri-biri dari Australia, Thailand dan ternakan tempatan—semua tersedia. Kami mengutamakan kebajikan haiwan. Setiap haiwan boleh dijejak dari pilihan hingga sembelihan, pemprosesan dan penghantaran ke KL, Cheras, Ampang, Serdang, Sri Kembangan, Cyberjaya dan Putrajaya.",
         },
       ],
     },
@@ -1026,7 +1343,7 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "从农场到您" },
         {
           type: "p",
-          text: "我们与重视动物福利的可信牧场合作。每只牲畜从选择到屠宰、加工并配送到吉隆坡、蕉赖、安邦、沙登、史里肯邦安、赛城和布城均可追溯。",
+          text: "我们在自有牧场拥有并饲养牲畜，并供应来自澳大利亚、泰国及本地自养的山羊和羊——均有供应。我们重视动物福利。每只牲畜从选择到屠宰、加工并配送到吉隆坡、蕉赖、安邦、沙登、史里肯邦安、赛城和布城均可追溯。",
         },
       ],
     },
@@ -1034,7 +1351,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 8: What weight
   {
     slug: "what-weight-goat-sheep-aqiqah-qurban",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "What Weight Goat or Sheep for Aqiqah and Qurban?",
       description:
@@ -1131,7 +1448,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 9: About the farm
   {
     slug: "about-kordoba-farms-our-story",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "About Kordoba Farms: Our Story and How We Work",
       description:
@@ -1151,12 +1468,12 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "How We Work" },
         {
           type: "p",
-          text: "You choose your occasion (Aqiqah, Qurban, or personal), pick goat or sheep and a weight band, then select your slaughter date and how you want the meat: delivered to your address, collected, or donated on your behalf. We handle the rest: coordination with our partner farms, halal slaughter (with optional video proof), and delivery across Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, and Putrajaya.",
+          text: "You choose your occasion (Aqiqah, Qurban, or personal), pick goat or sheep and a weight band (we source from Australia, Thailand, and our own local raising—all available), then select your slaughter date and how you want the meat: delivered to your address, collected, or donated on your behalf. We handle the rest: our own farms and raising, halal slaughter (with optional video proof), and delivery across Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, and Putrajaya.",
         },
         { type: "h2", text: "Why the Farm Matters" },
         {
           type: "p",
-          text: "We work with trusted local farms that raise animals with proper feed and care. Healthy animals and clear processes mean you get meat you can rely on for your Aqiqah, Qurban, or family table. When you order from Kordoba Farms, you are not just buying meat—you are part of a chain that respects the animal, the tradition, and the people who receive it.",
+          text: "We have our own farms and we own and raise the animals ourselves, with proper feed and care. We source goats and sheep from Australia, Thailand, and our own local raising—all available. Healthy animals and clear processes mean you get meat you can rely on for your Aqiqah, Qurban, or family table. When you order from Kordoba Farms, you are not just buying meat—you are part of a chain that respects the animal, the tradition, and the people who receive it.",
         },
       ],
     },
@@ -1169,22 +1486,22 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "من نحن" },
         {
           type: "p",
-          text: "مزارع قرطبة جزء من كوردوبا أغروتيك، وتركيزنا على شيء واحد: جعل طلب الماعز والخروف الحلال للعقيقة والأضحية والاستهلاك الشخصي في ماليزيا بسيطاً وموثوقاً. نربطك بحيوانات قابلة للتتبع، وذبح وفق الشريعة، وتوصيل أو توزيع خيري موثوق.",
+          text: "مزارع قرطبة جزء من KORDOBA AGROTECH SND. BHD.، وتركيزنا على شيء واحد: جعل طلب الماعز والخروف الحلال للعقيقة والأضحية والاستهلاك الشخصي في ماليزيا بسيطاً وموثوقاً. نربطك بحيوانات قابلة للتتبع، وذبح وفق الشريعة، وتوصيل أو توزيع خيري موثوق.",
         },
         { type: "h2", text: "مهمتنا" },
         {
           type: "p",
-          text: "نريد أن يحصل كل عائلة في وادي كلانغ وما حوله على لحم حلال ذي جودة يثقون به. ذلك يعني العمل مع مزارع تهتم برفاهية الحيوان، وذبّاحين يلتزمون بمتطلبات الإسلام، وعملية يمكنك تتبعها من الاختيار حتى باب بيتك أو المحتاجين.",
+          text: "نريد أن يحصل كل عائلة في وادي كلانغ وما حوله على لحم حلال ذي جودة يثقون به. ذلك يعني مزارعنا وتربيتنا حيث نراعي رفاهية الحيوان، وذبّاحين يلتزمون بمتطلبات الإسلام، وعملية يمكنك تتبعها من الاختيار حتى باب بيتك أو المحتاجين.",
         },
         { type: "h2", text: "كيف نعمل" },
         {
           type: "p",
-          text: "تختار مناسبتك (عقيقة، أضحية، أو شخصي)، تختار الماعز أو الخروف وفئة الوزن، ثم تاريخ الذبح وكيف تريد اللحم: توصيل إلى عنوانك، استلام، أو تبرع نيابة عنك. نحن نتابع الباقي: التنسيق مع المزارع الشريكة، الذبح الحلال (مع إمكانية فيديو الإثبات)، والتوصيل في كوالالمبور، شيراس، أمبانغ، تامان ملاواتي، سردانغ، سري كمبانغان، سيبرجايا وبوتراجايا.",
+          text: "تختار مناسبتك (عقيقة، أضحية، أو شخصي)، تختار الماعز أو الخروف وفئة الوزن (نوفر من أستراليا وتايلاند وتربية محلية—الكل متوفر)، ثم تاريخ الذبح وكيف تريد اللحم: توصيل إلى عنوانك، استلام، أو تبرع نيابة عنك. نحن نتابع الباقي: مزارعنا وتربيتنا، الذبح الحلال (مع إمكانية فيديو الإثبات)، والتوصيل في كوالالمبور، شيراس، أمبانغ، تامان ملاواتي، سردانغ، سري كمبانغان، سيبرجايا وبوتراجايا.",
         },
         { type: "h2", text: "لماذا المزرعة مهمة" },
         {
           type: "p",
-          text: "نعمل مع مزارع محلية موثوقة تربي الحيوانات بتغذية ورعاية سليمة. حيوانات سليمة وعمليات واضحة تعني لحم يمكنك الاعتماد عليه للعقيقة أو الأضحية أو مائدة العائلة. عندما تطلب من مزارع قرطبة، أنت لا تشتري لحماً فقط—أنت جزء من سلسلة تحترم الحيوان والتقاليد والمستفيدين.",
+          text: "لدينا مزارعنا ونربي الحيوانات بأنفسنا بتغذية ورعاية سليمة. نوفر الماعز والخروف من أستراليا وتايلاند ومن تربية محلية—الكل متوفر. حيوانات سليمة وعمليات واضحة تعني لحم يمكنك الاعتماد عليه للعقيقة أو الأضحية أو مائدة العائلة. عندما تطلب من مزارع قرطبة، أنت لا تشتري لحماً فقط—أنت جزء من سلسلة تحترم الحيوان والتقاليد والمستفيدين.",
         },
       ],
     },
@@ -1202,17 +1519,17 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "Misi Kami" },
         {
           type: "p",
-          text: "Kami mahu setiap keluarga di Lembah Klang—dan sekitarnya—mempunyai akses kepada daging halal berkualiti yang boleh dipercayai. Itu bermakna bekerjasama dengan ladang yang menjaga kebajikan haiwan, penyembelih yang ikut keperluan Islam, dan proses yang boleh anda ikuti dari pilihan hingga ke pintu rumah anda atau kepada yang memerlukan.",
+          text: "Kami mahu setiap keluarga di Lembah Klang—dan sekitarnya—mempunyai akses kepada daging halal berkualiti yang boleh dipercayai. Itu bermakna ladang dan ternakan kami sendiri yang menjaga kebajikan haiwan, penyembelih yang ikut keperluan Islam, dan proses yang boleh anda ikuti dari pilihan hingga ke pintu rumah anda atau kepada yang memerlukan.",
         },
         { type: "h2", text: "Cara Kami Beroperasi" },
         {
           type: "p",
-          text: "Anda pilih acara (Aqiqah, Korban atau peribadi), pilih kambing atau biri-biri dan julat berat, kemudian tarikh sembelihan dan cara anda nak daging: dihantar ke alamat, ambil sendiri, atau diderma bagi pihak anda. Kami urus selebihnya: penyelarasan dengan ladang rakan, sembelihan halal (dengan pilihan video bukti), dan penghantaran ke Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya dan Putrajaya.",
+          text: "Anda pilih acara (Aqiqah, Korban atau peribadi), pilih kambing atau biri-biri dan julat berat (kami dapatkan dari Australia, Thailand dan ternakan tempatan kami—semua tersedia), kemudian tarikh sembelihan dan cara anda nak daging: dihantar ke alamat, ambil sendiri, atau diderma bagi pihak anda. Kami urus selebihnya: ladang dan ternakan kami sendiri, sembelihan halal (dengan pilihan video bukti), dan penghantaran ke Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya dan Putrajaya.",
         },
         { type: "h2", text: "Mengapa Ladang Penting" },
         {
           type: "p",
-          text: "Kami bekerjasama dengan ladang tempatan yang dipercayai yang menternak haiwan dengan makanan dan penjagaan yang betul. Haiwan sihat dan proses jelas bermakna anda dapat daging yang boleh diandalkan untuk Aqiqah, Korban atau meja keluarga. Bila anda pesan dari Kordoba Farms, anda bukan sekadar beli daging—anda sebahagian daripada rantaian yang menghormati haiwan, tradisi dan penerima.",
+          text: "Kami mempunyai ladang sendiri dan memiliki serta menternak haiwan sendiri, dengan makanan dan penjagaan yang betul. Kami mendapatkan kambing dan biri-biri dari Australia, Thailand dan ternakan tempatan kami—semua tersedia. Haiwan sihat dan proses jelas bermakna anda dapat daging yang boleh diandalkan untuk Aqiqah, Korban atau meja keluarga. Bila anda pesan dari Kordoba Farms, anda bukan sekadar beli daging—anda sebahagian daripada rantaian yang menghormati haiwan, tradisi dan penerima.",
         },
       ],
     },
@@ -1230,17 +1547,17 @@ export const BLOG_POSTS: BlogPost[] = [
         { type: "h2", text: "我们的使命" },
         {
           type: "p",
-          text: "我们希望巴生谷及周边每个家庭都能获得可信赖的优质清真肉。因此我们与重视动物福利的牧场、遵循伊斯兰要求的屠夫合作，并让您能从选择一路追踪到您家门口或有需要的人手中。",
+          text: "我们希望巴生谷及周边每个家庭都能获得可信赖的优质清真肉。因此我们以自有牧场与饲养、重视动物福利，配合遵循伊斯兰要求的屠夫，并让您能从选择一路追踪到您家门口或有需要的人手中。",
         },
         { type: "h2", text: "我们如何运作" },
         {
           type: "p",
-          text: "您选择场合（阿奇卡、古尔邦或自用），选择山羊或羊及重量段，再选择屠宰日期和肉的交付方式：送货上门、自提或代您捐赠。其余由我们负责：与合作牧场协调、清真屠宰（可选视频证明），并配送到吉隆坡、蕉赖、安邦、塔曼美拉瓦蒂、沙登、史里肯邦安、赛城和布城。",
+          text: "您选择场合（阿奇卡、古尔邦或自用），选择山羊或羊及重量段（我们供应来自澳大利亚、泰国及本地自养——均有供应），再选择屠宰日期和肉的交付方式：送货上门、自提或代您捐赠。其余由我们负责：自有牧场与饲养、清真屠宰（可选视频证明），并配送到吉隆坡、蕉赖、安邦、塔曼美拉瓦蒂、沙登、史里肯邦安、赛城和布城。",
         },
         { type: "h2", text: "为什么牧场重要" },
         {
           type: "p",
-          text: "我们与可信赖的本地牧场合作，以合理饲料与照料饲养牲畜。健康的牲畜和清晰的流程意味着您获得的肉可用于阿奇卡、古尔邦或家庭餐桌。当您从科尔多巴农场订购时，您不仅是买肉——您是一条尊重动物、传统与受赠人的链条的一部分。",
+          text: "我们拥有自己的牧场并自行饲养牲畜，提供合理的饲料与照料。我们的山羊和羊来自澳大利亚、泰国以及本地自养——均有供应。健康的牲畜和清晰的流程意味着您获得的肉可用于阿奇卡、古尔邦或家庭餐桌。当您从科尔多巴农场订购时，您不仅是买肉——您是一条尊重动物、传统与受赠人的链条的一部分。",
         },
       ],
     },
@@ -1248,7 +1565,7 @@ export const BLOG_POSTS: BlogPost[] = [
   // Post 10: From farm to table
   {
     slug: "from-farm-to-table-traceability",
-    date: "2025-02-20",
+    date: "2026-03-06",
     en: {
       title: "From Farm to Your Table: Traceability at Kordoba Farms",
       description:
@@ -1265,7 +1582,7 @@ export const BLOG_POSTS: BlogPost[] = [
           type: "ul",
           items: [
             "Selection: You choose whole goat or whole sheep and a weight band (or we assign from available stock).",
-            "Farm: Animals come from partner farms that we work with regularly. Welfare and feed matter to us.",
+            "Farm: All animals are from our farms—we have no partner farms. We import goats and sheep (from Australia, Thailand) and we raise locally; we feed them and take care of them. Everything is ours: our farms, our feed, our care.",
             "Slaughter: Muslim slaughtermen perform halal slaughter in line with Shariah. You can request video proof.",
             "Processing: The meat is cut according to your choice (e.g. fridge, salona, biryani) and packed for delivery or collection.",
             "Delivery: We deliver to your address in Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, and Putrajaya—or we distribute as charity on your behalf.",
@@ -1294,7 +1611,7 @@ export const BLOG_POSTS: BlogPost[] = [
           type: "ul",
           items: [
             "الاختيار: تختار ماعزاً أو خروفاً كاملاً وفئة وزن (أو نعين من المخزون المتاح).",
-            "المزرعة: الحيوانات من مزارع شريكة نعمل معها بانتظام. الرفاهية والتغذية مهمتان لنا.",
+            "المزرعة: كل الحيوانات من مزارعنا—لا نعمل مع مزارع شريكة. نستورد الماعز والخروف (من أستراليا وتايلاند) ونربّي محلياً؛ نغذّيهم ونعتني بهم. كل شيء لنا: مزارعنا، علفنا، رعايتنا.",
             "الذبح: ذبّاحون مسلمون ينفذون الذبح الحلال وفق الشريعة. يمكنك طلب فيديو الإثبات.",
             "التجهيز: اللحم يُقطّع حسب اختيارك (ثلاجة، سالونا، برياني، إلخ) ويُعبّأ للتوصيل أو الاستلام.",
             "التوصيل: نوصّل إلى عنوانك في كوالالمبور، شيراس، أمبانغ، تامان ملاواتي، سردانغ، سري كمبانغان، سيبرجايا وبوتراجايا—أو نوزّع نيابة عنك كصدقة.",
@@ -1323,7 +1640,7 @@ export const BLOG_POSTS: BlogPost[] = [
           type: "ul",
           items: [
             "Pilihan: Anda pilih kambing atau biri-biri keseluruhan dan julat berat (atau kami tentukan dari stok).",
-            "Ladang: Haiwan dari ladang rakan yang kami bekerjasama secara tetap. Kebajikan dan makanan penting bagi kami.",
+            "Ladang: Semua haiwan dari ladang kami—kami tiada ladang rakan. Kami import kambing dan biri-biri (dari Australia, Thailand) dan kami ternak tempatan; kami beri makan dan jaga mereka. Semuanya kami: ladang kami, makanan kami, penjagaan kami.",
             "Sembelihan: Penyembelih Muslim lakukan sembelihan halal ikut syariah. Anda boleh minta video bukti.",
             "Pemprosesan: Daging dipotong mengikut pilihan anda (peti sejuk, salona, biryani, dll) dan dibungkus untuk hantar atau ambil.",
             "Penghantaran: Kami hantar ke alamat anda di KL, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya dan Putrajaya—atau kami agihkan sebagai derma bagi pihak anda.",
@@ -1352,7 +1669,7 @@ export const BLOG_POSTS: BlogPost[] = [
           type: "ul",
           items: [
             "选择：您选择整只山羊或整只羊及重量段（或我们从现有库存分配）。",
-            "农场：牲畜来自我们长期合作的合作牧场。我们重视福利与饲养。",
+            "农场：所有牲畜均来自我们自己的牧场——我们没有合作牧场。我们进口山羊和羊（来自澳大利亚、泰国）并在本地饲养；我们负责喂养和照料。一切皆为我们自有：我们的牧场、我们的饲料、我们的照料。",
             "屠宰：穆斯林屠夫按教法进行清真屠宰。您可要求视频证明。",
             "加工：按您选择的切割方式（冷藏、沙洛纳、香饭等）切割并包装，以便配送或自提。",
             "配送：我们配送到您在吉隆坡、蕉赖、安邦、塔曼美拉瓦蒂、沙登、史里肯邦安、赛城和布城的地址——或代您捐赠给有需要的人。",

@@ -137,12 +137,12 @@ export default async function AboutPage({
         <ul className="space-y-2 text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
           <li>
             {isAr
-              ? "• نعمل مع مزارع موثوقة تلتزم برفاهية الحيوان والتغذية السليمة."
+              ? "• مزارعنا وتربيتنا: نستورد من أستراليا وتايلاند ونربّي محلياً؛ نغذّي الحيوانات ونعتني بها."
               : isMs
-                ? "• Kami bekerjasama dengan ladang yang dipercayai yang menjaga kebajikan haiwan dan pemakanan yang baik."
+                ? "• Ladang dan ternakan kami: kami import dari Australia dan Thailand, ternak tempatan; kami beri makan dan jaga haiwan."
                 : isZh
-                  ? "• 我们与可信赖的本地牧场合作，重视动物福利和饲养质量。"
-                  : "• We partner with trusted local farms that prioritise animal welfare and proper feeding."}
+                  ? "• 我们自有牧场与饲养：从澳大利亚、泰国进口并本地饲养；我们喂养并照料牲畜。"
+                  : "• Our farms and our raising: we import from Australia and Thailand and raise locally; we feed and take care of every animal."}
           </li>
           <li>
             {isAr

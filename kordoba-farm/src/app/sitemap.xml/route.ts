@@ -14,7 +14,7 @@ function escapeXml(s: string): string {
 }
 
 export async function GET() {
-  const now = new Date().toISOString().slice(0, 19) + "Z";
+  const now = "2026-03-06T00:00:00Z";
   const urlset: string[] = [];
 
   for (const path of STATIC_PATHS) {
@@ -68,7 +68,7 @@ export async function GET() {
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' +
     urlset.join("\n") +
-    "\n</urlset>";
+    "\n</urlset>\n";
 
   return new NextResponse(xml, {
     status: 200,

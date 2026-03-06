@@ -32,6 +32,7 @@ export const BLOG_SLUGS = [
   "aqiqah-vs-qurban-difference",
   "when-to-do-aqiqah-timing",
   "goat-or-sheep-for-aqiqah-qurban",
+  "conditions-of-aqiqah-and-qurban",
   "where-we-deliver-cheras-ampang-kl",
   "halal-slaughter-process-video-proof",
   "what-weight-goat-sheep-aqiqah-qurban",
