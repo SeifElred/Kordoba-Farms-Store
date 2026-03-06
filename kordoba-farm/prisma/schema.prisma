@@ -70,6 +70,7 @@ model Product {
   id                String   @id @default(uuid())
   productType       String   @unique  // half_sheep, half_goat, whole_sheep, whole_goat
   label             String
+  enabled           Boolean  @default(true)
   minPrice          Float    // fallback when no weight options
   maxPrice          Float
   imageUrl          String   // fallback when no locale-specific image
@@ -79,15 +80,17 @@ model Product {
   updatedAt         DateTime @updatedAt
 }
 
-// Global weight definitions (label + price). Add here, then enable/disable per product.
+// Global weight definitions (label + price). occasionScope: qurban_aqiqah | personal (which occasion uses this band).
 model WeightOption {
-  id          String         @id @default(uuid())
-  label       String         // e.g. "12 kg", "14 kg"
-  price       Float
-  sortOrder   Int            @default(0)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  products   ProductWeight[]
+  id             String         @id @default(uuid())
+  bandId         String?        @unique // e.g. "whole_28_30", "personal_17_20" — for idempotent seed & legacy display
+  label          String         // e.g. "28-30 kg", "17-20 kg (45-55 days)"
+  price          Float
+  sortOrder      Int            @default(0)
+  occasionScope  String?        // "qurban_aqiqah" | "personal" — filters which occasion sees this option
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  products       ProductWeight[]
 }
 
 // Which weight options are enabled for each product type (many-to-many)

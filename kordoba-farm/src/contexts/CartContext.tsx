@@ -19,6 +19,8 @@ export type CartLineItem = {
   specialCutLabel: string;
   slaughterDate: string;
   distribution: string;
+  /** DB weight option id (preferred for checkout price) */
+  weightOptionId?: string;
   weightSelection: string;
   weightLabel?: string;
   videoProof: boolean;

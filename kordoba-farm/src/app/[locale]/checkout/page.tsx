@@ -2,20 +2,25 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { getSiteSetting } from "@/lib/content";
 import { CheckoutPageClient } from "@/components/checkout/CheckoutPageClient";
 
 export default async function CheckoutPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ intent?: string }>;
 }) {
   const { locale } = await params;
+  const { intent } = await searchParams;
   if (!routing.locales.includes(locale as "ar" | "en" | "ms" | "zh")) notFound();
   setRequestLocale(locale);
 
-  const [t, tPurpose] = await Promise.all([
+  const [t, tPurpose, whatsappLink] = await Promise.all([
     getTranslations("checkout"),
     getTranslations("purpose"),
+    getSiteSetting("whatsapp_link"),
   ]);
 
   const purposeLabels: Record<string, string> = {
@@ -44,7 +49,7 @@ export default async function CheckoutPage({
             </div>
           }
         >
-          <CheckoutPageClient locale={locale} purposeLabels={purposeLabels} />
+          <CheckoutPageClient locale={locale} purposeLabels={purposeLabels} intentWhatsapp={intent === "whatsapp"} whatsappLink={whatsappLink ?? undefined} />
         </Suspense>
       </div>
     </div>

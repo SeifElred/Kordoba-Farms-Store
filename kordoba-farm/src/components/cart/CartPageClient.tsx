@@ -4,53 +4,13 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
-import type { CartLineItem } from "@/contexts/CartContext";
 import { formatPriceRange, formatPrice } from "@/lib/utils";
 import { getWeightBandDisplayLabel } from "@/lib/weight-bands";
+import { getSpecialCutDisplayLabel } from "@/lib/special-cut-labels";
 import { ShoppingBag, Pencil, Trash2, CreditCard, ShieldCheck, Lock } from "lucide-react";
-
-const WHATSAPP_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_LINK ?? "https://wa.me/60123456789";
-
-function buildCartOrderMessage(
-  items: CartLineItem[],
-  purposeLabels: Record<string, string>,
-  distLabels: Record<string, string>,
-  hint: string
-): string {
-  const lines = [
-    "*New order – Kordoba Farms*",
-    "",
-    `*Items (${items.length})*`,
-    ...items.flatMap((item, i) => {
-      const purpose = purposeLabels[item.occasion] ?? item.occasion;
-      const dist = distLabels[item.distribution] ?? item.distribution;
-      const includes: string[] = [];
-      if (item.includeHead) includes.push("Head");
-      if (item.includeStomach) includes.push("Stomach");
-      if (item.includeIntestines) includes.push("Intestines");
-      const orderIncludes = includes.length ? includes.join(", ") : "—";
-      return [
-        "",
-        `*${i + 1}. ${item.productLabel}*`,
-        `Occasion: ${purpose}`,
-        `Slaughter date: ${item.slaughterDate || "TBD"}`,
-        `Distribution: ${dist}`,
-        `Cut: ${item.specialCutLabel || "—"}`,
-        `Price: ${formatPriceRange(item.minPrice, item.maxPrice)}`,
-        `Video proof: ${item.videoProof ? "Yes" : "No"}`,
-        `Includes: ${orderIncludes}`,
-        ...(item.note?.trim() ? [`Note: ${item.note.trim()}`] : []),
-      ];
-    }),
-    "",
-    hint,
-  ];
-  return lines.join("\n");
-}
 
 export function CartPageClient({
   locale,
-  whatsappLink,
 }: {
   locale: string;
   whatsappLink?: string | null;
@@ -60,6 +20,7 @@ export function CartPageClient({
   const tOrder = useTranslations("orderDetails");
   const tWizard = useTranslations("orderWizard");
   const tAnimal = useTranslations("animal");
+  const tProduct = useTranslations("product");
   const searchParams = useSearchParams();
   const added = searchParams.get("added") === "1";
 
@@ -75,20 +36,12 @@ export function CartPageClient({
     pickup: tOrder("pickup"),
     donate: tOrder("donate"),
   };
-
-  function handleCompleteOrder() {
-    if (items.length === 0) return;
-    const message = buildCartOrderMessage(
-      items,
-      purposeLabels,
-      distLabels,
-      t("completeOrderHint")
-    );
-    const base = (whatsappLink?.trim() || WHATSAPP_FALLBACK).replace(/\/$/, "");
-    const separator = base.includes("?") ? "&" : "?";
-    const url = `${base}${separator}text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
+  const productLabels: Record<string, string> = {
+    whole_sheep: tProduct("whole_sheep"),
+    whole_goat: tProduct("whole_goat"),
+    half_sheep: tProduct("half_sheep"),
+    half_goat: tProduct("half_goat"),
+  };
 
   if (items.length === 0) {
     return (
@@ -125,22 +78,47 @@ export function CartPageClient({
                 <p className="mt-0.5 text-lg font-semibold text-[var(--foreground)]">
                   {purposeLabels[item.occasion] ?? item.occasion}
                 </p>
-                <p className="mt-1 text-xl font-bold text-[var(--primary)]">{item.productLabel}</p>
-                <p className="mt-0.5 text-sm text-[var(--muted-foreground)]">
-                  {item.specialCutLabel && `${item.specialCutLabel} · `}
-                  {item.slaughterDate && `${item.slaughterDate} · `}
-                  {distLabels[item.distribution] ?? item.distribution}
+                <p className="mt-1 text-xl font-bold text-[var(--primary)]">
+                  {productLabels[item.product] ?? item.productLabel}
                 </p>
+                <div className="mt-0.5 flex flex-wrap gap-1.5">
+                  {item.specialCutLabel && (
+                    <span className="rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
+                      {getSpecialCutDisplayLabel(locale, item.specialCutId, item.specialCutLabel)}
+                    </span>
+                  )}
+                  {item.slaughterDate && (
+                    <span className="rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
+                      {item.slaughterDate}
+                    </span>
+                  )}
+                  <span className="rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
+                    {distLabels[item.distribution] ?? item.distribution}
+                  </span>
+                </div>
                 {(item.weightLabel || item.weightSelection) && (
-                  <p className="mt-0.5 text-sm text-[var(--muted-foreground)]">
-                    <span className="font-medium text-[var(--foreground)]">{t("weightAndAge")}:</span>{" "}
-                    {item.weightLabel || getWeightBandDisplayLabel(item.weightSelection, item.occasion, locale) || item.weightSelection}
-                  </p>
-                )}
-                {(item.occasion === "qurban" || item.occasion === "aqiqah") && (
-                  <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
-                    {tAnimal("weightAgeNote")}
-                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <span className="text-xs text-[var(--muted-foreground)]">
+                      {t("weightAndAge")}:
+                    </span>
+                    <span className="rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
+                      {getWeightBandDisplayLabel(item.weightSelection, item.occasion, locale) ||
+                        item.weightLabel ||
+                        item.weightSelection}
+                    </span>
+                    {(item.occasion === "qurban" || item.occasion === "aqiqah") &&
+                      item.product.includes("sheep") && (
+                        <span className="rounded-md border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-2 py-0.5 text-xs text-[var(--primary)]">
+                          {tAnimal("sheepAgeBadge")}
+                        </span>
+                      )}
+                    {(item.occasion === "qurban" || item.occasion === "aqiqah") &&
+                      item.product.includes("goat") && (
+                        <span className="rounded-md border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-2 py-0.5 text-xs text-[var(--primary)]">
+                          {tAnimal("goatAgeBadge")}
+                        </span>
+                      )}
+                  </div>
                 )}
                 <p className="mt-1 text-base font-semibold text-[var(--foreground)]">
                   {formatPriceRange(item.minPrice, item.maxPrice)}
@@ -184,15 +162,15 @@ export function CartPageClient({
       <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--muted)]/20 px-4 py-3 text-xs text-[var(--muted-foreground)]">
         <span className="flex items-center gap-1.5">
           <Lock className="h-4 w-4 text-[var(--primary)]" aria-hidden />
-          Secure payment
+          {t("trustSecure")}
         </span>
         <span className="flex items-center gap-1.5">
           <ShieldCheck className="h-4 w-4 text-[var(--primary)]" aria-hidden />
-          100% Halal
+          {t("trustHalal")}
         </span>
         <span className="flex items-center gap-1.5">
           <CreditCard className="h-4 w-4 text-[var(--primary)]" aria-hidden />
-          Card & FPX
+          {t("trustCardFpx")}
         </span>
       </div>
 
@@ -221,13 +199,12 @@ export function CartPageClient({
         </span>
         <hr className="border-[var(--border)]" />
       </div>
-      <button
-        type="button"
-        onClick={handleCompleteOrder}
-        className="w-full rounded-[var(--radius)] border-2 border-[var(--primary)]/50 bg-transparent px-4 py-3 font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+      <Link
+        href={`/${locale}/checkout?intent=whatsapp`}
+        className="flex w-full items-center justify-center rounded-[var(--radius)] border-2 border-[var(--primary)]/50 bg-transparent px-4 py-3 font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
       >
         {t("completeOrder")}
-      </button>
+      </Link>
       <p className="text-center text-xs text-[var(--muted-foreground)]">
         {t("completeOrderHint")}
       </p>

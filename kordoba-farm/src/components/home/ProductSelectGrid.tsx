@@ -19,7 +19,7 @@ export function ProductSelectGrid({
 }) {
   const products = productsProp ?? PRODUCT_TYPES.map((productType) => {
     const c = getProductConfig(productType);
-    return c ? { productType, ...c } : null;
+    return c ?? null;
   }).filter(Boolean) as ProductConfig[];
   return (
     <ul className="mt-6 grid gap-5 sm:mt-8 sm:grid-cols-2 sm:gap-6" role="list">

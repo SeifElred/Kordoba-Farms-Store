@@ -22,15 +22,19 @@
   "orderDetails": {
     "title": "订单详情",
     "invalidProduct": "无效产品。请返回选择产品。",
+    "deliveryTransportNote": "我们使用 LalaMove 进行配送。",
     "delivery": "配送到我家",
     "pickup": "自行取货",
     "donate": "捐赠做慈善（我们代发）",
+    "deliveryDesc": "我们通过合作的配送服务将肉类送到您提供的地址。",
+    "pickupDesc": "您或您的代表到我们的地点自取肉类。",
+    "donateDesc": "我们代表您将肉类作为善款分发给有需要的人。",
     "notesPlaceholder": "任何特殊要求...",
     "weightAsIs": "原样（标准重量）",
     "weightRange": "重量范围（联系我们）",
     "chooseWeight": "选择重量",
     "chooseCut": "选择切割方式",
-    "chooseCutSubtitle": "选择一项。点击播放图标观看视频。",
+    "chooseCutSubtitle": "从可用的切割方式中选择一项。",
     "watchVideo": "观看视频",
     "yourProduct": "您的产品",
     "selectDate": "选择日期",
@@ -40,7 +44,8 @@
     "completeRequiredToProceed": "请选择屠宰日期、特殊切割和重量选项以继续。",
     "summaryTitle": "订单摘要",
     "weightAndAge": "重量 / 月龄",
-    "occasionLabel": "场合"
+    "occasionLabel": "场合",
+    "none": "—"
   },
   "nav": {
     "home": "首页",
@@ -73,7 +78,10 @@
     "editItem": "编辑",
     "removeItem": "删除",
     "itemAdded": "已加入购物车。",
-    "weightAndAge": "重量 / 月龄"
+    "weightAndAge": "重量 / 月龄",
+    "trustSecure": "安全支付",
+    "trustHalal": "100% 清真",
+    "trustCardFpx": "银行卡 & FPX"
   },
   "orderWizard": {
     "step1Title": "选择场合",
@@ -91,6 +99,12 @@
     "goat": "山羊",
     "half": "半只",
     "whole": "整只"
+  },
+  "product": {
+    "whole_sheep": "整只羊",
+    "whole_goat": "整只山羊",
+    "half_sheep": "半只羊",
+    "half_goat": "半只山羊"
   },
   "purpose": {
     "title": "您想怎样庆祝？",
@@ -152,6 +166,8 @@
     "addToOrder": "去结账",
     "weightSelection": "重量选择",
     "weightAgeNote": "绵羊：大于 6 个月。山羊：大于 1 年。",
+    "sheepAgeBadge": "大于 6 个月。",
+    "goatAgeBadge": "大于 1 年。",
     "weightAsIs": "原样（{weight} 公斤）",
     "specialCut": "特殊切割（可选）",
     "orderIncludes": "订单包含",
@@ -169,6 +185,7 @@
     "address": "地址",
     "addressPlaceholder": "街道、城市、邮编、州",
     "optional": "选填",
+    "addressRequired": "请输入您的完整地址。",
     "orderSummaryNote": "订单详情将发送至 WhatsApp",
     "sendToWhatsApp": "发送订单到 WhatsApp",
     "placeOrder": "提交订单",
@@ -202,7 +219,7 @@
     "reorder": "再次订购"
   },
   "footer": {
-    "company": "Kordoba Agrotech Sdn. Bhd.",
+    "company": "KORDOBA AGROTECH SDN. BHD.",
     "companySection": "公司",
     "allRights": "版权所有。",
     "tagline": "古尔邦、阿奇卡与优质清真羊肉 — 从牧场到您的餐桌，全程可追溯。",
@@ -219,7 +236,9 @@
     "error": "出错了。",
     "back": "返回",
     "next": "下一步",
-    "buyNow": "立即购买"
+    "buyNow": "立即购买",
+    "yes": "是",
+    "no": "否"
   },
   "admin": {
     "currentTheme": "当前主题",

@@ -7,6 +7,7 @@ const createSchema = z.object({
   label: z.string().min(1),
   price: z.number().min(0),
   sortOrder: z.number().int().optional(),
+  occasionScope: z.enum(["qurban_aqiqah", "personal"]).optional(),
 });
 
 export async function GET() {
@@ -24,10 +25,10 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 });
   }
-  const { label, price, sortOrder } = parsed.data;
+  const { label, price, sortOrder, occasionScope } = parsed.data;
   const count = await prisma.weightOption.count();
   const row = await prisma.weightOption.create({
-    data: { label, price, sortOrder: sortOrder ?? count },
+    data: { label, price, sortOrder: sortOrder ?? count, occasionScope: occasionScope ?? null },
   });
   return NextResponse.json(row);
 }

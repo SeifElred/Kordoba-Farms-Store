@@ -1,16 +1,22 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import type { CartLineItem } from "@/contexts/CartContext";
-import { formatPrice } from "@/lib/utils";
-import { Lock, ShieldCheck, CreditCard } from "lucide-react";
+import { formatPrice, formatPriceRange } from "@/lib/utils";
+import { getFlagEmoji, COUNTRY_DIAL_LIST } from "@/lib/country-dial";
+import { Lock, ShieldCheck, CreditCard, MessageCircle } from "lucide-react";
+import { toast } from "sonner";
+
+const WHATSAPP_FALLBACK = process.env.NEXT_PUBLIC_WHATSAPP_LINK ?? "https://wa.me/60123456789";
 
 type CartPayloadItem = {
   product: string;
   occasion: string;
-  weightSelection: string;
+  weightOptionId?: string;
+  weightSelection?: string;
   specialCutId: string;
   specialCutLabel: string;
   slaughterDate: string;
@@ -27,7 +33,8 @@ function cartToPayload(items: CartLineItem[]): CartPayloadItem[] {
   return items.map((item) => ({
     product: item.product,
     occasion: item.occasion,
-    weightSelection: item.weightSelection,
+    ...(item.weightOptionId && { weightOptionId: item.weightOptionId }),
+    weightSelection: item.weightSelection || undefined,
     specialCutId: item.specialCutId,
     specialCutLabel: item.specialCutLabel,
     slaughterDate: item.slaughterDate,
@@ -44,12 +51,25 @@ function cartToPayload(items: CartLineItem[]): CartPayloadItem[] {
 export function CheckoutPageClient({
   locale,
   purposeLabels,
+  intentWhatsapp = false,
+  whatsappLink,
 }: {
   locale: string;
   purposeLabels: Record<string, string>;
+  intentWhatsapp?: boolean;
+  whatsappLink?: string | null;
 }) {
   const t = useTranslations("checkout");
+  const tProduct = useTranslations("product");
+  const tOrder = useTranslations("orderDetails");
   const { items, clearCart } = useCart();
+
+  const productLabels: Record<string, string> = {
+    whole_sheep: tProduct("whole_sheep"),
+    whole_goat: tProduct("whole_goat"),
+    half_sheep: tProduct("half_sheep"),
+    half_goat: tProduct("half_goat"),
+  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -62,10 +82,95 @@ export function CheckoutPageClient({
 
   const totalMYR = items.reduce((sum, i) => sum + i.minPrice, 0);
 
+  const distLabels: Record<string, string> = {
+    delivery: tOrder("delivery"),
+    pickup: tOrder("pickup"),
+    donate: tOrder("donate"),
+  };
+
+  async function handleSendWhatsApp(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (items.length === 0) return;
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+      setError(t("addressRequired"));
+      return;
+    }
+    const countryMeta =
+      COUNTRY_DIAL_LIST.find((c) => c.code === form.country) ??
+      COUNTRY_DIAL_LIST.find((c) => c.code === "MY")!;
+    const phoneWithDial = `${countryMeta.dial} ${form.phone.trim()}`;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/checkout/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          channel: "whatsapp",
+          name: form.name.trim(),
+          email: (form.email?.trim() || "").trim() || undefined,
+          phone: phoneWithDial,
+          address: form.address.trim(),
+          country: form.country,
+          locale,
+          items: cartToPayload(items),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error ?? "Could not create order. Please try again.");
+        setLoading(false);
+        return;
+      }
+      const lines = [
+        "*New order – Kordoba Farms*",
+        "",
+        "*Customer*",
+        `Name: ${form.name.trim()}`,
+        `Phone: ${phoneWithDial}`,
+        `Address: ${form.address.trim()}`,
+        ...(form.email?.trim() ? [`Email: ${form.email.trim()}`] : []),
+        "",
+        `*Items (${items.length})*`,
+        ...items.flatMap((item, i) => {
+          const purpose = purposeLabels[item.occasion] ?? item.occasion;
+          const dist = distLabels[item.distribution] ?? item.distribution;
+          const productName = productLabels[item.product] ?? item.productLabel;
+          return [
+            "",
+            `*${i + 1}. ${productName}*`,
+            `Occasion: ${purpose}`,
+            `Slaughter: ${item.slaughterDate || "TBD"}`,
+            `Distribution: ${dist}`,
+            `Cut: ${item.specialCutLabel || "—"}`,
+            `Price: ${formatPriceRange(item.minPrice, item.maxPrice)}`,
+          ];
+        }),
+      ];
+      const message = lines.join("\n");
+      const base = (whatsappLink?.trim() || WHATSAPP_FALLBACK).replace(/\/$/, "");
+      const url = `${base}${base.includes("?") ? "&" : "?"}text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+      clearCart();
+      toast.success("Order created. We'll confirm via WhatsApp.");
+      window.location.href = `/${locale}/cart`;
+    } catch {
+      setError("Something went wrong. Please try again.");
+    }
+    setLoading(false);
+  }
+
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     if (items.length === 0) return;
+    if (!form.address.trim()) {
+      setError(t("addressRequired"));
+      return;
+    }
+    const countryMeta =
+      COUNTRY_DIAL_LIST.find((c) => c.code === form.country) ??
+      COUNTRY_DIAL_LIST.find((c) => c.code === "MY")!;
     setLoading(true);
     try {
       const res = await fetch("/api/checkout/cart", {
@@ -74,8 +179,8 @@ export function CheckoutPageClient({
         body: JSON.stringify({
           name: form.name.trim(),
           email: form.email.trim(),
-          phone: form.phone.trim(),
-          address: form.address.trim() || undefined,
+          phone: `${countryMeta.dial} ${form.phone.trim()}`,
+          address: form.address.trim(),
           country: form.country,
           locale,
           items: cartToPayload(items),
@@ -116,7 +221,7 @@ export function CheckoutPageClient({
   return (
     <div className="grid gap-8 lg:grid-cols-5">
       <div className="lg:col-span-3">
-        <form onSubmit={handlePay} className="space-y-4">
+        <form onSubmit={intentWhatsapp ? handleSendWhatsApp : handlePay} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("name")} *
@@ -131,11 +236,10 @@ export function CheckoutPageClient({
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {t("email")} *
+              {t("email")}
             </label>
             <input
               type="email"
-              required
               className="input-base w-full"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
@@ -145,20 +249,39 @@ export function CheckoutPageClient({
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("phone")} *
             </label>
-            <input
-              type="tel"
-              required
-              className="input-base w-full"
-              value={form.phone}
-              onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-            />
+            <div className="flex gap-2">
+              <select
+                className="input-base w-32 shrink-0"
+                value={form.country}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    country: e.target.value,
+                  }))
+                }
+              >
+                {COUNTRY_DIAL_LIST.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {getFlagEmoji(c.code)} {c.dial}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="tel"
+                required
+                className="input-base w-full"
+                value={form.phone}
+                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+              />
+            </div>
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {t("address")} <span className="text-xs text-[var(--muted-foreground)]">({t("optional")})</span>
+              {t("address")} *
             </label>
             <textarea
               rows={3}
+              required
               className="input-base w-full min-h-[80px] resize-y"
               value={form.address}
               onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
@@ -172,10 +295,12 @@ export function CheckoutPageClient({
             </div>
           )}
 
-          <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--muted)]/30 px-4 py-3 text-sm text-[var(--muted-foreground)]">
-            <Lock className="h-5 w-5 shrink-0 text-[var(--primary)]" aria-hidden />
-            <span>{t("securePayment")}</span>
-          </div>
+          {!intentWhatsapp && (
+            <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--muted)]/30 px-4 py-3 text-sm text-[var(--muted-foreground)]">
+              <Lock className="h-5 w-5 shrink-0 text-[var(--primary)]" aria-hidden />
+              <span>{t("securePayment")}</span>
+            </div>
+          )}
 
           <button
             type="submit"
@@ -184,6 +309,11 @@ export function CheckoutPageClient({
           >
             {loading ? (
               <span>{t("processing")}</span>
+            ) : intentWhatsapp ? (
+              <>
+                <MessageCircle className="h-5 w-5" aria-hidden />
+                {t("sendToWhatsApp")}
+              </>
             ) : (
               <>
                 <CreditCard className="h-5 w-5" aria-hidden />
@@ -191,6 +321,13 @@ export function CheckoutPageClient({
               </>
             )}
           </button>
+          {intentWhatsapp && (
+            <p className="text-center">
+              <Link href={`/${locale}/checkout`} className="text-sm text-[var(--primary)] hover:underline">
+                {t("payNow")} instead
+              </Link>
+            </p>
+          )}
         </form>
       </div>
 
@@ -203,7 +340,7 @@ export function CheckoutPageClient({
             {items.map((item) => (
               <li key={item.id} className="flex justify-between gap-2 text-sm">
                 <span className="min-w-0 truncate text-[var(--foreground)]">
-                  {purposeLabels[item.occasion] ?? item.occasion} · {item.productLabel}
+                  {purposeLabels[item.occasion] ?? item.occasion} · {productLabels[item.product] ?? item.productLabel}
                 </span>
                 <span className="shrink-0 font-medium text-[var(--primary)]">
                   {formatPrice(item.minPrice)}

@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Baby, Beef, User, ChevronRight } from "lucide-react";
 
 type AccentKey = "amber" | "primary" | "gold";
@@ -20,7 +22,16 @@ const accentStyles: Record<AccentKey, string> = {
 
 export function PurposeGrid() {
   const t = useTranslations("purpose");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
+  const router = useRouter();
+  const [loadingPurpose, setLoadingPurpose] = useState<string | null>(null);
+
+  useEffect(() => {
+    for (const item of purposes) {
+      router.prefetch(`/${locale}/order?occasion=${item.slug}&step=2`);
+    }
+  }, [locale, router]);
 
   return (
     <div className="space-y-1">
@@ -28,13 +39,20 @@ export function PurposeGrid() {
         {purposes.map((item, i) => {
           const Icon = item.icon;
           const styles = accentStyles[item.accent];
+          const href = `/${locale}/order?occasion=${item.slug}&step=2`;
+          const isLoading = loadingPurpose === item.slug;
           const staggerClass =
             i === 0 ? "stagger-in stagger-in-1" : i === 1 ? "stagger-in stagger-in-2" : i === 2 ? "stagger-in stagger-in-3" : "";
           return (
             <li key={item.key} className={staggerClass}>
               <Link
-                href={`/${locale}/order?occasion=${item.slug}&step=2`}
-                className={`group flex min-h-[80px] items-center gap-4 rounded-2xl border-2 px-5 py-4 shadow-sm transition-all hover:shadow-md active:scale-[0.99] sm:min-h-[88px] sm:gap-5 sm:px-6 sm:py-5 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 ${styles}`}
+                href={href}
+                prefetch
+                onMouseEnter={() => router.prefetch(href)}
+                onFocus={() => router.prefetch(href)}
+                onClick={() => setLoadingPurpose(item.slug)}
+                aria-busy={isLoading}
+                className={`group flex min-h-[80px] items-center gap-4 rounded-2xl border-2 px-5 py-4 shadow-sm transition-all hover:shadow-md active:scale-[0.99] sm:min-h-[88px] sm:gap-5 sm:px-6 sm:py-5 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 ${styles} ${isLoading ? "pointer-events-none opacity-90" : ""}`}
               >
                 <span className="icon-wrap flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors sm:h-14 sm:w-14">
                   <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2} />
@@ -44,10 +62,17 @@ export function PurposeGrid() {
                     {t(item.key)}
                   </span>
                   <span className="mt-0.5 block text-sm leading-snug text-[var(--muted-foreground)]">
-                    {t(`${item.key}Desc`)}
+                    {isLoading ? tCommon("loading") : t(`${item.key}Desc`)}
                   </span>
                 </div>
-                <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)] transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 sm:h-6 sm:w-6" aria-hidden />
+                {isLoading ? (
+                  <span
+                    className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent text-[var(--muted-foreground)] sm:h-6 sm:w-6"
+                    aria-hidden
+                  />
+                ) : (
+                  <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)] transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 sm:h-6 sm:w-6" aria-hidden />
+                )}
               </Link>
             </li>
           );

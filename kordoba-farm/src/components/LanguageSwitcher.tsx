@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 
 const locales = [
@@ -14,16 +14,23 @@ const locales = [
 export function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   function onSelect(next: string) {
     if (next === locale) return;
     const segments = pathname.split("/").filter(Boolean);
-    const rest = segments.slice(1).join("/");
-    const newPath = `/${next}${rest ? `/${rest}` : ""}`;
+    const localeCodes = ["en", "ar", "ms", "zh"];
+    const pathSegments =
+      segments[0] && localeCodes.includes(segments[0])
+        ? [next, ...segments.slice(1)]
+        : [next, ...segments];
+    const basePath = `/${pathSegments.filter(Boolean).join("/")}`;
+    const search = searchParams.toString();
+    const newPath = search ? `${basePath}?${search}` : basePath;
     startTransition(() => {
-      router.push(newPath);
+      router.push(newPath, { scroll: false });
     });
   }
 

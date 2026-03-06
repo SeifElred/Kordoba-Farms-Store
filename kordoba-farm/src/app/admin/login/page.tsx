@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -34,42 +38,44 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0f172a] px-4">
-      <div className="w-full max-w-sm">
-        <div className="rounded-2xl border border-[#334155] bg-[#1e293b] p-8 shadow-xl">
-          <div className="mb-6 text-center">
-            <h1 className="text-xl font-bold text-white">Kordoba Farms</h1>
-            <p className="mt-1 text-sm text-[#94a3b8]">Admin sign in</p>
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
+      <Card className="w-full max-w-sm shadow-lg">
+        <CardHeader className="space-y-1 text-center">
+          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-2xl font-bold text-primary">
+            K
           </div>
+          <CardTitle className="text-xl">Kordoba Admin</CardTitle>
+          <CardDescription>Sign in with your admin password</CardDescription>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="password" className="mb-1 block text-sm font-medium text-[#cbd5e1]">
-                Password
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-[#475569] bg-[#0f172a] px-3 py-2.5 text-white placeholder-[#64748b] focus:border-[#c8a951] focus:outline-none focus:ring-1 focus:ring-[#c8a951]"
                 placeholder="Enter admin password"
                 required
                 autoFocus
+                disabled={loading}
+                className="h-10"
               />
             </div>
             {error && (
-              <p className="text-sm text-red-400">{error}</p>
+              <p className="text-sm text-destructive">{error}</p>
             )}
-            <button
+            <Button
               type="submit"
+              className="w-full"
               disabled={loading}
-              className="w-full rounded-lg bg-[#0F3D2E] py-2.5 font-medium text-white transition-colors hover:bg-[#14533a] focus:outline-none focus:ring-2 focus:ring-[#c8a951] focus:ring-offset-2 focus:ring-offset-[#1e293b] disabled:opacity-50"
             >
               {loading ? "Signing in…" : "Sign in"}
-            </button>
+            </Button>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

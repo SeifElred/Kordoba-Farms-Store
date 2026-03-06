@@ -1,7 +1,9 @@
 /**
- * Server-side cart line price. Must match OrderWizard bands so checkout total is consistent.
+ * Server-side cart line price. Prefers DB lookup by weightOptionId; falls back to legacy band ids.
  * Used by /api/checkout/cart to avoid trusting client-submitted prices.
  */
+import type { PrismaClient } from "@prisma/client";
+
 const QURBAN_AQIQAH_BANDS: { id: string; price: number }[] = [
   { id: "whole_28_30", price: 1020 },
   { id: "whole_31_33", price: 1120 },
@@ -29,7 +31,10 @@ const PERSONAL_BANDS: { id: string; price: number }[] = [
 export type CartLineItemPayload = {
   product: string;
   occasion: string;
-  weightSelection: string;
+  /** DB WeightOption id (preferred); price resolved from DB */
+  weightOptionId?: string;
+  /** Legacy band id (e.g. whole_28_30); used when weightOptionId missing */
+  weightSelection?: string;
   specialCutId: string;
   specialCutLabel: string;
   slaughterDate: string;
@@ -43,18 +48,35 @@ export type CartLineItemPayload = {
 };
 
 /**
- * Returns price in MYR for a cart line item. Uses fixed bands for whole carcass; otherwise 0 (invalid).
+ * Returns price in MYR for a cart line item. Uses DB when weightOptionId present; else legacy bands.
  */
-export function getCartLinePrice(item: CartLineItemPayload): number {
+export async function getCartLinePrice(
+  item: CartLineItemPayload,
+  prisma: PrismaClient
+): Promise<number> {
+  if (item.weightOptionId) {
+    const opt = await prisma.weightOption.findUnique({
+      where: { id: item.weightOptionId },
+    });
+    if (opt) return opt.price;
+  }
   const isWhole =
     item.product === "whole_sheep" || item.product === "whole_goat";
-  if (!isWhole || !item.weightSelection) return 0;
+  const sel = item.weightSelection;
+  if (!isWhole || !sel) return 0;
   const bands =
     item.occasion === "personal" ? PERSONAL_BANDS : QURBAN_AQIQAH_BANDS;
-  const band = bands.find((b) => b.id === item.weightSelection);
+  const band = bands.find((b) => b.id === sel);
   return band ? band.price : 0;
 }
 
-export function getCartTotalMYR(items: CartLineItemPayload[]): number {
-  return items.reduce((sum, item) => sum + getCartLinePrice(item), 0);
+export async function getCartTotalMYR(
+  items: CartLineItemPayload[],
+  prisma: PrismaClient
+): Promise<number> {
+  let total = 0;
+  for (const item of items) {
+    total += await getCartLinePrice(item, prisma);
+  }
+  return total;
 }

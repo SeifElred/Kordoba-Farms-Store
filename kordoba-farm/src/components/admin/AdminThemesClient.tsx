@@ -2,6 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, Check } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ORDER_TEMPLATE_PRESETS } from "@/lib/order-template-presets";
 import type { OrderTemplatePresetId } from "@/lib/order-template-presets";
 
@@ -102,10 +114,12 @@ export function AdminThemesClient() {
       body: JSON.stringify({ key: "active_theme", value: theme }),
     });
     setSavingTheme(false);
-    if (res.ok) setActiveTheme(theme);
-    else {
+    if (res.ok) {
+      setActiveTheme(theme);
+      toast.success("Theme updated");
+    } else {
       const d = await res.json().catch(() => ({}));
-      alert(d.error || "Failed to save");
+      toast.error(d.error || "Failed to save");
     }
   }
 
@@ -126,185 +140,164 @@ export function AdminThemesClient() {
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        alert(d.error || "Failed to save");
+        toast.error(d.error || "Failed to save");
         break;
       }
     }
     setSavingContent(null);
+    toast.success("Theme content saved");
   }
-
-  const inputClass =
-    "w-full rounded-lg border border-[#334155] bg-[#0f172a] px-3 py-2 text-sm text-white font-mono focus:border-[#c8a951] focus:outline-none focus:ring-1 focus:ring-[#c8a951]";
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center rounded-xl border border-[#334155] bg-[#1e293b] py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-[#94a3b8]" />
-      </div>
+      <Card>
+        <CardContent className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
     );
   }
 
   const activeThemeLabel = THEMES.find((t) => t.id === activeTheme)?.label ?? activeTheme;
 
   return (
-    <div className="space-y-8">
-      {/* Current theme – very visible */}
-      <div className="rounded-xl border-2 border-[#c8a951] bg-[#c8a951]/10 px-5 py-4">
-        <p className="text-sm font-medium uppercase tracking-wider text-[#c8a951]">Current theme</p>
-        <p className="mt-1 text-2xl font-bold text-white">{activeThemeLabel}</p>
-        <p className="mt-1 text-sm text-[#94a3b8]">This theme is live site-wide: full design (colors, background, vibe), banner, hero text, and WhatsApp order message.</p>
-      </div>
+    <div className="space-y-6">
+      <Card className="border-primary/40 bg-primary/5">
+        <CardContent className="pt-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">Current theme</p>
+          <p className="mt-1 text-xl font-bold">{activeThemeLabel}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Live site-wide: design, banner, hero text, and WhatsApp order message.</p>
+        </CardContent>
+      </Card>
 
-      {/* Active theme selector */}
-      <section className="rounded-xl border border-[#334155] bg-[#1e293b] p-5">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[#94a3b8]">
-          Choose active theme
-        </h2>
-        <p className="mb-4 text-sm text-[#94a3b8]">
-          Click a theme to make it active. The whole site switches to that design (colors, backgrounds, feel) plus its banner and hero text.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          {THEMES.map((t) => {
-            const isActive = activeTheme === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setActive(t.id)}
-                disabled={savingTheme}
-                className={`relative rounded-xl border-2 px-4 py-3 text-left transition-colors disabled:opacity-50 ${
-                  isActive
-                    ? "border-[#c8a951] bg-[#c8a951]/10 text-white"
-                    : "border-[#334155] bg-[#0f172a] text-[#94a3b8] hover:border-[#475569] hover:text-white"
-                }`}
-              >
-                {isActive && (
-                  <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-[#c8a951] px-2 py-0.5 text-xs font-semibold text-[#0f172a]">
-                    <Check className="h-3 w-3" /> Active
-                  </span>
-                )}
-                <span className="block font-medium">{t.label}</span>
-                <span className="mt-0.5 block text-xs opacity-80">
-                  {t.description}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Choose active theme</CardTitle>
+          <CardDescription>Click a theme to make it active. The whole site switches to that design.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            {THEMES.map((t) => {
+              const isActive = activeTheme === t.id;
+              return (
+                <Button
+                  key={t.id}
+                  type="button"
+                  variant={isActive ? "default" : "outline"}
+                  className="relative h-auto flex-col items-start gap-0.5 px-4 py-3 text-left"
+                  onClick={() => setActive(t.id)}
+                  disabled={savingTheme}
+                >
+                  {isActive && (
+                    <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-background/20 px-2 py-0.5 text-xs font-medium">
+                      <Check className="h-3 w-3" /> Active
+                    </span>
+                  )}
+                  <span className="font-medium">{t.label}</span>
+                  <span className="text-xs opacity-90">{t.description}</span>
+                </Button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Per-theme: banner, hero, order message */}
-      <div className="space-y-6">
-        {THEMES.map((t) => (
-          <section
-            key={t.id}
-            className="rounded-xl border border-[#334155] bg-[#1e293b] p-5"
-          >
-            <h2 className="mb-4 text-lg font-semibold text-white">
-              {t.label} – Banner & hero text (design is automatic)
-            </h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-[#94a3b8]">Banner (top of every page)</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  value={content[t.id].banner}
-                  onChange={(e) =>
-                    setContent((prev) => ({
-                      ...prev,
-                      [t.id]: { ...prev[t.id], banner: e.target.value },
-                    }))
-                  }
-                  placeholder="e.g. Ramadan Mubarak – Free delivery on orders above RM500"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-[#94a3b8]">Hero heading (main pages)</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  value={content[t.id].heroHeading}
-                  onChange={(e) =>
-                    setContent((prev) => ({
-                      ...prev,
-                      [t.id]: { ...prev[t.id], heroHeading: e.target.value },
-                    }))
-                  }
-                  placeholder="e.g. Choose your occasion"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-[#94a3b8]">Hero subtitle</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  value={content[t.id].heroSubtitle}
-                  onChange={(e) =>
-                    setContent((prev) => ({
-                      ...prev,
-                      [t.id]: { ...prev[t.id], heroSubtitle: e.target.value },
-                    }))
-                  }
-                  placeholder="e.g. What brings you here?"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-[#94a3b8]">Order message template (WhatsApp)</label>
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-[#64748b]">Apply preset:</span>
-                  <select
-                    className="rounded-lg border border-[#334155] bg-[#0f172a] px-2 py-1.5 text-sm text-white focus:border-[#c8a951] focus:outline-none"
-                    value=""
-                    onChange={(e) => {
-                      const id = e.target.value as OrderTemplatePresetId | "";
-                      if (!id) return;
-                      const preset = ORDER_TEMPLATE_PRESETS.find((p) => p.id === id);
-                      if (preset) {
-                        setContent((prev) => ({
-                          ...prev,
-                          [t.id]: { ...prev[t.id], orderTemplate: preset.template },
-                        }));
-                      }
-                      e.target.value = "";
-                    }}
-                  >
-                    <option value="">— Choose preset —</option>
-                    {ORDER_TEMPLATE_PRESETS.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="text-xs text-[#64748b]">Then edit below if needed and Save.</span>
-                </div>
-                <textarea
-                  className={inputClass + " min-h-[160px]"}
-                  value={content[t.id].orderTemplate}
-                  onChange={(e) =>
-                    setContent((prev) => ({
-                      ...prev,
-                      [t.id]: { ...prev[t.id], orderTemplate: e.target.value },
-                    }))
-                  }
-                  placeholder={`*New order*\nName: {{name}}\n...`}
-                />
-                <p className="mt-1 text-xs text-[#64748b]">Placeholders: {PLACEHOLDERS}</p>
-              </div>
+      {THEMES.map((t) => (
+        <Card key={t.id}>
+          <CardHeader>
+            <CardTitle className="text-base">{t.label} – Banner & hero</CardTitle>
+            <CardDescription>Banner text, hero heading/subtitle, and WhatsApp order message for this theme.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Banner (top of every page)</Label>
+              <Input
+                value={content[t.id].banner}
+                onChange={(e) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    [t.id]: { ...prev[t.id], banner: e.target.value },
+                  }))
+                }
+                placeholder="e.g. Ramadan Mubarak – Free delivery on orders above RM500"
+              />
             </div>
-
-            <button
-              type="button"
+            <div className="space-y-2">
+              <Label>Hero heading</Label>
+              <Input
+                value={content[t.id].heroHeading}
+                onChange={(e) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    [t.id]: { ...prev[t.id], heroHeading: e.target.value },
+                  }))
+                }
+                placeholder="e.g. Choose your occasion"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Hero subtitle</Label>
+              <Input
+                value={content[t.id].heroSubtitle}
+                onChange={(e) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    [t.id]: { ...prev[t.id], heroSubtitle: e.target.value },
+                  }))
+                }
+                placeholder="e.g. What brings you here?"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Order message template (WhatsApp)</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                <Select
+                  onValueChange={(id: OrderTemplatePresetId) => {
+                    const preset = ORDER_TEMPLATE_PRESETS.find((p) => p.id === id);
+                    if (preset) {
+                      setContent((prev) => ({
+                        ...prev,
+                        [t.id]: { ...prev[t.id], orderTemplate: preset.template },
+                      }));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Apply preset…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ORDER_TEMPLATE_PRESETS.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-xs text-muted-foreground">Then edit below and Save.</span>
+              </div>
+              <textarea
+                className="min-h-[160px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={content[t.id].orderTemplate}
+                onChange={(e) =>
+                  setContent((prev) => ({
+                    ...prev,
+                    [t.id]: { ...prev[t.id], orderTemplate: e.target.value },
+                  }))
+                }
+                placeholder={`*New order*\nName: {{name}}\n...`}
+              />
+              <p className="text-xs text-muted-foreground">Placeholders: {PLACEHOLDERS}</p>
+            </div>
+            <Button
               onClick={() => saveThemeContent(t.id)}
               disabled={savingContent === t.id}
-              className="mt-4 rounded-lg bg-[#0F3D2E] px-3 py-1.5 text-sm text-white hover:bg-[#14533a] disabled:opacity-50"
+              size="sm"
             >
               {savingContent === t.id ? "Saving…" : "Save " + t.label}
-            </button>
-          </section>
-        ))}
-      </div>
+            </Button>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

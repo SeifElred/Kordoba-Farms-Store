@@ -22,15 +22,19 @@
   "orderDetails": {
     "title": "تفاصيل الطلب",
     "invalidProduct": "منتج غير صالح. يرجى العودة واختيار منتج.",
+    "deliveryTransportNote": "نستخدم خدمة لالاموف للتوصيل.",
     "delivery": "توصيل إلى عنواني",
     "pickup": "أستلمه بنفسي",
     "donate": "تبرع للصدقة (نوزّعه نيابة عنك)",
+    "deliveryDesc": "نقوم بتوصيل اللحم إلى عنوانك عبر شركة التوصيل.",
+    "pickupDesc": "أنت أو من ينوب عنك تستلمون اللحم من موقعنا.",
+    "donateDesc": "نقوم بتوزيع اللحم كصدقة عنك للفئات المستحقة.",
     "notesPlaceholder": "أي طلبات خاصة...",
     "weightAsIs": "كما هو (وزن قياسي)",
     "weightRange": "نطاق وزن (تواصل معنا)",
     "chooseWeight": "اختر نطاق الوزن",
     "chooseCut": "اختر القطع",
-    "chooseCutSubtitle": "اختر خياراً. اضغط على أيقونة التشغيل لمشاهدة الفيديو.",
+    "chooseCutSubtitle": "اختر خياراً واحداً من خيارات التقطيع المتاحة.",
     "watchVideo": "مشاهدة الفيديو",
     "yourProduct": "منتجك",
     "selectDate": "اختر التاريخ",
@@ -40,7 +44,8 @@
     "completeRequiredToProceed": "يرجى اختيار تاريخ الذبح، ونوع القطع، وخيار الوزن للمتابعة.",
     "summaryTitle": "ملخص الطلب",
     "weightAndAge": "الوزن / العمر",
-    "occasionLabel": "المناسبة"
+    "occasionLabel": "المناسبة",
+    "none": "—"
   },
   "nav": {
     "home": "الرئيسية",
@@ -73,7 +78,10 @@
     "editItem": "تعديل",
     "removeItem": "إزالة",
     "itemAdded": "تمت إضافة الصنف إلى السلة.",
-    "weightAndAge": "الوزن / العمر"
+    "weightAndAge": "الوزن / العمر",
+    "trustSecure": "دفع آمن",
+    "trustHalal": "حلال ١٠٠٪",
+    "trustCardFpx": "بطاقة و FPX"
   },
   "orderWizard": {
     "step1Title": "اختر المناسبة",
@@ -91,6 +99,12 @@
     "goat": "ماعز",
     "half": "نصف ذبيحة",
     "whole": "ذبيحة كاملة"
+  },
+  "product": {
+    "whole_sheep": "خروف كامل",
+    "whole_goat": "ماعز كامل",
+    "half_sheep": "نصف خروف",
+    "half_goat": "نصف ماعز"
   },
   "purpose": {
     "title": "كيف تحب أن تحتفل؟",
@@ -152,6 +166,8 @@
     "addToOrder": "إتمام الطلب",
     "weightSelection": "اختيار نطاق الوزن",
     "weightAgeNote": "الخروف: أكبر من ٦ أشهر. الماعز: أكبر من سنة واحدة.",
+    "sheepAgeBadge": "أكبر من ٦ أشهر.",
+    "goatAgeBadge": "أكبر من سنة واحدة.",
     "weightAsIs": "كما هو ({weight} كغ)",
     "specialCut": "قطع خاص (اختياري)",
     "orderIncludes": "يشمل الطلب",
@@ -169,6 +185,7 @@
     "address": "العنوان",
     "addressPlaceholder": "الشارع، المدينة، الرمز البريدي",
     "optional": "اختياري",
+    "addressRequired": "يرجى إدخال العنوان بالكامل.",
     "orderSummaryNote": "تفاصيل الطلب ستُرسل إلى واتساب",
     "sendToWhatsApp": "إرسال الطلب إلى واتساب",
     "placeOrder": "تأكيد الطلب",
@@ -202,7 +219,7 @@
     "reorder": "إعادة الطلب"
   },
   "footer": {
-    "company": "Kordoba Agrotech Sdn. Bhd.",
+    "company": "KORDOBA AGROTECH SDN. BHD.",
     "companySection": "الشركة",
     "allRights": "جميع الحقوق محفوظة.",
     "tagline": "أضاحي وعقائق ولحم ضاني — من المزرعة إلى مائدتك مع تتبع كامل.",
@@ -219,7 +236,9 @@
     "error": "حدث خطأ.",
     "back": "رجوع",
     "next": "التالي",
-    "buyNow": "اشتري الآن"
+    "buyNow": "اشتري الآن",
+    "yes": "نعم",
+    "no": "لا"
   },
   "admin": {
     "currentTheme": "السمة الحالية",

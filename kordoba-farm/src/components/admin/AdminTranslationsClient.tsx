@@ -2,6 +2,25 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Pencil, Loader2, Search } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const LOCALES = ["en", "ar", "ms", "zh"] as const;
 
@@ -58,78 +77,114 @@ export function AdminTranslationsClient() {
     setSaving(false);
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
-      alert(d.error || "Failed to save");
+      toast.error(d.error || "Failed to save");
       return;
     }
     setTranslations((prev) => prev.map((t) => (t.key === editing ? { ...t, value: editValue } : t)));
     setEditing(null);
+    toast.success("Translation saved");
   }
 
-  const inputClass = "w-full rounded-lg border border-[#334155] bg-[#0f172a] px-3 py-2 text-sm text-white focus:border-[#c8a951] focus:outline-none focus:ring-1 focus:ring-[#c8a951]";
-
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <select value={locale} onChange={(e) => setLocale(e.target.value)} className="rounded-lg border border-[#334155] bg-[#1e293b] px-3 py-2 text-sm text-white focus:border-[#c8a951] focus:outline-none">
-          {LOCALES.map((l) => (
-            <option key={l} value={l}>{l}</option>
-          ))}
-        </select>
-        <div className="flex flex-1 min-w-[200px] gap-2">
-          <input type="text" placeholder="Search keys..." value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && doSearch()} className={inputClass} />
-          <button type="button" onClick={doSearch} className="rounded-lg border border-[#334155] bg-[#1e293b] px-3 py-2 text-[#94a3b8] hover:bg-[#334155] hover:text-white" aria-label="Search">
-            <Search className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-[#334155] bg-[#1e293b] overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-[#94a3b8]" />
-          </div>
-        ) : (
-          <div className="max-h-[70vh] overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-[#1e293b] border-b border-[#334155]">
-                <tr className="text-left text-[#94a3b8]">
-                  <th className="p-4 font-medium">Key</th>
-                  <th className="p-4 font-medium">Value</th>
-                  <th className="p-4 w-24 text-right font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {translations.map((t) => (
-                  <tr key={t.id} className="border-b border-[#334155]">
-                    <td className="p-4 font-mono text-[#94a3b8] align-top whitespace-nowrap">{t.key}</td>
-                    {editing === t.key ? (
-                      <td className="p-4" colSpan={2}>
-                        <div className="flex gap-2">
-                          <textarea className={inputClass + " min-h-[60px]"} value={editValue} onChange={(e) => setEditValue(e.target.value)} rows={2} />
-                          <div className="flex flex-col gap-1">
-                            <button type="button" onClick={save} disabled={saving} className="rounded-lg bg-[#0F3D2E] px-3 py-1.5 text-sm text-white hover:bg-[#14533a] disabled:opacity-50">{saving ? "…" : "Save"}</button>
-                            <button type="button" onClick={() => setEditing(null)} className="rounded-lg border border-[#334155] px-3 py-1.5 text-sm text-[#94a3b8] hover:bg-[#334155]">Cancel</button>
-                          </div>
-                        </div>
-                      </td>
-                    ) : (
-                      <>
-                        <td className="p-4 text-white align-top break-words max-w-md">{t.value}</td>
-                        <td className="p-4 text-right align-top">
-                          <button type="button" onClick={() => startEdit(t)} className="rounded-lg border border-[#334155] p-1.5 text-[#94a3b8] hover:bg-[#334155] hover:text-white" aria-label="Edit">
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                        </td>
-                      </>
-                    )}
-                  </tr>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Translations</CardTitle>
+          <CardDescription>Override copy per locale. Select locale and search by key, then edit and save.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={locale} onValueChange={setLocale}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LOCALES.map((l) => (
+                  <SelectItem key={l} value={l}>
+                    {l}
+                  </SelectItem>
                 ))}
-              </tbody>
-            </table>
+              </SelectContent>
+            </Select>
+            <div className="flex flex-1 min-w-[200px] gap-2">
+              <Input
+                placeholder="Search keys…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && doSearch()}
+                className="max-w-sm"
+              />
+              <Button type="button" variant="outline" size="icon" onClick={doSearch} aria-label="Search">
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        )}
-        {!loading && translations.length === 0 && <div className="p-12 text-center text-[#94a3b8]">No translations. Run: npx tsx prisma/seed-content.ts</div>}
-      </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : translations.length === 0 ? (
+            <div className="py-12 text-center text-sm text-muted-foreground">
+              No translations. Run: npx tsx prisma/seed-content.ts
+            </div>
+          ) : (
+            <div className="max-h-[70vh] overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="sticky top-0 bg-muted/95 backdrop-blur">
+                    <TableHead className="font-medium">Key</TableHead>
+                    <TableHead className="font-medium">Value</TableHead>
+                    <TableHead className="w-20 text-right font-medium">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {translations.map((t) => (
+                    <TableRow key={t.id}>
+                      <TableCell className="font-mono text-muted-foreground align-top whitespace-nowrap">
+                        {t.key}
+                      </TableCell>
+                      {editing === t.key ? (
+                        <TableCell colSpan={2} className="align-top">
+                          <div className="flex gap-2">
+                            <textarea
+                              className="min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              rows={2}
+                            />
+                            <div className="flex flex-col gap-1 shrink-0">
+                              <Button size="sm" onClick={save} disabled={saving}>
+                                {saving ? "…" : "Save"}
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => setEditing(null)}>
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        </TableCell>
+                      ) : (
+                        <>
+                          <TableCell className="align-top break-words max-w-md">{t.value}</TableCell>
+                          <TableCell className="text-right align-top">
+                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => startEdit(t)} aria-label="Edit">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { formatPrice, formatPriceRange, getProductConfig, getLocalDateString, SP
 import { cn } from "@/lib/utils";
 import type { ProductConfig, ProductWeightOption } from "@/lib/content";
 import type { SpecialCutOption } from "@/lib/utils";
+import { CalendarSelector } from "@/components/ui/CalendarSelector";
 
 const PRODUCT_TYPES = ["half_sheep", "half_goat", "whole_sheep", "whole_goat"] as const;
 
@@ -73,10 +74,7 @@ export function OrderDetailsForm({
   const checkoutMin = selectedWeight ? selectedWeight.price : minPrice;
   const checkoutMax = selectedWeight ? selectedWeight.price : maxPrice;
 
-  const today = getLocalDateString(new Date());
-  const oneYearFromNow = new Date();
-  oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-  const maxDate = getLocalDateString(oneYearFromNow);
+  const defaultTransportNote = tOrder("deliveryTransportNote");
 
   const canProceed =
     slaughterDate.trim() !== "" &&
@@ -193,36 +191,54 @@ export function OrderDetailsForm({
         <SectionTitle>{tOrder("deliveryOptions")}</SectionTitle>
         <div className="space-y-4">
           <div>
-            <label htmlFor="slaughter-date" className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+            <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("slaughterDate")}
             </label>
-            <input
-              id="slaughter-date"
-              type="date"
-              min={today}
-              max={maxDate}
-              className="input-base w-full"
-              value={slaughterDate}
-              onChange={(e) => setSlaughterDate(e.target.value)}
-              aria-required="true"
+            <CalendarSelector
+              locale={locale}
+              selected={slaughterDate ? new Date(slaughterDate) : undefined}
+              onSelect={(date) => {
+                if (!date) return;
+                setSlaughterDate(getLocalDateString(date));
+              }}
             />
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("distribution")}
             </label>
-            <select
-              className="input-base w-full"
-              value={distribution}
-              onChange={(e) => setDistribution(e.target.value)}
-            >
-              <option value="delivery">{tOrder("delivery")}</option>
-              <option value="pickup">{tOrder("pickup")}</option>
-              <option value="donate">{tOrder("donate")}</option>
-            </select>
-            {distribution === "delivery" && (deliveryTransportNote ?? "We use LalaMove for transportation.").trim() && (
+            <div className="grid grid-cols-1 gap-2">
+              {(["delivery", "pickup", "donate"] as const).map((value) => {
+                const selected = distribution === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setDistribution(value)}
+                    className={cn(
+                      "flex flex-col items-start rounded-xl border px-3 py-2 text-start text-xs sm:text-sm transition-colors",
+                      selected
+                        ? "border-[var(--primary)] bg-[var(--primary)]/5 text-[var(--foreground)]"
+                        : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/50"
+                    )}
+                  >
+                    <span className="font-semibold">
+                      {tOrder(value)}
+                    </span>
+                    <span className="mt-0.5 text-[10px] sm:text-xs text-[var(--muted-foreground)]">
+                      {value === "delivery"
+                        ? tOrder("deliveryDesc")
+                        : value === "pickup"
+                          ? tOrder("pickupDesc")
+                          : tOrder("donateDesc")}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {distribution === "delivery" && (deliveryTransportNote?.trim() || defaultTransportNote) && (
               <p className="mt-1.5 text-sm text-[var(--muted-foreground)]" role="note">
-                {(deliveryTransportNote ?? "We use LalaMove for transportation.").trim()}
+                {deliveryTransportNote?.trim() || defaultTransportNote}
               </p>
             )}
           </div>

@@ -21,7 +21,7 @@ export function Header({ bannerText }: { bannerText?: string }) {
   useEffect(() => setMounted(true), []);
 
   return (
-    <header className="sticky top-0 z-40 shrink-0 bg-[var(--card)] shadow-[0_1px_0_0_var(--border)]">
+    <header className="sticky top-0 z-50 shrink-0 bg-[var(--card)] shadow-[0_1px_0_0_var(--border)]">
       {bannerText?.trim() ? (
         <div className="bg-[var(--primary)] px-4 py-1.5 text-center text-xs font-medium tracking-wide text-white/95 sm:px-6">
           {bannerText.trim()}

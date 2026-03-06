@@ -34,7 +34,7 @@ export function Footer() {
           <Link href={`${base}/about`} className="hover:text-[var(--foreground)]">{t("about")}</Link>
         </div>
         <p className="text-xs">
-          © {new Date().getFullYear()} {t("company")}
+          © {new Date().getFullYear()} {t("company")} {t("allRights")}
         </p>
       </div>
     </footer>

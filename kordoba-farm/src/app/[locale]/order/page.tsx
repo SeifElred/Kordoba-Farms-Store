@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import { getProductConfig, getProductWeights, getSpecialCuts, getSiteSetting } from "@/lib/content";
+import {
+  getProductsMap,
+  getProductWeightsByProduct,
+  getSpecialCuts,
+  getSiteSettings,
+} from "@/lib/content";
+import { getProductLabel } from "@/lib/utils";
 import { OrderWizard } from "@/components/order/OrderWizard";
 import { HowItWorks } from "@/components/layout/HowItWorks";
 
@@ -38,8 +44,8 @@ export async function generateMetadata({
   };
 }
 
-// Half carcass products are temporarily disabled (only whole products are loaded).
-const PRODUCT_TYPES = ["whole_sheep", "whole_goat"] as const;
+// All four products: half only for personal; whole for qurban, aqiqah, personal.
+const PRODUCT_TYPES = ["half_sheep", "half_goat", "whole_sheep", "whole_goat"] as const;
 
 const DEFAULT_SHEEP_IMAGE =
   "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800&q=80";
@@ -57,22 +63,26 @@ export default async function OrderPage({
   const { step, occasion, edit, product: productParam } = await searchParams;
   setRequestLocale(locale);
 
-  const [specialCuts, deliveryTransportNote, sheepImageSetting, goatImageSetting, ...rest] = await Promise.all([
-    getSpecialCuts(),
-    getSiteSetting("delivery_transport_note"),
-    getSiteSetting("animal_image_sheep"),
-    getSiteSetting("animal_image_goat"),
-    ...PRODUCT_TYPES.map((pt) => getProductConfig(pt, locale, occasion)),
-    ...PRODUCT_TYPES.map((pt) => getProductWeights(pt)),
+  const [specialCuts, productsMap, weightsByProduct, siteSettings] = await Promise.all([
+    getSpecialCuts(locale),
+    getProductsMap(locale, occasion),
+    getProductWeightsByProduct([...PRODUCT_TYPES], occasion),
+    getSiteSettings([
+      "delivery_transport_note",
+      "animal_image_sheep",
+      "animal_image_goat",
+    ]),
   ]);
 
   const productConfigs: Record<string, { label: string; minPrice: number; maxPrice: number; imageUrl: string }> = {};
-  const weightOptionsByProduct: Record<string, { id: string; label: string; price: number; sortOrder: number }[]> = {};
-  const n = PRODUCT_TYPES.length;
-  PRODUCT_TYPES.forEach((pt, i) => {
-    const config = rest[i] as { label: string; minPrice: number; maxPrice: number; imageUrl: string } | null;
-    if (config) productConfigs[pt] = config;
-    const weights = rest[n + i] as { id: string; label: string; price: number; sortOrder: number }[];
+  const weightOptionsByProduct: Record<string, { id: string; bandId?: string | null; label: string; price: number; sortOrder: number; occasionScope?: string | null }[]> = {};
+  PRODUCT_TYPES.forEach((pt) => {
+    const config = productsMap[pt] ?? null;
+    if (config) {
+      const localizedLabel = locale === "ar" ? getProductLabel(pt) : config.label;
+      productConfigs[pt] = { ...config, label: localizedLabel };
+    }
+    const weights = weightsByProduct[pt] ?? [];
     weightOptionsByProduct[pt] = Array.isArray(weights) ? weights : [];
   });
 
@@ -88,10 +98,10 @@ export default async function OrderPage({
         productConfigs={productConfigs}
         weightOptionsByProduct={weightOptionsByProduct}
         animalImages={{
-          sheep: (sheepImageSetting ?? "").trim() || DEFAULT_SHEEP_IMAGE,
-          goat: (goatImageSetting ?? "").trim() || DEFAULT_GOAT_IMAGE,
+          sheep: (siteSettings.animal_image_sheep ?? "").trim() || DEFAULT_SHEEP_IMAGE,
+          goat: (siteSettings.animal_image_goat ?? "").trim() || DEFAULT_GOAT_IMAGE,
         }}
-        deliveryTransportNote={deliveryTransportNote ?? undefined}
+        deliveryTransportNote={siteSettings.delivery_transport_note ?? undefined}
       />
       <HowItWorks locale={locale} />
     </div>

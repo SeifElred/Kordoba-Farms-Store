@@ -8,84 +8,36 @@ import { useCart } from "@/contexts/CartContext";
 import type { CartLineItem } from "@/contexts/CartContext";
 import { formatPrice, formatPriceRange, getLocalDateString } from "@/lib/utils";
 import { getWeightBandDisplayLabel } from "@/lib/weight-bands";
+import { getSpecialCutDisplayLabel } from "@/lib/special-cut-labels";
 import type { ProductWeightOption } from "@/lib/content";
 import type { SpecialCutOption } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { CalendarSelector } from "@/components/ui/CalendarSelector";
 
 const PURPOSES = ["qurban", "aqiqah", "personal"] as const;
 const ANIMALS = ["sheep", "goat"] as const;
-// Half carcass selection is temporarily disabled; only whole portion is available.
-const PORTIONS = ["whole"] as const;
+// Half only for personal; qurban/aqiqah get whole only.
+const PORTIONS = ["half", "whole"] as const;
 
-// Fixed weight/price bands for whole carcass.
-// We distinguish between personal "لحم ضاني" pricing and Qurban/Aqiqah pricing.
-// Labels are rendered per-locale (Arabic uses Arabic wording/digits).
-const QURBAN_AQIQAH_BANDS = [
-  { id: "whole_28_30", minKg: 28, maxKg: 30, price: 1020 },
-  { id: "whole_31_33", minKg: 31, maxKg: 33, price: 1120 },
-  { id: "whole_34_36", minKg: 34, maxKg: 36, price: 1250 },
-  { id: "whole_37_40", minKg: 37, maxKg: 40, price: 1350 },
-  { id: "whole_41_45", minKg: 41, maxKg: 45, price: 1500 },
-  { id: "whole_46_50", minKg: 46, maxKg: 50, price: 1675 },
-  { id: "whole_51_55", minKg: 51, maxKg: 55, price: 1850 },
-  { id: "whole_56_60", minKg: 56, maxKg: 60, price: 1950 },
-  { id: "whole_61_65", minKg: 61, maxKg: 65, price: 2050 },
-  { id: "whole_66_70", minKg: 66, maxKg: 70, price: 2200 },
-  { id: "whole_71_75", minKg: 71, maxKg: 75, price: 2400 },
-  { id: "whole_76_80", minKg: 76, maxKg: 80, price: 2550 },
-] as const;
-
-// Personal "لحم ضاني" pricing bands (with age info).
-const PERSONAL_BANDS = [
-  // 45–55 days
-  { id: "personal_17_20", minKg: 17, maxKg: 20, price: 750, minAgeDays: 45, maxAgeDays: 55 },
-  // 60–80 days
-  { id: "personal_21_26", minKg: 21, maxKg: 26, price: 825, minAgeDays: 60, maxAgeDays: 80 },
-  // 3–5 months
-  { id: "personal_28_30", minKg: 28, maxKg: 30, price: 1000, minAgeMonths: 3, maxAgeMonths: 5 },
-  { id: "personal_31_33", minKg: 31, maxKg: 33, price: 1120, minAgeMonths: 3, maxAgeMonths: 5 },
-  { id: "personal_34_36", minKg: 34, maxKg: 36, price: 1220, minAgeMonths: 3, maxAgeMonths: 5 },
-  { id: "personal_37_40", minKg: 37, maxKg: 40, price: 1320, minAgeMonths: 3, maxAgeMonths: 5 },
-] as const;
-
-function formatKgRangeLabel(locale: string, minKg: number, maxKg: number): string {
-  const nf = new Intl.NumberFormat(locale === "ar" ? "ar" : locale);
-  if (locale === "ar") return `${nf.format(minKg)} إلى ${nf.format(maxKg)} كغ`;
-  return `${nf.format(minKg)} – ${nf.format(maxKg)} kg`;
-}
-
-function formatPersonalBandLabel(
-  locale: string,
-  band: (typeof PERSONAL_BANDS)[number],
-): string {
-  const nf = new Intl.NumberFormat(locale === "ar" ? "ar" : locale);
-  const weightPart =
-    locale === "ar"
-      ? `${nf.format(band.minKg)} إلى ${nf.format(band.maxKg)} كغ`
-      : `${nf.format(band.minKg)} – ${nf.format(band.maxKg)} kg`;
-  if ("minAgeDays" in band && band.minAgeDays && band.maxAgeDays) {
-    if (locale === "ar") {
-      return `عمر ${nf.format(band.minAgeDays)} إلى ${nf.format(
-        band.maxAgeDays,
-      )} يوم · ${weightPart}`;
-    }
-    return `Age ${band.minAgeDays}–${band.maxAgeDays} days · ${weightPart}`;
-  }
-  if ("minAgeMonths" in band && band.minAgeMonths && band.maxAgeMonths) {
-    if (locale === "ar") {
-      return `عمر ${nf.format(band.minAgeMonths)} إلى ${nf.format(
-        band.maxAgeMonths,
-      )} شهر · ${weightPart}`;
-    }
-    return `Age ${band.minAgeMonths}–${band.maxAgeMonths} months · ${weightPart}`;
-  }
-  return weightPart;
-}
+const WIZARD_DRAFT_KEY = "kordoba_order_draft";
 
 type ProductConfigMap = Record<string, { label: string; minPrice: number; maxPrice: number; imageUrl: string }>;
-type WeightOptionsMap = Record<string, ProductWeightOption[]>;
+type WeightOptionWithScope = ProductWeightOption & { occasionScope?: string | null };
+type WeightOptionsMap = Record<string, WeightOptionWithScope[]>;
+
+function getLocalizedWeightOptionLabel(
+  option: WeightOptionWithScope,
+  occasion: string,
+  locale: string
+): string {
+  if (option.bandId) {
+    const localized = getWeightBandDisplayLabel(option.bandId, occasion, locale);
+    if (localized && localized !== option.bandId) return localized;
+  }
+  return option.label;
+}
 
 type WizardState = {
   occasion: string;
@@ -134,18 +86,10 @@ function getPriceRange(
 ): { minPrice: number; maxPrice: number; productLabel: string } {
   const config = productConfigs[product];
   if (!config) return { minPrice: 0, maxPrice: 0, productLabel: product };
-  // Whole carcass: use fixed bands (ignore DB weight options for now).
-  if (state.portion === "whole" && state.weightSelection) {
-    const bands =
-      state.occasion === "personal" ? PERSONAL_BANDS : QURBAN_AQIQAH_BANDS;
-    const band = bands.find((b) => b.id === state.weightSelection);
-    if (band) return { minPrice: band.price, maxPrice: band.price, productLabel: config.label };
-  } else {
-    const weights = weightOptionsByProduct[product] ?? [];
-    if (weights.length > 0 && state.weightSelection) {
-      const w = weights.find((x) => x.id === state.weightSelection);
-      if (w) return { minPrice: w.price, maxPrice: w.price, productLabel: config.label };
-    }
+  const weights = weightOptionsByProduct[product] ?? [];
+  if (weights.length > 0 && state.weightSelection) {
+    const w = weights.find((x) => x.id === state.weightSelection);
+    if (w) return { minPrice: w.price, maxPrice: w.price, productLabel: config.label };
   }
   return { minPrice: config.minPrice, maxPrice: config.maxPrice, productLabel: config.label };
 }
@@ -174,6 +118,7 @@ export function OrderWizard({
   productConfigs: ProductConfigMap;
   weightOptionsByProduct: WeightOptionsMap;
   animalImages: Record<"sheep" | "goat", string>;
+  /** Shown under delivery option (e.g. "We use LalaMove"). Editable in admin Settings. */
   deliveryTransportNote?: string | null;
   breadcrumbItems?: BreadcrumbItem[];
 }) {
@@ -187,14 +132,23 @@ export function OrderWizard({
 
   const hasInitialOccasion = !!initialOccasion && !editItemId;
 
-  const startStep =
-    initialProduct && (initialProduct === "half_sheep" || initialProduct === "half_goat" || initialProduct === "whole_sheep" || initialProduct === "whole_goat")
+  const resolvedStartStep =
+    initialStep ??
+    (initialProduct &&
+    (initialProduct === "half_sheep" ||
+      initialProduct === "half_goat" ||
+      initialProduct === "whole_sheep" ||
+      initialProduct === "whole_goat")
       ? 4
       : hasInitialOccasion
         ? 2
-        : initialStep ?? 1;
-  const [step, setStep] = useState(Math.min(7, Math.max(1, startStep)));
+        : 1);
+
+  const [step, setStep] = useState(() =>
+    Math.min(7, Math.max(1, resolvedStartStep))
+  );
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
   const [state, setState] = useState<WizardState>(() => {
     const s: WizardState = { ...defaultState, occasion: initialOccasion ?? "" };
     if (initialProduct === "half_sheep" || initialProduct === "half_goat" || initialProduct === "whole_sheep" || initialProduct === "whole_goat") {
@@ -206,16 +160,21 @@ export function OrderWizard({
 
   const product = stateToProduct(state);
   const config = product ? productConfigs[product] : null;
-  const wholeBandsLabelById = useMemo(() => {
-    const out: Record<string, string> = {};
-    for (const b of QURBAN_AQIQAH_BANDS) {
-      out[b.id] = formatKgRangeLabel(locale, b.minKg, b.maxKg);
-    }
-    for (const b of PERSONAL_BANDS) {
-      out[b.id] = formatPersonalBandLabel(locale, b);
-    }
-    return out;
-  }, [locale]);
+  const availablePortionsForStep3 = useMemo(() => {
+    const candidatePortions =
+      state.occasion === "personal" ? PORTIONS : (["whole"] as const);
+    return candidatePortions.filter((p) => {
+      const productType = `${p}_${state.animal}`;
+      return !!productConfigs[productType];
+    });
+  }, [state.occasion, state.animal, productConfigs]);
+  // Weight options for current product filtered by occasion (qurban/aqiqah -> qurban_aqiqah, personal -> personal)
+  const weightOptionsForStep3 = useMemo(() => {
+    if (!product) return [];
+    const list = weightOptionsByProduct[product] ?? [];
+    const scope = state.occasion === "personal" ? "personal" : "qurban_aqiqah";
+    return list.filter((o) => o.occasionScope === scope);
+  }, [product, state.occasion, weightOptionsByProduct]);
 
   // For half carcass, only allow a limited set of cutting options.
   const visibleSpecialCuts = useMemo(() => {
@@ -228,16 +187,37 @@ export function OrderWizard({
     return specialCuts.filter((cut) => allowedIds.has(cut.id));
   }, [specialCuts, state.portion]);
 
-  // Ensure half portions are only used for personal orders.
-  // For aqiqah and qurban, force "whole" and hide half option.
+  // No half in Qurban or Aqiqah — only Personal can choose half. Force whole for qurban/aqiqah.
   useEffect(() => {
     if (state.occasion === "aqiqah" || state.occasion === "qurban") {
       if (state.portion === "half") {
-        setState((s) => ({ ...s, portion: "whole" }));
+        setState((s) => ({ ...s, portion: "whole", weightSelection: "", weightLabel: "" }));
       }
     }
   }, [state.occasion, state.portion]);
 
+  // If state is inconsistent with current step (e.g. after a bad restore), step back so the user sees options.
+  useEffect(() => {
+    if (!draftReady) return;
+    if (step === 3 && state.portion) {
+      const currentProductType = `${state.portion}_${state.animal}`;
+      if (!productConfigs[currentProductType]) {
+        setState((s) => ({ ...s, portion: "", weightSelection: "", weightLabel: "" }));
+      }
+    }
+    if (step >= 4 && !state.animal) {
+      setStep(2);
+      return;
+    }
+    const p = stateToProduct(state);
+    if (step >= 4 && (!p || !productConfigs[p])) {
+      setStep(3);
+    }
+    // Intentionally omit full state to avoid running on every keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftReady, step, state.animal, state.portion, productConfigs]);
+
+  // Initial hydration: prefer edit mode, then draft from sessionStorage, then URL props.
   useEffect(() => {
     if (editItemId) {
       const item = getItemById(editItemId);
@@ -259,35 +239,104 @@ export function OrderWizard({
           note: item.note,
         });
         setStep(1);
-      } else if (initialProduct && (initialProduct === "half_sheep" || initialProduct === "half_goat" || initialProduct === "whole_sheep" || initialProduct === "whole_goat")) {
-        setState((s) => ({
+        setDraftReady(true);
+        return;
+      }
+      // if editItemId but no item found, fall through to normal init
+      setDraftReady(true);
+    }
+
+    // For non-edit flows, try to restore a saved draft.
+    if (typeof window !== "undefined" && !editItemId) {
+      try {
+        const raw = window.sessionStorage.getItem(WIZARD_DRAFT_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as {
+            step?: number;
+            state?: Partial<WizardState>;
+          } | null;
+          if (parsed && parsed.state) {
+            const draft = parsed.state;
+            setState((s) => ({
+              ...s,
+              ...draft,
+              occasion: initialOccasion || draft.occasion || s.occasion,
+            }));
+            if (parsed.step && parsed.step >= 1 && parsed.step <= 7) {
+              setStep(parsed.step);
+            }
+            setDraftReady(true);
+            return;
+          }
+        }
+      } catch {
+        // ignore draft errors
+      }
+    }
+
+    // Fallback: honor initialOccasion / initialProduct when no draft restored.
+    // Never allow half_sheep/half_goat for Qurban or Aqiqah — treat as whole.
+    if (initialProduct && (initialProduct === "half_sheep" || initialProduct === "half_goat" || initialProduct === "whole_sheep" || initialProduct === "whole_goat")) {
+      setState((s) => {
+        const occasion = s.occasion || initialOccasion || "";
+        const isHalf = initialProduct.startsWith("half");
+        const noHalfAllowed = occasion === "qurban" || occasion === "aqiqah";
+        return {
           ...s,
           occasion: s.occasion || initialOccasion || "",
           animal: initialProduct.includes("sheep") ? "sheep" : "goat",
-          portion: initialProduct.startsWith("half") ? "half" : "whole",
-        }));
-        setStep(4);
-      }
+          portion: isHalf && noHalfAllowed ? "whole" : isHalf ? "half" : "whole",
+        };
+      });
+      setStep(4);
+      setDraftReady(true);
     } else if (initialOccasion && !editItemId) {
       setState((s) => ({ ...s, occasion: initialOccasion }));
+      setDraftReady(true);
+    } else {
+      setDraftReady(true);
     }
   }, [editItemId, initialOccasion, initialProduct, getItemById]);
+
+  // Keep URL in sync with current step and occasion so refresh / language change
+  // doesn't always send the user back to the beginning, but avoid redundant replaces.
+  useEffect(() => {
+    if (!draftReady) return;
+    const params = new URLSearchParams();
+    if (state.occasion) params.set("occasion", state.occasion);
+    if (step) params.set("step", String(step));
+    if (editItemId) params.set("edit", editItemId);
+    if (initialProduct) params.set("product", initialProduct);
+    const qs = params.toString();
+    const href = qs ? `/${locale}/order?${qs}` : `/${locale}/order`;
+
+    if (typeof window !== "undefined") {
+      const current = window.location.pathname + window.location.search;
+      if (current === href) return;
+    }
+
+    router.replace(href);
+  }, [draftReady, step, state.occasion, editItemId, initialProduct, locale, router]);
+
+  // Persist draft so switching languages / refresh keeps the user's selections.
+  useEffect(() => {
+    if (typeof window === "undefined" || editItemId || !draftReady) return;
+    try {
+      const payload = JSON.stringify({
+        step,
+        state,
+      });
+      window.sessionStorage.setItem(WIZARD_DRAFT_KEY, payload);
+    } catch {
+      // ignore storage errors
+    }
+  }, [draftReady, step, state, editItemId]);
 
   const set = useCallback((patch: Partial<WizardState>) => {
     setState((s) => ({ ...s, ...patch }));
   }, []);
 
   const canProceedStep5 = state.slaughterDate.trim() !== "" && state.specialCutId !== "";
-  const slaughterDateOptions = useMemo(() => {
-    const start = new Date();
-    const options: { value: string; label: string }[] = [];
-    const formatter = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
-    for (let i = 0; i < 60; i++) {
-      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      options.push({ value: getLocalDateString(d), label: formatter.format(d) });
-    }
-    return options;
-  }, [locale]);
 
   const handleAddToCart = useCallback(() => {
     const productType = stateToProduct(state);
@@ -306,8 +355,9 @@ export function OrderWizard({
       specialCutLabel: state.specialCutLabel,
       slaughterDate: state.slaughterDate,
       distribution: state.distribution,
+      weightOptionId: state.weightSelection || undefined,
       weightSelection: state.weightSelection || "as_is",
-      weightLabel: state.weightLabel || getWeightBandDisplayLabel(state.weightSelection, state.occasion, locale) || undefined,
+      weightLabel: state.weightLabel || undefined,
       videoProof: state.videoProof,
       includeHead: state.includeHead,
       includeStomach: state.includeStomach,
@@ -447,9 +497,7 @@ export function OrderWizard({
       {step === 3 && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {(
-              state.occasion === "personal" ? PORTIONS : (["whole"] as const)
-            ).map((p) => {
+            {availablePortionsForStep3.map((p) => {
               const productType = `${p}_${state.animal}` as const;
               const cfg = productConfigs[productType];
               const isSelected = state.portion === p;
@@ -457,7 +505,7 @@ export function OrderWizard({
                 <button
                   key={p}
                   type="button"
-                  onClick={() => set({ portion: p })}
+                  onClick={() => set({ portion: p, weightSelection: "", weightLabel: "" })}
                   className={cn(
                     "flex flex-col overflow-hidden rounded-2xl border-2 text-start transition-all",
                     isSelected ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20" : "border-[var(--border)] hover:border-[var(--primary)]/40"
@@ -475,70 +523,112 @@ export function OrderWizard({
               );
             })}
           </div>
-          {state.portion === "whole" && (
-            <div className="space-y-2">
+          {(state.portion === "half" || state.portion === "whole") && (
+            <div className="space-y-3">
               <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
                 {tAnimal("weightSelection")}
               </label>
-              {state.occasion !== "personal" && (
-                <p className="mb-1 text-xs text-[var(--muted-foreground)]">
-                  {tAnimal("weightAgeNote")}
-                </p>
-              )}
-              {/* Weight band selector differs for personal vs qurban/aqiqah */}
-              {state.occasion && (
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-xs sm:text-sm text-[var(--muted-foreground)]">
-                  <p className="mb-1 font-medium text-[var(--foreground)]">
-                    {state.occasion === "personal"
-                      ? locale === "ar"
-                        ? "أسعار لحم الضاني (للاستخدام الشخصي)"
-                        : "Personal lamb pricing"
-                      : locale === "ar"
-                        ? "أسعار الغنم في الأضحية والعقيقة"
-                        : "Sheep prices for Qurban & Aqiqah"}
+              {state.occasion !== "personal" && state.portion === "whole" && (
+                <div className="rounded-2xl border border-[var(--border)] bg-[var(--muted)]/35 px-4 py-3 text-xs sm:text-sm text-[var(--foreground)]">
+                  <p className="mb-2 text-center text-[11px] font-semibold tracking-wide text-[var(--primary)] sm:text-xs">
+                    {locale === "ar"
+                      ? "شروط العمر للأضحية والعقيقة"
+                      : locale === "ms"
+                        ? "Syarat umur Korban & Aqiqah"
+                        : locale === "zh"
+                          ? "古尔邦与阿奇卡的年龄条件"
+                          : "Age conditions for Qurban & Aqiqah"}
                   </p>
-                  <ul className="space-y-0.5">
-                    {(state.occasion === "personal"
-                      ? PERSONAL_BANDS
-                      : QURBAN_AQIQAH_BANDS
-                    ).map((b) => (
-                      <li key={b.id} className="flex items-center justify-between gap-2">
-                        <span>{wholeBandsLabelById[b.id]}</span>
-                        <span className="font-semibold text-[var(--primary)]">
-                          {formatPrice(b.price)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/90 px-3 py-2">
+                      <p className="text-[11px] font-semibold text-[var(--foreground)]">
+                        {locale === "ar"
+                          ? "الخروف"
+                          : locale === "ms"
+                            ? "Biri-biri"
+                            : locale === "zh"
+                              ? "绵羊"
+                              : "Sheep"}
+                      </p>
+                      <p className="mt-0.5 text-xs sm:text-sm">
+                        {locale === "ar" ? "أكبر من ٦ أشهر." : ""}
+                        {locale === "ms" ? "Lebih 6 bulan." : ""}
+                        {locale === "zh" ? "大于 6 个月。" : ""}
+                        {locale === "en" ? "More than 6 months." : ""}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/90 px-3 py-2">
+                      <p className="text-[11px] font-semibold text-[var(--foreground)]">
+                        {locale === "ar"
+                          ? "الماعز"
+                          : locale === "ms"
+                            ? "Kambing"
+                            : locale === "zh"
+                              ? "山羊"
+                              : "Goat"}
+                      </p>
+                      <p className="mt-0.5 text-xs sm:text-sm">
+                        {locale === "ar" ? "أكبر من سنة واحدة." : ""}
+                        {locale === "ms" ? "Lebih satu tahun." : ""}
+                        {locale === "zh" ? "大于 1 年。" : ""}
+                        {locale === "en" ? "More than one year." : ""}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
-              <select
-                className="input-base w-full"
-                value={state.weightSelection}
-                onChange={(e) => {
-                  const selectedId = e.target.value;
-                  set({
-                    weightSelection: selectedId,
-                    weightLabel: wholeBandsLabelById[selectedId] ?? "",
-                  });
-                }}
-              >
-                <option value="">{tOrder("chooseWeight")}</option>
-                {(state.occasion === "personal"
-                  ? PERSONAL_BANDS
-                  : QURBAN_AQIQAH_BANDS
-                ).map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {(wholeBandsLabelById[b.id] ?? "")} — {formatPrice(b.price)}
-                  </option>
-                ))}
-              </select>
+              {weightOptionsForStep3.length > 0 ? (
+                <div className="grid gap-2 sm:grid-cols-2" role="list">
+                  {weightOptionsForStep3.map((o) => {
+                    const localizedLabel = getLocalizedWeightOptionLabel(
+                      o,
+                      state.occasion,
+                      locale
+                    );
+                    const isSelected = state.weightSelection === o.id;
+                    return (
+                      <button
+                        key={o.id}
+                        type="button"
+                        onClick={() =>
+                          set({
+                            weightSelection: o.id,
+                            weightLabel: localizedLabel,
+                          })
+                        }
+                        className={cn(
+                          "rounded-2xl border-2 px-4 py-3 text-start transition-all",
+                          isSelected
+                            ? "border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20"
+                            : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/40 hover:bg-[var(--muted)]/20"
+                        )}
+                        aria-pressed={isSelected}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold leading-6 text-[var(--foreground)]">
+                              {localizedLabel}
+                            </p>
+                          </div>
+                          <span className="shrink-0 rounded-full bg-[var(--muted)] px-2.5 py-1 text-xs font-semibold text-[var(--foreground)]">
+                            {formatPrice(o.price)}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--muted)]/20 px-4 py-3 text-sm text-[var(--muted-foreground)]">
+                  {tOrder("chooseWeight")}
+                </div>
+              )}
             </div>
           )}
           <button
             type="button"
             disabled={
-              !state.portion || (state.portion === "whole" && !state.weightSelection)
+              !state.portion || !state.weightSelection
             }
             onClick={() => setStep(4)}
             className="btn-primary flex w-full items-center justify-center gap-2"
@@ -593,37 +683,55 @@ export function OrderWizard({
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--primary)]">
               {tOrder("deliveryOptions")}
             </h2>
-            <div className="min-w-0 space-y-4">
-              <label htmlFor="wizard-slaughter-date" className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-                {tAnimal("slaughterDate")}
-              </label>
-              <select
-                id="wizard-slaughter-date"
-                className="input-base w-full"
-                value={state.slaughterDate}
-                onChange={(e) => set({ slaughterDate: e.target.value })}
-                aria-required
-              >
-                <option value="">{tOrder("selectDate")}</option>
-                {slaughterDateOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <div>
+            <div className="min-w-0 space-y-4 sm:flex sm:items-start sm:gap-4 sm:space-y-0 sm:justify-between">
+              <div className="w-full max-w-xs mx-auto sm:w-1/2 sm:max-w-none lg:w-[320px] sm:mx-0">
+                <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                  {tAnimal("slaughterDate")}
+                </label>
+                <CalendarSelector
+                  locale={locale}
+                  selected={state.slaughterDate ? new Date(state.slaughterDate) : undefined}
+                  onSelect={(date) => {
+                    if (!date) return;
+                    set({ slaughterDate: getLocalDateString(date) });
+                  }}
+                />
+              </div>
+              <div className="mt-4 w-full max-w-xs mx-auto sm:mt-0 sm:flex-1 sm:max-w-none sm:mx-0">
                 <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">{tAnimal("distribution")}</label>
-                <select
-                  className="input-base w-full"
-                  value={state.distribution}
-                  onChange={(e) => set({ distribution: e.target.value })}
-                >
-                  <option value="delivery">{tOrder("delivery")}</option>
-                  <option value="pickup">{tOrder("pickup")}</option>
-                  <option value="donate">{tOrder("donate")}</option>
-                </select>
-                {state.distribution === "delivery" && (deliveryTransportNote ?? "").trim() && (
-                  <p className="mt-1.5 text-sm text-[var(--muted-foreground)]">{deliveryTransportNote?.trim()}</p>
+                <div className="grid grid-cols-1 gap-2">
+                  {(["delivery", "pickup", "donate"] as const).map((value) => {
+                    const selected = state.distribution === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => set({ distribution: value })}
+                        className={cn(
+                          "flex flex-col items-start rounded-xl border px-3 py-2 text-start text-xs sm:text-sm transition-colors",
+                          selected
+                            ? "border-[var(--primary)] bg-[var(--primary)]/5 text-[var(--foreground)]"
+                            : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/50"
+                        )}
+                      >
+                        <span className="font-semibold">
+                          {tOrder(value)}
+                        </span>
+                        <span className="mt-0.5 text-[10px] sm:text-xs text-[var(--muted-foreground)]">
+                          {value === "delivery"
+                            ? tOrder("deliveryDesc")
+                            : value === "pickup"
+                              ? tOrder("pickupDesc")
+                              : tOrder("donateDesc")}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {state.distribution === "delivery" && (
+                  <p className="mt-1.5 text-xs text-[var(--muted-foreground)]">
+                    {deliveryTransportNote?.trim() || tOrder("deliveryTransportNote")}
+                  </p>
                 )}
               </div>
             </div>
@@ -657,50 +765,6 @@ export function OrderWizard({
                 />
                 <span className="text-sm font-medium">{tAnimal("videoProof")}</span>
               </label>
-              {state.portion === "whole" ? (
-                <div>
-                  <p className="mb-1 text-sm font-medium text-[var(--foreground)]">
-                    {tAnimal("weightSelection")}
-                  </p>
-                  <p className="text-sm text-[var(--muted-foreground)]">
-                    {state.weightLabel || tOrder("chooseWeight")}
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">{tAnimal("weightSelection")}</label>
-                  <select
-                    className="input-base w-full"
-                    value={state.weightSelection}
-                    onChange={(e) => {
-                      const product = stateToProduct(state);
-                      const opts = weightOptionsByProduct[product] ?? [];
-                      const opt = opts.find((w) => w.id === e.target.value);
-                      set({ weightSelection: e.target.value, weightLabel: opt?.label ?? "" });
-                    }}
-                  >
-                    {(() => {
-                      const product = stateToProduct(state);
-                      const opts = weightOptionsByProduct[product] ?? [];
-                      return opts.length > 0 ? (
-                        <>
-                          <option value="">{tOrder("chooseWeight")}</option>
-                          {opts.map((w) => (
-                            <option key={w.id} value={w.id}>
-                              {w.label} — {formatPrice(w.price)}
-                            </option>
-                          ))}
-                        </>
-                      ) : (
-                        <>
-                          <option value="as_is">{tOrder("weightAsIs")}</option>
-                          <option value="range">{tOrder("weightRange")}</option>
-                        </>
-                      );
-                    })()}
-                  </select>
-                </div>
-              )}
               <div>
                 <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{tAnimal("orderIncludes")}</p>
                 <div className="flex flex-wrap gap-3">
@@ -721,9 +785,8 @@ export function OrderWizard({
           </section>
           <button
             type="button"
-            disabled={!state.weightSelection}
             onClick={() => setStep(7)}
-            className="btn-primary flex w-full items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+            className="btn-primary flex w-full items-center justify-center gap-2"
           >
             {tCommon("next")}
             <ChevronRight className="h-5 w-5 rtl:rotate-180" />
@@ -735,58 +798,81 @@ export function OrderWizard({
       {step === 7 && (
         <div className="space-y-6">
           {/* Order summary before adding to cart */}
-          <section className="rounded-2xl border-2 border-[var(--primary)]/20 bg-[var(--card)] p-4 sm:p-5">
+          <section className="rounded-2xl border-2 border-[var(--primary)]/20 bg-[var(--card)] p-4 sm:p-5" dir="auto">
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--primary)]">
               {tOrder("summaryTitle")}
             </h2>
-            <dl className="space-y-2.5 text-sm">
-              <div className="flex justify-between gap-3">
-                <dt className="text-[var(--muted-foreground)]">{tOrder("occasionLabel")}</dt>
-                <dd className="font-medium text-[var(--foreground)] text-end">{state.occasion ? (t(state.occasion as "qurban" | "aqiqah" | "personal") ?? state.occasion) : "—"}</dd>
-              </div>
-              {config && (
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[var(--muted-foreground)]">{tOrder("yourProduct")}</dt>
-                  <dd className="font-medium text-[var(--foreground)] text-end">{config.label}</dd>
+
+            {/* Product & price — works LTR and RTL */}
+            {config && (
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[var(--muted)]/30 px-4 py-3">
+                <div className="min-w-0 flex-1 text-start">
+                  <p className="text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]">
+                    {tOrder("occasionLabel")} · {state.occasion ? (t(state.occasion as "qurban" | "aqiqah" | "personal") ?? state.occasion) : tOrder("none")}
+                  </p>
+                  <p className="mt-0.5 font-semibold text-[var(--foreground)]">{config.label}</p>
                 </div>
-              )}
+                <p className="shrink-0 text-end text-lg font-bold text-[var(--primary)]">
+                  {product
+                    ? (() => {
+                        const { minPrice, maxPrice } = getPriceRange(product, state, productConfigs, weightOptionsByProduct);
+                        return minPrice === maxPrice ? formatPrice(minPrice) : formatPriceRange(minPrice, maxPrice);
+                      })()
+                    : formatPriceRange(config.minPrice, config.maxPrice)}
+                </p>
+              </div>
+            )}
+
+            {/* Detail rows — direction-safe alignment */}
+            <dl className="divide-y divide-[var(--border)]/80 text-sm">
               {(state.weightLabel || state.weightSelection) && (
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[var(--muted-foreground)]">{tOrder("weightAndAge")}</dt>
-                  <dd className="font-medium text-[var(--foreground)] text-end">
-                    {state.weightLabel || getWeightBandDisplayLabel(state.weightSelection, state.occasion, locale) || state.weightSelection}
+                <div className="flex flex-wrap items-center justify-between gap-2 py-3">
+                  <dt className="shrink-0 text-start text-[var(--muted-foreground)]">{tOrder("weightAndAge")}</dt>
+                  <dd className="flex min-w-0 flex-wrap justify-end gap-1.5 text-end">
+                    <span className="rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
+                      {state.weightLabel || getWeightBandDisplayLabel(state.weightSelection, state.occasion, locale) || state.weightSelection}
+                    </span>
+                    {(state.occasion === "qurban" || state.occasion === "aqiqah") && state.animal === "sheep" && (
+                      <span className="rounded-md border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-2 py-0.5 text-xs text-[var(--primary)]">
+                        {tAnimal("sheepAgeBadge")}
+                      </span>
+                    )}
+                    {(state.occasion === "qurban" || state.occasion === "aqiqah") && state.animal === "goat" && (
+                      <span className="rounded-md border border-[var(--primary)]/40 bg-[var(--primary)]/15 px-2 py-0.5 text-xs text-[var(--primary)]">
+                        {tAnimal("goatAgeBadge")}
+                      </span>
+                    )}
                   </dd>
                 </div>
               )}
-              {(state.occasion === "qurban" || state.occasion === "aqiqah") && (
-                <p className="rounded-lg bg-[var(--muted)]/40 px-3 py-2 text-xs text-[var(--muted-foreground)]">
-                  {tAnimal("weightAgeNote")}
-                </p>
-              )}
               {state.specialCutLabel && (
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[var(--muted-foreground)]">{tOrder("chooseCut")}</dt>
-                  <dd className="font-medium text-[var(--foreground)] text-end">{state.specialCutLabel}</dd>
+                <div className="flex flex-wrap items-center justify-between gap-2 py-3">
+                  <dt className="shrink-0 text-start text-[var(--muted-foreground)]">{tOrder("chooseCut")}</dt>
+                  <dd className="min-w-0 text-end">
+                    <span className="inline-block rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--foreground)]">
+                      {getSpecialCutDisplayLabel(locale, state.specialCutId, state.specialCutLabel)}
+                    </span>
+                  </dd>
                 </div>
               )}
               {state.slaughterDate && (
-                <div className="flex justify-between gap-3">
-                  <dt className="text-[var(--muted-foreground)]">{tAnimal("slaughterDate")}</dt>
+                <div className="flex flex-wrap items-center justify-between gap-2 py-3">
+                  <dt className="shrink-0 text-start text-[var(--muted-foreground)]">{tAnimal("slaughterDate")}</dt>
                   <dd className="font-medium text-[var(--foreground)] text-end">{state.slaughterDate}</dd>
                 </div>
               )}
-              <div className="flex justify-between gap-3">
-                <dt className="text-[var(--muted-foreground)]">{tAnimal("distribution")}</dt>
+              <div className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <dt className="shrink-0 text-start text-[var(--muted-foreground)]">{tAnimal("distribution")}</dt>
                 <dd className="font-medium text-[var(--foreground)] text-end">{tOrder(state.distribution)}</dd>
               </div>
-              <div className="flex justify-between gap-3">
-                <dt className="text-[var(--muted-foreground)]">{tAnimal("videoProof")}</dt>
-                <dd className="font-medium text-[var(--foreground)] text-end">{state.videoProof ? "Yes" : "No"}</dd>
+              <div className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <dt className="shrink-0 text-start text-[var(--muted-foreground)]">{tAnimal("videoProof")}</dt>
+                <dd className="font-medium text-[var(--foreground)] text-end">{state.videoProof ? tCommon("yes") : tCommon("no")}</dd>
               </div>
-              <div className="flex justify-between gap-3">
-                <dt className="text-[var(--muted-foreground)]">{tAnimal("orderIncludes")}</dt>
-                <dd className="font-medium text-[var(--foreground)] text-end">
-                  {[state.includeHead && tAnimal("includeHead"), state.includeStomach && tAnimal("includeStomach"), state.includeIntestines && tAnimal("includeIntestines")].filter(Boolean).join(", ") || "—"}
+              <div className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <dt className="shrink-0 text-start text-[var(--muted-foreground)]">{tAnimal("orderIncludes")}</dt>
+                <dd className="min-w-0 max-w-[65%] text-end font-medium text-[var(--foreground)]">
+                  {[state.includeHead && tAnimal("includeHead"), state.includeStomach && tAnimal("includeStomach"), state.includeIntestines && tAnimal("includeIntestines")].filter(Boolean).join(", ") || tOrder("none")}
                 </dd>
               </div>
             </dl>
@@ -801,28 +887,6 @@ export function OrderWizard({
               placeholder={tOrder("notesPlaceholder") as string}
             />
           </section>
-          {config && (
-            <div className="rounded-xl border-2 border-[var(--primary)]/20 bg-[var(--card)] p-4">
-              <p className="text-sm font-medium text-[var(--foreground)]">{config.label}</p>
-              <p className="mt-1 text-xl font-bold text-[var(--primary)]">
-                {(() => {
-                  // Use the same pricing logic as the cart item (bands for whole, DB weights otherwise).
-                  if (!product) {
-                    return formatPriceRange(config.minPrice, config.maxPrice);
-                  }
-                  const { minPrice, maxPrice } = getPriceRange(
-                    product,
-                    state,
-                    productConfigs,
-                    weightOptionsByProduct,
-                  );
-                  return minPrice === maxPrice
-                    ? formatPrice(minPrice)
-                    : formatPriceRange(minPrice, maxPrice);
-                })()}
-              </p>
-            </div>
-          )}
           <button
             type="button"
             onClick={handleAddToCart}

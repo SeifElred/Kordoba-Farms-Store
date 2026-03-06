@@ -1,9 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import { ExternalLink, Loader2, Save } from "lucide-react";
+import { toast } from "sonner";
 import { ORDER_TEMPLATE_PRESETS } from "@/lib/order-template-presets";
 import type { OrderTemplatePresetId } from "@/lib/order-template-presets";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const KNOWN_KEYS = [
   "cities",
@@ -14,174 +30,388 @@ const KNOWN_KEYS = [
   "animal_image_goat",
 ] as const;
 
-const KEY_LABELS: Record<string, string> = {
-  whatsapp_link: "WhatsApp link (used for “Complete order via WhatsApp” on cart)",
-  delivery_transport_note: "Delivery note (e.g. “We use Lalamove for delivery” — shown in order step 5)",
-  order_message_template: "Order message template (placeholders filled when customer completes via WhatsApp)",
-  cities: "Cities (JSON array, optional — for city selector if used)",
-  animal_image_sheep: "Sheep image URL (Step 2 – animal choice)",
-  animal_image_goat: "Goat image URL (Step 2 – animal choice)",
-};
+const ORDER_MESSAGE_PLACEHOLDERS =
+  "{{name}}, {{phone}}, {{address}}, {{email}}, {{productLabel}}, {{priceRange}}, {{slaughterDate}}, {{distributionType}}, {{purpose}}, {{weightLine}}, {{weightSelection}}, {{specialCut}}, {{orderIncludes}}, {{videoProof}}, {{note}}";
 
-const ORDER_MESSAGE_PLACEHOLDERS = "{{name}}, {{phone}}, {{address}}, {{email}}, {{productLabel}}, {{minPrice}}, {{maxPrice}}, {{priceRange}}, {{slaughterDate}}, {{distributionType}}, {{purpose}}, {{weightLine}}, {{weightSelection}}, {{specialCut}}, {{orderIncludes}}, {{videoProof}}, {{note}}";
+function isDirty(original: Record<string, string>, draft: Record<string, string>, key: string): boolean {
+  return (draft[key] ?? "") !== (original[key] ?? "");
+}
+
+function safeParseCities(raw: string): { ok: boolean; count?: number; error?: string } {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed) return { ok: true, count: 0 };
+  try {
+    const v = JSON.parse(trimmed) as unknown;
+    if (!Array.isArray(v)) return { ok: false, error: "Cities must be a JSON array." };
+    const invalid = v.find((x) => typeof x !== "string");
+    if (invalid != null) return { ok: false, error: "Cities array must contain only strings." };
+    return { ok: true, count: v.length };
+  } catch {
+    return { ok: false, error: "Invalid JSON." };
+  }
+}
 
 export function AdminSettingsClient() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
+  const [draft, setDraft] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetch("/api/admin/content/settings")
       .then((r) => r.json())
       .then((data) => {
-        if (data && typeof data === "object") setSettings(data);
+        if (data && typeof data === "object") {
+          setSettings(data);
+          setDraft(data);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
-  function startEdit(key: string) {
-    setEditing(key);
-    setEditValue(settings[key] ?? "");
-  }
-
-  async function save() {
-    if (!editing) return;
+  async function saveKey(key: string) {
     setSaving(true);
     const res = await fetch("/api/admin/content/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key: editing, value: editValue }),
+      body: JSON.stringify({ key, value: draft[key] ?? "" }),
     });
     setSaving(false);
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
-      alert(d.error || "Failed to save");
+      toast.error(d.error || "Failed to save");
       return;
     }
-    setSettings((prev) => ({ ...prev, [editing]: editValue }));
-    setEditing(null);
+    setSettings((prev) => ({ ...prev, [key]: draft[key] ?? "" }));
+    toast.success("Saved");
   }
-
-  const inputClass = "w-full rounded-lg border border-[#334155] bg-[#0f172a] px-3 py-2 text-sm text-white focus:border-[#c8a951] focus:outline-none focus:ring-1 focus:ring-[#c8a951]";
-  const labelClass = "mb-1 block text-sm font-medium text-[#94a3b8]";
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center rounded-xl border border-[#334155] bg-[#1e293b] py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-[#94a3b8]" />
-      </div>
+      <Card>
+        <CardContent className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
     );
   }
 
-  const keys: string[] = [...KNOWN_KEYS, ...Object.keys(settings).filter((k) => !KNOWN_KEYS.includes(k as (typeof KNOWN_KEYS)[number]))];
+  const keys: string[] = [
+    ...KNOWN_KEYS,
+    ...Object.keys(settings).filter(
+      (k) => !KNOWN_KEYS.includes(k as (typeof KNOWN_KEYS)[number])
+    ),
+  ];
+
+  const citiesValidation = safeParseCities(draft.cities ?? "");
+  const anyDirty = keys.some((k) => isDirty(settings, draft, k));
 
   return (
-    <div className="max-w-2xl space-y-6">
-      {keys.map((key) => (
-        <div key={key} className="rounded-xl border border-[#334155] bg-[#1e293b] p-4">
-          <label className={labelClass}>{KEY_LABELS[key] ?? key}</label>
-          {editing === key ? (
-            <div className="space-y-2">
-              {key === "cities" ? (
-                <textarea
-                  className={inputClass + " min-h-[120px] font-mono text-xs"}
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  placeholder='["City A", "City B"]'
-                />
-              ) : key === "order_message_template" ? (
-                <div className="space-y-2">
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-base">Site settings</CardTitle>
+              <CardDescription>
+                Update operational settings used across the order flow and admin.
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              {anyDirty ? <Badge variant="secondary">Unsaved changes</Badge> : <Badge variant="outline">Up to date</Badge>}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="whatsapp" className="w-full">
+            <TabsList className="flex flex-wrap justify-start">
+              <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+              <TabsTrigger value="delivery">Delivery</TabsTrigger>
+              <TabsTrigger value="template">Order template</TabsTrigger>
+              <TabsTrigger value="animals">Animal images</TabsTrigger>
+              <TabsTrigger value="cities">Cities</TabsTrigger>
+              <TabsTrigger value="advanced">Advanced</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="whatsapp" className="mt-4">
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-sm">WhatsApp</CardTitle>
+                  <CardDescription>Used for “Complete order via WhatsApp”.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="whatsapp_link">WhatsApp link</Label>
+                    <div className="flex flex-wrap items-start gap-2">
+                      <Input
+                        id="whatsapp_link"
+                        value={draft.whatsapp_link ?? ""}
+                        onChange={(e) => setDraft((d) => ({ ...d, whatsapp_link: e.target.value }))}
+                        placeholder="https://wa.me/..."
+                      />
+                      {(draft.whatsapp_link ?? "").trim() ? (
+                        <a
+                          className="inline-flex h-9 items-center gap-1 rounded-md border border-input bg-background px-3 text-sm hover:bg-muted"
+                          href={(draft.whatsapp_link ?? "").trim()}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Open
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => saveKey("whatsapp_link")}
+                      disabled={saving || !isDirty(settings, draft, "whatsapp_link")}
+                      className="gap-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      Save
+                    </Button>
+                    {!isDirty(settings, draft, "whatsapp_link") && (
+                      <span className="text-xs text-muted-foreground">No changes</span>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="delivery" className="mt-4">
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-sm">Delivery</CardTitle>
+                  <CardDescription>Shown in step 5 under delivery options.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="delivery_transport_note">Delivery transport note</Label>
+                    <Input
+                      id="delivery_transport_note"
+                      value={draft.delivery_transport_note ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, delivery_transport_note: e.target.value }))}
+                      placeholder="We use LalaMove for transportation."
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => saveKey("delivery_transport_note")}
+                      disabled={saving || !isDirty(settings, draft, "delivery_transport_note")}
+                      className="gap-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      Save
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="template" className="mt-4">
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-sm">Order message template</CardTitle>
+                  <CardDescription>
+                    Used when customer completes via WhatsApp. You can apply a preset then customize.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs text-[#64748b]">Apply preset:</span>
-                    <select
-                      className="rounded-lg border border-[#334155] bg-[#0f172a] px-2 py-1.5 text-sm text-white focus:border-[#c8a951] focus:outline-none"
-                      value=""
-                      onChange={(e) => {
-                        const id = e.target.value as OrderTemplatePresetId | "";
-                        if (!id) return;
+                    <span className="text-xs text-muted-foreground">Preset</span>
+                    <Select
+                      onValueChange={(id: OrderTemplatePresetId) => {
                         const preset = ORDER_TEMPLATE_PRESETS.find((p) => p.id === id);
-                        if (preset) setEditValue(preset.template);
-                        e.target.value = "";
+                        if (preset) setDraft((d) => ({ ...d, order_message_template: preset.template }));
                       }}
                     >
-                      <option value="">— Choose preset —</option>
-                      {ORDER_TEMPLATE_PRESETS.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="text-xs text-[#64748b]">Then edit if needed and Save.</span>
+                      <SelectTrigger className="w-[220px]">
+                        <SelectValue placeholder="— Choose preset —" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ORDER_TEMPLATE_PRESETS.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <span className="text-xs text-muted-foreground">Apply, edit, then save.</span>
                   </div>
+
                   <textarea
-                    className={inputClass + " min-h-[200px] font-mono text-xs"}
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    className="min-h-[260px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    value={draft.order_message_template ?? ""}
+                    onChange={(e) => setDraft((d) => ({ ...d, order_message_template: e.target.value }))}
                     placeholder={"*New order*\nName: {{name}}\nPhone: {{phone}}\n..."}
                   />
-                  <p className="text-xs text-[#64748b]">
-                    Placeholders: {ORDER_MESSAGE_PLACEHOLDERS}. Leave empty to use default format.
-                  </p>
-                </div>
-              ) : (
-                <input
-                  type="text"
-                  className={inputClass}
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  placeholder={
-                    key === "whatsapp_link"
-                      ? "https://wa.me/..."
-                      : key === "delivery_transport_note"
-                        ? "We use LalaMove for transportation."
-                        : key === "animal_image_sheep" || key === "animal_image_goat"
-                          ? "https://... (image URL for animal card)"
-                          : "Value"
-                  }
-                />
-              )}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={save}
-                  disabled={saving}
-                  className="rounded-lg bg-[#0F3D2E] px-3 py-1.5 text-sm text-white hover:bg-[#14533a] disabled:opacity-50"
-                >
-                  {saving ? "Saving…" : "Save"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditing(null)}
-                  className="rounded-lg border border-[#334155] px-3 py-1.5 text-sm text-[#94a3b8] hover:bg-[#334155]"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-start justify-between gap-4">
-              <pre className="flex-1 overflow-x-auto rounded bg-[#0f172a] p-3 text-xs text-[#94a3b8] whitespace-pre-wrap break-all">
-                {settings[key] ?? "(not set)"}
-              </pre>
-              <button
-                type="button"
-                onClick={() => startEdit(key)}
-                className="shrink-0 rounded-lg border border-[#334155] px-3 py-1.5 text-sm text-[#94a3b8] hover:bg-[#334155] hover:text-white"
-              >
-                Edit
-              </button>
-            </div>
-          )}
-        </div>
-      ))}
-      {keys.length === 0 && (
-        <div className="rounded-xl border border-[#334155] bg-[#1e293b] p-12 text-center text-[#94a3b8]">
-          No settings. Run the content seed: npx tsx prisma/seed-content.ts
-        </div>
-      )}
+                  <div className="rounded-lg border border-border bg-muted/20 p-3">
+                    <p className="text-xs text-muted-foreground">
+                      Placeholders: {ORDER_MESSAGE_PLACEHOLDERS}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => saveKey("order_message_template")}
+                      disabled={saving || !isDirty(settings, draft, "order_message_template")}
+                      className="gap-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      Save template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="animals" className="mt-4">
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-sm">Animal images</CardTitle>
+                  <CardDescription>Used on step 2 (sheep/goat selection).</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {(["animal_image_sheep", "animal_image_goat"] as const).map((k) => {
+                    const label = k === "animal_image_sheep" ? "Sheep image URL" : "Goat image URL";
+                    const url = (draft[k] ?? "").trim();
+                    return (
+                      <div key={k} className="space-y-3">
+                        <Label htmlFor={k}>{label}</Label>
+                        <div className="flex flex-wrap items-start gap-3">
+                          <Input
+                            id={k}
+                            value={draft[k] ?? ""}
+                            onChange={(e) => setDraft((d) => ({ ...d, [k]: e.target.value }))}
+                            placeholder="https://... (image URL)"
+                          />
+                          {url ? (
+                            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
+                              <Image
+                                src={url}
+                                alt=""
+                                fill
+                                unoptimized
+                                className="object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = "none";
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 text-xs text-muted-foreground">
+                              —
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            onClick={() => saveKey(k)}
+                            disabled={saving || !isDirty(settings, draft, k)}
+                            className="gap-2"
+                          >
+                            <Save className="h-4 w-4" />
+                            Save
+                          </Button>
+                        </div>
+                        <Separator />
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="cities" className="mt-4">
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-sm">Cities</CardTitle>
+                  <CardDescription>Optional. JSON array of city names.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <textarea
+                    className="min-h-[220px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    value={draft.cities ?? ""}
+                    onChange={(e) => setDraft((d) => ({ ...d, cities: e.target.value }))}
+                    placeholder='["Kuala Lumpur", "Shah Alam", "Other"]'
+                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    {citiesValidation.ok ? (
+                      <Badge variant="secondary">
+                        Valid JSON{typeof citiesValidation.count === "number" ? ` · ${citiesValidation.count} cities` : ""}
+                      </Badge>
+                    ) : (
+                      <Badge variant="destructive">{citiesValidation.error}</Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => saveKey("cities")}
+                      disabled={saving || !isDirty(settings, draft, "cities") || !citiesValidation.ok}
+                      className="gap-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      Save
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="advanced" className="mt-4">
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-sm">Advanced</CardTitle>
+                  <CardDescription>Raw key/value editor for uncommon settings.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {keys
+                    .filter((k) => !KNOWN_KEYS.includes(k as (typeof KNOWN_KEYS)[number]))
+                    .length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No additional settings.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {keys
+                        .filter((k) => !KNOWN_KEYS.includes(k as (typeof KNOWN_KEYS)[number]))
+                        .map((k) => (
+                          <div key={k} className="rounded-lg border border-border bg-muted/20 p-3">
+                            <div className="mb-2 flex items-center justify-between gap-3">
+                              <span className="font-mono text-xs text-muted-foreground">{k}</span>
+                              {isDirty(settings, draft, k) ? (
+                                <Badge variant="secondary">changed</Badge>
+                              ) : (
+                                <Badge variant="outline">saved</Badge>
+                              )}
+                            </div>
+                            <Input
+                              value={draft[k] ?? ""}
+                              onChange={(e) => setDraft((d) => ({ ...d, [k]: e.target.value }))}
+                              placeholder="Value"
+                            />
+                            <div className="mt-2">
+                              <Button
+                                size="sm"
+                                onClick={() => saveKey(k)}
+                                disabled={saving || !isDirty(settings, draft, k)}
+                                className="gap-2"
+                              >
+                                <Save className="h-4 w-4" />
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 }

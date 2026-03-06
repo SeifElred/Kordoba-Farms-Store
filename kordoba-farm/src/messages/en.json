@@ -22,15 +22,19 @@
   "orderDetails": {
     "title": "Order details",
     "invalidProduct": "Invalid product. Please go back and choose a product.",
+    "deliveryTransportNote": "We use LalaMove for transportation.",
     "delivery": "Delivery to my address",
     "pickup": "I'll collect myself",
     "donate": "Donate to charity (we distribute)",
+    "deliveryDesc": "We send the meat to your address via our delivery partner.",
+    "pickupDesc": "You or your representative will collect the meat from our location.",
+    "donateDesc": "We distribute the meat as charity on your behalf to those in need.",
     "notesPlaceholder": "Any special requests...",
     "weightAsIs": "As is (standard weight)",
     "weightRange": "Weight range (contact us)",
     "chooseWeight": "Choose weight",
     "chooseCut": "Choose your cut",
-    "chooseCutSubtitle": "Select one option. Tap the play icon to watch how it's done.",
+    "chooseCutSubtitle": "Select one option from the available cutting styles.",
     "watchVideo": "Watch video",
     "yourProduct": "Your product",
     "selectDate": "Select date",
@@ -40,7 +44,8 @@
     "completeRequiredToProceed": "Please select slaughter date, a special cut, and weight option to continue.",
     "summaryTitle": "Order summary",
     "weightAndAge": "Weight / age",
-    "occasionLabel": "Occasion"
+    "occasionLabel": "Occasion",
+    "none": "—"
   },
   "nav": {
     "home": "Home",
@@ -73,7 +78,10 @@
     "editItem": "Edit",
     "removeItem": "Remove",
     "itemAdded": "Item added to cart.",
-    "weightAndAge": "Weight / age"
+    "weightAndAge": "Weight / age",
+    "trustSecure": "Secure payment",
+    "trustHalal": "100% Halal",
+    "trustCardFpx": "Card & FPX"
   },
   "orderWizard": {
     "step1Title": "Choose your occasion",
@@ -91,6 +99,12 @@
     "goat": "Goat",
     "half": "Half",
     "whole": "Whole"
+  },
+  "product": {
+    "whole_sheep": "Whole Sheep",
+    "whole_goat": "Whole Goat",
+    "half_sheep": "Half Sheep",
+    "half_goat": "Half Goat"
   },
   "purpose": {
     "title": "How would you like to celebrate?",
@@ -152,6 +166,8 @@
     "addToOrder": "Proceed to Checkout",
     "weightSelection": "Weight selection",
     "weightAgeNote": "Sheep: more than 6 months. Goat: more than one year.",
+    "sheepAgeBadge": "More than 6 months.",
+    "goatAgeBadge": "More than one year.",
     "weightAsIs": "As is ({weight} kg)",
     "specialCut": "Special cut (optional)",
     "orderIncludes": "Order includes",
@@ -169,6 +185,7 @@
     "address": "Address",
     "addressPlaceholder": "Street, city, postcode, state",
     "optional": "optional",
+    "addressRequired": "Please enter your full address.",
     "orderSummaryNote": "Order details will be sent to WhatsApp",
     "sendToWhatsApp": "Send order to WhatsApp",
     "placeOrder": "Place Order",
@@ -202,9 +219,9 @@
     "reorder": "Reorder"
   },
   "footer": {
-    "company": "Kordoba Agrotech Sdn. Bhd.",
+    "company": "KORDOBA AGROTECH SDN. BHD.",
     "companySection": "Company",
-    "allRights": "All rights reserved.",
+    "allRights": "ALL RIGHTS RESERVED.",
     "tagline": "Qurban, Aqiqah & premium halal lamb — from farm to your table with full traceability.",
     "quickLinks": "Quick links",
     "home": "Home",
@@ -219,7 +236,9 @@
     "error": "Something went wrong.",
     "back": "Back",
     "next": "Next",
-    "buyNow": "Buy Now"
+    "buyNow": "Buy Now",
+    "yes": "Yes",
+    "no": "No"
   },
   "admin": {
     "currentTheme": "Current theme",

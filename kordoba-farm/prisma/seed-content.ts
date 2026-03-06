@@ -25,10 +25,10 @@ function flatten(obj: Record<string, unknown>, prefix = ""): Record<string, stri
 }
 
 const PRODUCTS = [
-  { productType: "half_sheep", label: "½ Sheep", minPrice: 500, maxPrice: 700, imageUrl: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&q=80", sortOrder: 0 },
-  { productType: "half_goat", label: "½ Goat", minPrice: 400, maxPrice: 600, imageUrl: "https://images.unsplash.com/photo-1546445317-29f4545e9d53?w=600&q=80", sortOrder: 1 },
-  { productType: "whole_sheep", label: "Whole Sheep", minPrice: 1000, maxPrice: 1400, imageUrl: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=600&q=80", sortOrder: 2 },
-  { productType: "whole_goat", label: "Whole Goat", minPrice: 800, maxPrice: 1200, imageUrl: "https://images.unsplash.com/photo-1578645510387-c3e02018f305?w=600&q=80", sortOrder: 3 },
+  { productType: "half_sheep", label: "½ Sheep", enabled: true, minPrice: 500, maxPrice: 700, imageUrl: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&q=80", sortOrder: 0 },
+  { productType: "half_goat", label: "½ Goat", enabled: true, minPrice: 400, maxPrice: 600, imageUrl: "https://images.unsplash.com/photo-1546445317-29f4545e9d53?w=600&q=80", sortOrder: 1 },
+  { productType: "whole_sheep", label: "Whole Sheep", enabled: true, minPrice: 1000, maxPrice: 1400, imageUrl: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=600&q=80", sortOrder: 2 },
+  { productType: "whole_goat", label: "Whole Goat", enabled: true, minPrice: 800, maxPrice: 1200, imageUrl: "https://images.unsplash.com/photo-1578645510387-c3e02018f305?w=600&q=80", sortOrder: 3 },
 ];
 
 const SPECIAL_CUTS = [
@@ -75,6 +75,65 @@ async function main() {
     });
   }
   console.log(`Seeded ${PRODUCTS.length} products`);
+
+  // Weight options: qurban/aqiqah (whole carcass 28–80 kg) and personal (17–40 kg with age bands)
+  const QURBAN_AQIQAH_WEIGHTS: { bandId: string; label: string; price: number; sortOrder: number }[] = [
+    { bandId: "whole_28_30", label: "28-30 kg", price: 1020, sortOrder: 0 },
+    { bandId: "whole_31_33", label: "31-33 kg", price: 1120, sortOrder: 1 },
+    { bandId: "whole_34_36", label: "34-36 kg", price: 1250, sortOrder: 2 },
+    { bandId: "whole_37_40", label: "37-40 kg", price: 1350, sortOrder: 3 },
+    { bandId: "whole_41_45", label: "41-45 kg", price: 1500, sortOrder: 4 },
+    { bandId: "whole_46_50", label: "46-50 kg", price: 1675, sortOrder: 5 },
+    { bandId: "whole_51_55", label: "51-55 kg", price: 1850, sortOrder: 6 },
+    { bandId: "whole_56_60", label: "56-60 kg", price: 1950, sortOrder: 7 },
+    { bandId: "whole_61_65", label: "61-65 kg", price: 2050, sortOrder: 8 },
+    { bandId: "whole_66_70", label: "66-70 kg", price: 2200, sortOrder: 9 },
+    { bandId: "whole_71_75", label: "71-75 kg", price: 2400, sortOrder: 10 },
+    { bandId: "whole_76_80", label: "76-80 kg", price: 2550, sortOrder: 11 },
+  ];
+  const PERSONAL_WEIGHTS: { bandId: string; label: string; price: number; sortOrder: number }[] = [
+    { bandId: "personal_17_20", label: "17-20 kg (45-55 days)", price: 750, sortOrder: 0 },
+    { bandId: "personal_21_26", label: "21-26 kg (60-80 days)", price: 825, sortOrder: 1 },
+    { bandId: "personal_28_30", label: "28-30 kg (3-5 months)", price: 1000, sortOrder: 2 },
+    { bandId: "personal_31_33", label: "31-33 kg (3-5 months)", price: 1120, sortOrder: 3 },
+    { bandId: "personal_34_36", label: "34-36 kg (3-5 months)", price: 1220, sortOrder: 4 },
+    { bandId: "personal_37_40", label: "37-40 kg (3-5 months)", price: 1320, sortOrder: 5 },
+  ];
+  for (const w of QURBAN_AQIQAH_WEIGHTS) {
+    await prisma.weightOption.upsert({
+      where: { bandId: w.bandId },
+      create: { bandId: w.bandId, label: w.label, price: w.price, sortOrder: w.sortOrder, occasionScope: "qurban_aqiqah" },
+      update: { label: w.label, price: w.price, sortOrder: w.sortOrder, occasionScope: "qurban_aqiqah" },
+    });
+  }
+  for (const w of PERSONAL_WEIGHTS) {
+    await prisma.weightOption.upsert({
+      where: { bandId: w.bandId },
+      create: { bandId: w.bandId, label: w.label, price: w.price, sortOrder: w.sortOrder, occasionScope: "personal" },
+      update: { label: w.label, price: w.price, sortOrder: w.sortOrder, occasionScope: "personal" },
+    });
+  }
+  const allWeightOptions = await prisma.weightOption.findMany({ where: { bandId: { not: null } }, orderBy: { sortOrder: "asc" } });
+  const byBandId = new Map<string, string>();
+  for (const o of allWeightOptions) {
+    if (o.bandId) byBandId.set(o.bandId, o.id);
+  }
+  const qurbanIds = QURBAN_AQIQAH_WEIGHTS.map((w) => byBandId.get(w.bandId)).filter(Boolean) as string[];
+  const personalIds = PERSONAL_WEIGHTS.map((w) => byBandId.get(w.bandId)).filter(Boolean) as string[];
+  await prisma.productWeight.deleteMany({});
+  const productWeightRows: { productType: string; weightOptionId: string; sortOrder: number }[] = [];
+  [...qurbanIds, ...personalIds].forEach((weightOptionId, i) => {
+    productWeightRows.push({ productType: "whole_sheep", weightOptionId, sortOrder: i });
+    productWeightRows.push({ productType: "whole_goat", weightOptionId, sortOrder: i });
+  });
+  personalIds.forEach((weightOptionId, i) => {
+    productWeightRows.push({ productType: "half_sheep", weightOptionId, sortOrder: i });
+    productWeightRows.push({ productType: "half_goat", weightOptionId, sortOrder: i });
+  });
+  if (productWeightRows.length > 0) {
+    await prisma.productWeight.createMany({ data: productWeightRows });
+  }
+  console.log("Seeded weight options and product-weight links");
 
   await prisma.specialCut.deleteMany({
     where: {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: { default: "Kordoba Farms | Premium Qurban & Aqiqah", template: "%s | Kordoba Farms" },
@@ -34,7 +35,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Kordoba Farms",
-              alternateName: "Kordoba Agrotech Sdn. Bhd.",
+              alternateName: "KORDOBA AGROTECH SDN. BHD.",
               url: process.env.NEXT_PUBLIC_APP_URL ?? "https://kordobafarm.com",
               description: "Premium halal livestock for Qurban, Aqiqah, and personal consumption. Malaysia & Southeast Asia.",
             }),
@@ -45,6 +46,7 @@ export default function RootLayout({
         <div className="flex h-full min-h-[100dvh] min-h-screen w-full max-w-[100vw] flex-col overflow-hidden">
           {children}
         </div>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

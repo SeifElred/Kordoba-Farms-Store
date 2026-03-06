@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import React from "react";
 import Image from "next/image";
-import { Pencil, Loader2 } from "lucide-react";
-
-const LOCALES = [
-  { code: "en", label: "EN" },
-  { code: "ar", label: "AR" },
-  { code: "ms", label: "MS" },
-  { code: "zh", label: "中文" },
-] as const;
+import { Pencil, Loader2, X } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Separator } from "@/components/ui/separator";
 
 const OCCASIONS = [
   { key: "aqiqah", label: "Aqiqah" },
@@ -22,16 +28,22 @@ type Product = {
   id: string;
   productType: string;
   label: string;
-  minPrice: number;
-  maxPrice: number;
+  enabled?: boolean;
   imageUrl: string;
   imageUrlByLocale?: string | null;
   sortOrder: number;
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 type ProductForm = Omit<Partial<Product>, "imageUrlByLocale"> & { imageUrlByLocale?: Record<string, string> };
 
-type GlobalWeightOption = { id: string; label: string; price: number; sortOrder: number };
+type GlobalWeightOption = { id: string; label: string; price: number; sortOrder: number; occasionScope?: string | null };
+
+function productOccasionBadge(productType: string): string {
+  if (productType === "half_sheep" || productType === "half_goat") return "Personal only";
+  return "Qurban, Aqiqah, Personal";
+}
 
 export function AdminProductsClient() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -54,21 +66,20 @@ export function AdminProductsClient() {
   }, []);
 
   function parseImageUrlByLocale(raw: string | null | undefined): Record<string, string> {
-  if (!raw || typeof raw !== "string") return {};
-  try {
-    const o = JSON.parse(raw) as Record<string, string>;
-    return o && typeof o === "object" ? o : {};
-  } catch {
-    return {};
+    if (!raw || typeof raw !== "string") return {};
+    try {
+      const o = JSON.parse(raw) as Record<string, string>;
+      return o && typeof o === "object" ? o : {};
+    } catch {
+      return {};
+    }
   }
-}
 
   async function startEdit(p: Product) {
     setEditing(p.productType);
     setForm({
       label: p.label,
-      minPrice: p.minPrice,
-      maxPrice: p.maxPrice,
+      enabled: p.enabled ?? true,
       imageUrl: p.imageUrl,
       imageUrlByLocale: parseImageUrlByLocale(p.imageUrlByLocale),
       sortOrder: p.sortOrder,
@@ -100,11 +111,12 @@ export function AdminProductsClient() {
     setSavingWeights(false);
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
-      alert(d.error || "Failed to save weights");
+      toast.error(d.error || "Failed to save weights");
       return;
     }
     const data = await res.json();
     setEnabledWeightIds(Array.isArray(data) ? data.map((w: { id: string }) => w.id) : []);
+    toast.success("Weights saved");
   }
 
   async function save() {
@@ -120,236 +132,525 @@ export function AdminProductsClient() {
     setSaving(false);
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
-      alert(d.error || "Failed to save");
+      toast.error(d.error || "Failed to save");
       return;
     }
     const updated = await res.json();
     setProducts((prev) => prev.map((p) => (p.productType === editing ? updated : p)));
     setEditing(null);
+    toast.success("Product saved");
   }
 
-  const inputClass = "w-full rounded-lg border border-[#334155] bg-[#0f172a] px-3 py-2 text-sm text-white focus:border-[#c8a951] focus:outline-none focus:ring-1 focus:ring-[#c8a951]";
+  const editingProduct = editing ? products.find((p) => p.productType === editing) : null;
+  const qurbanWeights = globalWeightOptions.filter((w) => w.occasionScope === "qurban_aqiqah");
+  const personalWeights = globalWeightOptions.filter((w) => w.occasionScope === "personal");
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center rounded-xl border border-[#334155] bg-[#1e293b] py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-[#94a3b8]" />
-      </div>
+      <Card>
+        <CardContent className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center text-sm text-muted-foreground">
+          No products. Run the content seed: npx tsx prisma/seed-content.ts
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border border-[#334155] bg-[#1e293b] overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-[#334155] text-left text-[#94a3b8]">
-              <th className="p-4 font-medium">Type</th>
-              <th className="p-4 font-medium">Label</th>
-              <th className="p-4 font-medium">Min / Max price</th>
-              <th className="p-4 font-medium">Image</th>
-              <th className="p-4 font-medium">Order</th>
-              <th className="p-4 text-right font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <React.Fragment key={p.id}>
-              <tr className="border-b border-[#334155]">
-                <td className="p-4 font-mono text-white">{p.productType}</td>
-                {editing === p.productType ? (
-                  <>
-                    <td className="p-4">
-                      <input
-                        className={inputClass}
-                        value={form.label ?? ""}
-                        onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
-                        placeholder="Label"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          step={0.01}
-                          className={inputClass}
-                          value={form.minPrice ?? ""}
-                          onChange={(e) => setForm((f) => ({ ...f, minPrice: Number(e.target.value) }))}
-                          placeholder="Min"
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Products</CardTitle>
+          <CardDescription>
+            Edit label, images, and weight options. Click Edit to open the editor.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-28">Type</TableHead>
+                  <TableHead>Label</TableHead>
+                  <TableHead className="w-24">Status</TableHead>
+                  <TableHead className="w-40">Occasion</TableHead>
+                  <TableHead>Image</TableHead>
+                  <TableHead className="w-16">Order</TableHead>
+                  <TableHead className="w-20 text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products.map((p) => (
+                  <TableRow
+                    key={p.id}
+                    className={editing === p.productType ? "bg-muted/50" : ""}
+                  >
+                    <TableCell className="font-mono text-muted-foreground">{p.productType}</TableCell>
+                    <TableCell className="font-medium">{p.label}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                          (p.enabled ?? true)
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {(p.enabled ?? true) ? "Enabled" : "Disabled"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{productOccasionBadge(p.productType)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={p.imageUrl}
+                          alt=""
+                          width={48}
+                          height={48}
+                          unoptimized
+                          className="h-12 w-12 rounded-lg border border-border object-cover bg-muted shrink-0"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />
-                        <input
-                          type="number"
-                          step={0.01}
-                          className={inputClass}
-                          value={form.maxPrice ?? ""}
-                          onChange={(e) => setForm((f) => ({ ...f, maxPrice: Number(e.target.value) }))}
-                          placeholder="Max"
+                        <a
+                          href={p.imageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline truncate max-w-[100px]"
+                        >
+                          View
+                        </a>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{p.sortOrder}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        size="icon"
+                        variant={editing === p.productType ? "secondary" : "ghost"}
+                        className="h-8 w-8"
+                        onClick={() => (editing === p.productType ? setEditing(null) : startEdit(p))}
+                        aria-label={editing === p.productType ? "Close" : "Edit"}
+                      >
+                        {editing === p.productType ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {editing && editingProduct && (
+        <Card className="border-primary/20 shadow-md">
+          <CardHeader className="space-y-1 pb-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-lg">Edit product</CardTitle>
+                <CardDescription className="mt-1 font-mono text-muted-foreground">{editing}</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setEditing(null)} className="shrink-0">
+                <X className="h-4 w-4 mr-1" />
+                Close
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {/* Basics */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-semibold text-foreground">Basics</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-label">Label</Label>
+                  <Input
+                    id="edit-label"
+                    value={form.label ?? ""}
+                    onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
+                    placeholder="e.g. Whole Sheep"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-sort">Sort order</Label>
+                  <Input
+                    id="edit-sort"
+                    type="number"
+                    className="w-24"
+                    value={form.sortOrder ?? 0}
+                    onChange={(e) => setForm((f) => ({ ...f, sortOrder: Number(e.target.value) }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant={(form.enabled ?? true) ? "default" : "outline"}
+                      onClick={() => setForm((f) => ({ ...f, enabled: true }))}
+                    >
+                      Enabled
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={(form.enabled ?? true) ? "outline" : "default"}
+                      onClick={() => setForm((f) => ({ ...f, enabled: false }))}
+                    >
+                      Disabled
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Disabled products stay in admin, but customers will not see them until you enable them again.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* Image */}
+            <section className="space-y-4">
+              <h3 className="text-sm font-semibold text-foreground">Image</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-image">Default image URL</Label>
+                  <div className="flex flex-wrap items-start gap-3">
+                    <Input
+                      id="edit-image"
+                      className="max-w-md"
+                      value={form.imageUrl ?? ""}
+                      onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
+                      placeholder="https://... or /uploads/..."
+                    />
+                    {(form.imageUrl ?? "").trim() && (
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
+                        <Image
+                          src={form.imageUrl!}
+                          alt=""
+                          fill
+                          unoptimized
+                          className="object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />
                       </div>
-                    </td>
-                    <td className="p-4">
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="rounded-lg border border-border bg-muted/20 p-3">
+                    <p className="text-xs text-muted-foreground">
+                      <strong>EN is reused for MS and ZH</strong> unless you set MS/ZH overrides below. Arabic is separate.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="img-en">EN (also MS & ZH unless overridden)</Label>
+                      <div className="flex items-start gap-2">
+                        <Input
+                          id="img-en"
+                          value={form.imageUrlByLocale?.en ?? ""}
+                          onChange={(e) =>
+                            setForm((f) => ({
+                              ...f,
+                              imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), en: e.target.value },
+                            }))
+                          }
+                          placeholder="URL"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="shrink-0"
+                          onClick={() => {
+                            const url = (form.imageUrlByLocale?.en ?? "").trim();
+                            if (!url) return;
+                            setForm((f) => ({
+                              ...f,
+                              imageUrlByLocale: {
+                                ...(f.imageUrlByLocale ?? {}),
+                                en: url,
+                                ms: url,
+                                zh: url,
+                              },
+                            }));
+                          }}
+                        >
+                          Apply to MS/ZH
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="img-ar">AR</Label>
+                      <Input
+                        id="img-ar"
+                        value={form.imageUrlByLocale?.ar ?? ""}
+                        onChange={(e) =>
+                          setForm((f) => ({
+                            ...f,
+                            imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), ar: e.target.value },
+                          }))
+                        }
+                        placeholder="URL"
+                      />
+                    </div>
+                  </div>
+
+                  <details className="rounded-lg border border-border bg-card p-3">
+                    <summary className="cursor-pointer select-none text-sm font-medium text-foreground">
+                      Advanced overrides (optional)
+                    </summary>
+                    <div className="mt-3 space-y-6">
                       <div className="space-y-3">
-                        <p className="text-xs text-[#94a3b8]">
-                          Images per occasion & language (URL). Leave empty to use global image below.
+                        <p className="text-xs font-medium text-muted-foreground">Per-locale overrides</p>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="img-ms">MS (override)</Label>
+                            <Input
+                              id="img-ms"
+                              value={form.imageUrlByLocale?.ms ?? ""}
+                              onChange={(e) =>
+                                setForm((f) => ({
+                                  ...f,
+                                  imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), ms: e.target.value },
+                                }))
+                              }
+                              placeholder="URL"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="img-zh">ZH (override)</Label>
+                            <Input
+                              id="img-zh"
+                              value={form.imageUrlByLocale?.zh ?? ""}
+                              onChange={(e) =>
+                                setForm((f) => ({
+                                  ...f,
+                                  imageUrlByLocale: { ...(f.imageUrlByLocale ?? {}), zh: e.target.value },
+                                }))
+                              }
+                              placeholder="URL"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Per-occasion overrides (whole products only). Half products only support Personal.
                         </p>
-                        <div className="space-y-3">
-                          {OCCASIONS.map(({ key: occKey, label: occLabel }) => (
-                            <div key={occKey} className="space-y-1">
-                              <p className="text-xs font-medium text-[#e2e8f0]">{occLabel}</p>
-                              <div className="flex flex-wrap gap-3">
-                                {LOCALES.map(({ code, label }) => {
-                                  const mapKey = `${occKey}:${code}`;
-                                  const url = form.imageUrlByLocale?.[mapKey] ?? "";
-                                  return (
-                                    <div key={mapKey} className="flex flex-col items-start gap-1">
-                                      <span className="text-[11px] text-[#64748b]">{label}</span>
-                                      <input
-                                        className={inputClass}
-                                        value={url}
+                        <div className="grid gap-3">
+                          {(editing === "half_sheep" || editing === "half_goat"
+                            ? OCCASIONS.filter((o) => o.key === "personal")
+                            : OCCASIONS
+                          ).map(({ key: occKey, label: occLabel }) => {
+                            const keyEn = `${occKey}:en`;
+                            const keyAr = `${occKey}:ar`;
+                            const keyMs = `${occKey}:ms`;
+                            const keyZh = `${occKey}:zh`;
+                            return (
+                              <div key={occKey} className="rounded-lg border border-border bg-muted/20 p-3">
+                                <p className="text-sm font-medium text-foreground">{occLabel}</p>
+                                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                  <div className="space-y-2">
+                                    <Label>EN (also MS & ZH unless overridden)</Label>
+                                    <div className="flex items-start gap-2">
+                                      <Input
+                                        value={form.imageUrlByLocale?.[keyEn] ?? ""}
                                         onChange={(e) =>
                                           setForm((f) => ({
                                             ...f,
                                             imageUrlByLocale: {
                                               ...(f.imageUrlByLocale ?? {}),
-                                              [mapKey]: e.target.value,
+                                              [keyEn]: e.target.value,
                                             },
                                           }))
                                         }
-                                        placeholder="https://... or /uploads/..."
+                                        placeholder="URL"
                                       />
-                                      {url && (
-                                        <Image
-                                          src={url}
-                                          alt=""
-                                          width={64}
-                                          height={64}
-                                          unoptimized
-                                          className="h-16 w-16 rounded-lg border border-[#334155] object-cover bg-[#0f172a]"
-                                          onError={(e) => {
-                                            (e.target as HTMLImageElement).style.display = "none";
-                                          }}
-                                        />
-                                      )}
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="shrink-0"
+                                        onClick={() => {
+                                          const url = (form.imageUrlByLocale?.[keyEn] ?? "").trim();
+                                          if (!url) return;
+                                          setForm((f) => ({
+                                            ...f,
+                                            imageUrlByLocale: {
+                                              ...(f.imageUrlByLocale ?? {}),
+                                              [keyEn]: url,
+                                              [keyMs]: url,
+                                              [keyZh]: url,
+                                            },
+                                          }));
+                                        }}
+                                      >
+                                        Apply to MS/ZH
+                                      </Button>
                                     </div>
-                                  );
-                                })}
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>AR</Label>
+                                    <Input
+                                      value={form.imageUrlByLocale?.[keyAr] ?? ""}
+                                      onChange={(e) =>
+                                        setForm((f) => ({
+                                          ...f,
+                                          imageUrlByLocale: {
+                                            ...(f.imageUrlByLocale ?? {}),
+                                            [keyAr]: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="URL"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                  <div className="space-y-2">
+                                    <Label>MS (override)</Label>
+                                    <Input
+                                      value={form.imageUrlByLocale?.[keyMs] ?? ""}
+                                      onChange={(e) =>
+                                        setForm((f) => ({
+                                          ...f,
+                                          imageUrlByLocale: {
+                                            ...(f.imageUrlByLocale ?? {}),
+                                            [keyMs]: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="URL"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>ZH (override)</Label>
+                                    <Input
+                                      value={form.imageUrlByLocale?.[keyZh] ?? ""}
+                                      onChange={(e) =>
+                                        setForm((f) => ({
+                                          ...f,
+                                          imageUrlByLocale: {
+                                            ...(f.imageUrlByLocale ?? {}),
+                                            [keyZh]: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="URL"
+                                    />
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="text-xs text-[#64748b]">
-                          Global image URL (fallback for all occasions & languages):
-                        </p>
-                        <input
-                          className={inputClass}
-                          value={form.imageUrl ?? ""}
-                          onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
-                          placeholder="https://... or /uploads/..."
-                        />
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <input
-                        type="number"
-                        className={inputClass}
-                        value={form.sortOrder ?? 0}
-                        onChange={(e) => setForm((f) => ({ ...f, sortOrder: Number(e.target.value) }))}
-                      />
-                    </td>
-                    <td className="p-4 text-right">
-                      <button
-                        type="button"
-                        onClick={save}
-                        disabled={saving}
-                        className="rounded-lg bg-[#0F3D2E] px-3 py-1.5 text-sm text-white hover:bg-[#14533a] disabled:opacity-50"
-                      >
-                        {saving ? "Saving…" : "Save"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditing(null)}
-                        className="ml-2 rounded-lg border border-[#334155] px-3 py-1.5 text-sm text-[#94a3b8] hover:bg-[#334155]"
-                      >
-                        Cancel
-                      </button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="p-4 text-white">{p.label}</td>
-                    <td className="p-4 text-white">{p.minPrice} / {p.maxPrice}</td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={p.imageUrl}
-                          alt=""
-                          width={56}
-                          height={56}
-                          unoptimized
-                          className="h-14 w-14 rounded-lg border border-[#334155] object-cover bg-[#0f172a] shrink-0"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                        />
-                        <a href={p.imageUrl} target="_blank" rel="noopener noreferrer" className="text-[#c8a951] hover:underline truncate block max-w-[140px] text-xs">
-                          Change in edit
-                        </a>
-                      </div>
-                    </td>
-                    <td className="p-4 text-white">{p.sortOrder}</td>
-                    <td className="p-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(p)}
-                        className="rounded-lg border border-[#334155] p-1.5 text-[#94a3b8] hover:bg-[#334155] hover:text-white"
-                        aria-label="Edit"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </>
-                )}
-              </tr>
-              {editing === p.productType && (
-                <tr className="border-b border-[#334155] bg-[#0f172a]/60">
-                  <td colSpan={6} className="p-4">
-                    <div className="rounded-lg border border-[#334155] bg-[#1e293b] p-4">
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="text-sm font-medium text-[#94a3b8]">Weights customers can select (enable/disable from Weight options)</span>
-                        <button type="button" onClick={saveWeights} disabled={savingWeights} className="rounded-lg bg-[#0F3D2E] px-2 py-1.5 text-xs text-white hover:bg-[#14533a] disabled:opacity-50">
-                          {savingWeights ? "Saving…" : "Save"}
-                        </button>
-                      </div>
-                      {globalWeightOptions.length === 0 ? (
-                        <p className="text-xs text-[#64748b]">No weight options yet. Add them in <strong>Weight options</strong> first, then enable them here.</p>
-                      ) : (
-                        <div className="flex flex-wrap gap-3">
-                          {globalWeightOptions.map((w) => {
-                            const enabled = enabledWeightIds.includes(w.id);
-                            return (
-                              <label key={w.id} className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#334155] px-3 py-2 hover:bg-[#334155]/50">
-                                <input
-                                  type="checkbox"
-                                  checked={enabled}
-                                  onChange={() => toggleWeightForProduct(w.id)}
-                                  className="h-4 w-4 rounded border-[#334155]"
-                                />
-                                <span className="text-sm text-white">{w.label}</span>
-                                <span className="text-xs text-[#c8a951]">{w.price.toFixed(2)} MYR</span>
-                              </label>
                             );
                           })}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </td>
-                </tr>
+                  </details>
+                </div>
+              </div>
+              <Button onClick={save} disabled={saving}>
+                {saving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving…
+                  </>
+                ) : (
+                  "Save product"
+                )}
+              </Button>
+            </section>
+
+            <Separator />
+
+            {/* Weight options */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-sm font-semibold text-foreground">Weight options</h3>
+                <Button size="sm" onClick={saveWeights} disabled={savingWeights}>
+                  {savingWeights ? (
+                    <>
+                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                      Saving…
+                    </>
+                  ) : (
+                    "Save weights"
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Enable which weight bands are available for this product. Manage options in <strong>Weight options</strong>.
+              </p>
+              {globalWeightOptions.length === 0 ? (
+                <p className="rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+                  No weight options yet. Add them in <strong>Weight options</strong> first.
+                </p>
+              ) : (
+                <div className="space-y-6">
+                  {qurbanWeights.length > 0 && (
+                    <div>
+                      <p className="mb-2 text-xs font-medium text-muted-foreground">Qurban / Aqiqah</p>
+                      <div className="flex flex-wrap gap-2">
+                        {qurbanWeights.map((w) => {
+                          const enabled = enabledWeightIds.includes(w.id);
+                          return (
+                            <label
+                              key={w.id}
+                              className="flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-sm transition-colors hover:bg-muted/50 has-[:checked]:border-primary/50 has-[:checked]:bg-primary/5"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={enabled}
+                                onChange={() => toggleWeightForProduct(w.id)}
+                                className="h-4 w-4 rounded border-input"
+                              />
+                              <span>{w.label}</span>
+                              <span className="text-muted-foreground">RM {w.price.toFixed(0)}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {personalWeights.length > 0 && (
+                    <div>
+                      <p className="mb-2 text-xs font-medium text-muted-foreground">Personal</p>
+                      <div className="flex flex-wrap gap-2">
+                        {personalWeights.map((w) => {
+                          const enabled = enabledWeightIds.includes(w.id);
+                          return (
+                            <label
+                              key={w.id}
+                              className="flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-sm transition-colors hover:bg-muted/50 has-[:checked]:border-primary/50 has-[:checked]:bg-primary/5"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={enabled}
+                                onChange={() => toggleWeightForProduct(w.id)}
+                                className="h-4 w-4 rounded border-input"
+                              />
+                              <span>{w.label}</span>
+                              <span className="text-muted-foreground">RM {w.price.toFixed(0)}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {products.length === 0 && (
-        <div className="p-12 text-center text-[#94a3b8]">No products. Run the content seed: npx tsx prisma/seed-content.ts</div>
+            </section>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

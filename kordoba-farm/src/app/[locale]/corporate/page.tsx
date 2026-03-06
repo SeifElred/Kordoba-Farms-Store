@@ -11,7 +11,7 @@ export default async function CorporatePage({
   return (
     <div className="mx-auto max-w-2xl py-12 sm:py-16">
       <h1 className="text-3xl font-bold text-[var(--primary)]">
-        Kordoba Agrotech Sdn. Bhd.
+        KORDOBA AGROTECH SDN. BHD.
       </h1>
       <p className="mt-2 text-lg text-[var(--muted-foreground)]">
         Parent company of Kordoba Farms. Premium agrotech and livestock in Southeast Asia.

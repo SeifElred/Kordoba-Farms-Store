@@ -84,8 +84,8 @@ export function HowItWorks({ locale }: Props) {
           ];
 
   return (
-    <section className="mx-auto max-w-3xl px-4 pt-4 pb-2 sm:px-6 sm:pt-6 sm:pb-4">
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-4 sm:px-5 sm:py-5">
+    <section className="mx-auto max-w-2xl px-4 pt-6 pb-6 sm:px-6 sm:pt-8 sm:pb-6">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-4 py-4 shadow-sm sm:px-5 sm:py-4">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--primary)] sm:text-xs">
           {isAr
             ? "كيف تسير العملية"

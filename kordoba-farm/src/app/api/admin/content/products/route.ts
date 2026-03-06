@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 const updateSchema = z.object({
   label: z.string().min(1).optional(),
+  enabled: z.boolean().optional(),
   minPrice: z.number().min(0).optional(),
   maxPrice: z.number().min(0).optional(),
   imageUrl: z.string().optional(), // fallback; can be URL or /uploads/...
@@ -32,6 +33,7 @@ export async function PATCH(req: NextRequest) {
     where: { productType },
     data: {
       ...(data.label != null && { label: data.label }),
+      ...(data.enabled != null && { enabled: data.enabled }),
       ...(data.minPrice != null && { minPrice: data.minPrice }),
       ...(data.maxPrice != null && { maxPrice: data.maxPrice }),
       ...(data.imageUrl != null && { imageUrl: data.imageUrl }),

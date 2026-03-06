@@ -7,6 +7,7 @@ const updateSchema = z.object({
   label: z.string().min(1).optional(),
   price: z.number().min(0).optional(),
   sortOrder: z.number().int().optional(),
+  occasionScope: z.enum(["qurban_aqiqah", "personal"]).nullable().optional(),
 });
 
 export async function PATCH(
@@ -28,6 +29,7 @@ export async function PATCH(
       ...(data.label != null && { label: data.label }),
       ...(data.price != null && { price: data.price }),
       ...(data.sortOrder != null && { sortOrder: data.sortOrder }),
+      ...(data.occasionScope !== undefined && { occasionScope: data.occasionScope }),
     },
   });
   return NextResponse.json(row);

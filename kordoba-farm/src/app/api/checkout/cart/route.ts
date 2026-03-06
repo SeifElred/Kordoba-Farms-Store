@@ -11,7 +11,8 @@ import {
 const cartItemSchema = z.object({
   product: z.string().min(1),
   occasion: z.string().min(1),
-  weightSelection: z.string(),
+  weightOptionId: z.string().uuid().optional(),
+  weightSelection: z.string().optional(),
   specialCutId: z.string(),
   specialCutLabel: z.string(),
   slaughterDate: z.string(),
@@ -22,17 +23,38 @@ const cartItemSchema = z.object({
   includeIntestines: z.boolean(),
   note: z.string(),
   productLabel: z.string(),
+}).refine((d) => d.weightOptionId != null || (d.weightSelection != null && d.weightSelection !== ""), {
+  message: "Either weightOptionId or weightSelection is required",
+  path: ["weightOptionId"],
 });
 
-const bodySchema = z.object({
-  name: z.string().min(1).max(200),
-  email: z.string().email(),
-  phone: z.string().min(1).max(50),
-  address: z.string().max(1000).optional(),
-  country: z.string().max(10).optional(),
-  locale: z.string().max(10).optional(),
-  items: z.array(cartItemSchema).min(1).max(20),
-});
+const bodySchema = z
+  .object({
+    channel: z.literal("whatsapp").optional(),
+    name: z.string().max(200).optional(),
+    email: z.string().max(500).optional(),
+    phone: z.string().max(50).optional(),
+    address: z.string().max(1000).optional(),
+    country: z.string().max(10).optional(),
+    locale: z.string().max(10).optional(),
+    items: z.array(cartItemSchema).min(1).max(20),
+  })
+  .refine(
+    (data) => {
+      if (data.channel === "whatsapp") return true;
+      const name = (data.name ?? "").trim();
+      const email = (data.email ?? "").trim();
+      const phone = (data.phone ?? "").trim();
+      const address = (data.address ?? "").trim();
+      if (name.length < 1 || phone.length < 1 || address.length < 1)
+        return false;
+      return email.length >= 1 && z.string().email().safeParse(email).success;
+    },
+    {
+      message:
+        "name, email, phone, and address are required when not completing via WhatsApp",
+    }
+  );
 
 export async function POST(req: Request) {
   try {
@@ -44,10 +66,10 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    const { name, email, phone, address, country, locale, items } =
+    const { channel, name, email, phone, address, country, locale, items } =
       parsed.data;
 
-    const totalMYR = getCartTotalMYR(items);
+    const totalMYR = await getCartTotalMYR(items, prisma);
     if (totalMYR <= 0) {
       return NextResponse.json(
         { error: "Invalid cart: unable to compute total" },
@@ -55,13 +77,26 @@ export async function POST(req: Request) {
       );
     }
 
+    const isWhatsApp = channel === "whatsapp";
+    const nameVal =
+      (isWhatsApp ? (name?.trim() || "WhatsApp order (pending details)") : name!) as string;
+    const emailVal = (
+      isWhatsApp
+        ? (email?.trim() && email !== "" ? email : "whatsapp-pending@kordoba.farm")
+        : email!
+    ) as string;
+    const phoneVal = (isWhatsApp ? (phone?.trim() || "—") : phone!) as string;
+    const addressVal = isWhatsApp
+      ? (address?.trim() || "To be confirmed via WhatsApp")
+      : (address ?? null);
+
     const totalCents = Math.round(totalMYR * 100);
     const cartOrder = await prisma.cartOrder.create({
       data: {
-        name,
-        email,
-        phone,
-        address: address ?? null,
+        name: nameVal,
+        email: emailVal,
+        phone: phoneVal,
+        address: addressVal,
         country: country ?? "MY",
         locale: locale ?? "en",
         totalCents,
@@ -69,6 +104,10 @@ export async function POST(req: Request) {
         items: items as unknown as object,
       },
     });
+
+    if (isWhatsApp) {
+      return NextResponse.json({ orderId: cartOrder.id });
+    }
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -78,26 +117,26 @@ export async function POST(req: Request) {
       const stripe = new Stripe(stripeKey, {
         apiVersion: "2026-01-28.clover",
       });
-      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
-        items.map((item: CartLineItemPayload) => {
-          const priceMYR = getCartLinePrice(item);
-          return {
-            price_data: {
-              currency: "myr",
-              product_data: {
-                name: item.productLabel,
-                description: [
-                  item.slaughterDate && `Slaughter: ${item.slaughterDate}`,
-                  item.specialCutLabel && `Cut: ${item.specialCutLabel}`,
-                ]
-                  .filter(Boolean)
-                  .join(" · ") || "Halal order",
-              },
-              unit_amount: Math.round(priceMYR * 100),
+      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+      for (const item of items as CartLineItemPayload[]) {
+        const priceMYR = await getCartLinePrice(item, prisma);
+        lineItems.push({
+          price_data: {
+            currency: "myr",
+            product_data: {
+              name: item.productLabel,
+              description: [
+                item.slaughterDate && `Slaughter: ${item.slaughterDate}`,
+                item.specialCutLabel && `Cut: ${item.specialCutLabel}`,
+              ]
+                .filter(Boolean)
+                .join(" · ") || "Halal order",
             },
-            quantity: 1,
-          };
+            unit_amount: Math.round(priceMYR * 100),
+          },
+          quantity: 1,
         });
+      }
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card", "fpx"],

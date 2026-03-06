@@ -22,15 +22,19 @@
   "orderDetails": {
     "title": "Butiran pesanan",
     "invalidProduct": "Produk tidak sah. Sila kembali dan pilih produk.",
+    "deliveryTransportNote": "Kami menggunakan LalaMove untuk penghantaran.",
     "delivery": "Penghantaran ke alamat saya",
     "pickup": "Saya ambil sendiri",
     "donate": "Derma untuk kebajikan (kami agih)",
+    "deliveryDesc": "Kami hantar daging ke alamat anda melalui rakan penghantaran kami.",
+    "pickupDesc": "Anda atau wakil anda datang ambil daging di lokasi kami.",
+    "donateDesc": "Kami agihkan daging sebagai derma bagi pihak anda kepada yang memerlukan.",
     "notesPlaceholder": "Apa-apa permintaan khas...",
     "weightAsIs": "Seperti ada (berat standard)",
     "weightRange": "Julat berat (hubungi kami)",
     "chooseWeight": "Pilih berat",
     "chooseCut": "Pilih potongan",
-    "chooseCutSubtitle": "Pilih satu pilihan. Ketik ikon play untuk tonton video.",
+    "chooseCutSubtitle": "Pilih satu pilihan daripada gaya potongan yang tersedia.",
     "watchVideo": "Tonton video",
     "yourProduct": "Produk anda",
     "selectDate": "Pilih tarikh",
@@ -40,7 +44,8 @@
     "completeRequiredToProceed": "Sila pilih tarikh sembelihan, potongan khas, dan pilihan berat untuk terus.",
     "summaryTitle": "Ringkasan pesanan",
     "weightAndAge": "Berat / umur",
-    "occasionLabel": "Acara"
+    "occasionLabel": "Acara",
+    "none": "—"
   },
   "nav": {
     "home": "Laman Utama",
@@ -73,7 +78,10 @@
     "editItem": "Sunting",
     "removeItem": "Buang",
     "itemAdded": "Item telah ditambah ke troli.",
-    "weightAndAge": "Berat / umur"
+    "weightAndAge": "Berat / umur",
+    "trustSecure": "Bayaran selamat",
+    "trustHalal": "100% Halal",
+    "trustCardFpx": "Kad & FPX"
   },
   "orderWizard": {
     "step1Title": "Pilih acara anda",
@@ -91,6 +99,12 @@
     "goat": "Kambing",
     "half": "Separuh",
     "whole": "Keseluruhan"
+  },
+  "product": {
+    "whole_sheep": "Biri-biri Keseluruhan",
+    "whole_goat": "Kambing Keseluruhan",
+    "half_sheep": "Setengah Biri-biri",
+    "half_goat": "Setengah Kambing"
   },
   "purpose": {
     "title": "Bagaimana anda ingin meraikan?",
@@ -152,6 +166,8 @@
     "addToOrder": "Terus ke Bayaran",
     "weightSelection": "Pilihan berat",
     "weightAgeNote": "Biri-biri: lebih 6 bulan. Kambing: lebih satu tahun.",
+    "sheepAgeBadge": "Lebih 6 bulan.",
+    "goatAgeBadge": "Lebih satu tahun.",
     "weightAsIs": "Seperti ada ({weight} kg)",
     "specialCut": "Potongan khas (pilihan)",
     "orderIncludes": "Pesanan termasuk",
@@ -169,6 +185,7 @@
     "address": "Alamat",
     "addressPlaceholder": "Jalan, bandar, poskod, negeri",
     "optional": "pilihan",
+    "addressRequired": "Sila masukkan alamat penuh anda.",
     "orderSummaryNote": "Butiran pesanan akan dihantar ke WhatsApp",
     "sendToWhatsApp": "Hantar pesanan ke WhatsApp",
     "placeOrder": "Tempat Pesanan",
@@ -202,7 +219,7 @@
     "reorder": "Pesan Semula"
   },
   "footer": {
-    "company": "Kordoba Agrotech Sdn. Bhd.",
+    "company": "KORDOBA AGROTECH SDN. BHD.",
     "companySection": "Syarikat",
     "allRights": "Hak cipta terpelihara.",
     "tagline": "Korban, Aqiqah & daging kambing halal premium — dari ladang ke meja anda dengan kebolehkesanan penuh.",
@@ -219,7 +236,9 @@
     "error": "Ralat berlaku.",
     "back": "Kembali",
     "next": "Seterusnya",
-    "buyNow": "Beli Sekarang"
+    "buyNow": "Beli Sekarang",
+    "yes": "Ya",
+    "no": "Tidak"
   },
   "admin": {
     "currentTheme": "Tema semasa",

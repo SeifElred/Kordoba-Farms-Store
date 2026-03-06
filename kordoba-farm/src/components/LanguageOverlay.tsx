@@ -35,7 +35,7 @@ export function LanguageOverlay() {
     const segments = pathname.split("/").filter(Boolean);
     const rest = segments.slice(1).join("/");
     const newPath = rest ? `/${locale}/${rest}` : `/${locale}`;
-    router.push(newPath);
+    router.push(newPath, { scroll: false });
   }
 
   if (!show) return null;
