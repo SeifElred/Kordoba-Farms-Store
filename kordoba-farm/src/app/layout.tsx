@@ -42,8 +42,8 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="h-full min-h-[100dvh] min-h-screen overflow-hidden bg-[var(--background)] text-[var(--foreground)] antialiased">
-        <div className="flex h-full min-h-[100dvh] min-h-screen w-full max-w-[100vw] flex-col overflow-hidden">
+      <body className="h-full min-h-[100dvh] min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased">
+        <div className="flex min-h-[100dvh] min-h-screen w-full max-w-[100vw] flex-col">
           {children}
         </div>
         <Toaster richColors position="top-right" />

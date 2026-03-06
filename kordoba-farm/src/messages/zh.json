@@ -181,6 +181,8 @@
     "title": "结账",
     "name": "姓名",
     "email": "邮箱",
+    "emailRequired": "请输入您的邮箱地址。",
+    "invalidEmail": "请输入有效的邮箱地址。",
     "phone": "电话",
     "address": "地址",
     "addressPlaceholder": "街道、城市、邮编、州",

@@ -336,6 +336,15 @@ export function OrderWizard({
     setState((s) => ({ ...s, ...patch }));
   }, []);
 
+  const clearDraft = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.sessionStorage.removeItem(WIZARD_DRAFT_KEY);
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
   const canProceedStep5 = state.slaughterDate.trim() !== "" && state.specialCutId !== "";
 
   const handleAddToCart = useCallback(() => {
@@ -372,8 +381,9 @@ export function OrderWizard({
     } else {
       addItem(lineItem);
     }
+    clearDraft();
     router.push(`/${locale}/cart?added=1`);
-  }, [state, productConfigs, weightOptionsByProduct, editItemId, addItem, updateItem, router, locale, isAddingToCart]);
+  }, [state, productConfigs, weightOptionsByProduct, editItemId, addItem, updateItem, clearDraft, router, locale, isAddingToCart]);
 
   const stepTitles = [
     tWizard("step1Title"),
@@ -435,7 +445,10 @@ export function OrderWizard({
                   <button
                     type="button"
                   onClick={() => {
-                    set({ occasion: key });
+                    setState({
+                      ...defaultState,
+                      occasion: key,
+                    });
                     setStep(2);
                   }}
                     className={cn(

@@ -9,6 +9,29 @@ import { getWeightBandDisplayLabel } from "@/lib/weight-bands";
 import { getSpecialCutDisplayLabel } from "@/lib/special-cut-labels";
 import { ShoppingBag, Pencil, Trash2, CreditCard, ShieldCheck, Lock } from "lucide-react";
 
+function getCartWeightDisplay(
+  weightLabel: string | undefined,
+  weightSelection: string | undefined,
+  occasion: string,
+  locale: string
+) {
+  const label = weightLabel?.trim();
+  if (label) return label;
+
+  const selection = weightSelection?.trim();
+  if (!selection) return "";
+
+  const localizedBand = getWeightBandDisplayLabel(selection, occasion, locale);
+  if (localizedBand && localizedBand !== selection) return localizedBand;
+
+  // New carts store a DB UUID in weightSelection, which is not user-facing.
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(selection)) {
+    return "";
+  }
+
+  return selection;
+}
+
 export function CartPageClient({
   locale,
 }: {
@@ -96,15 +119,13 @@ export function CartPageClient({
                     {distLabels[item.distribution] ?? item.distribution}
                   </span>
                 </div>
-                {(item.weightLabel || item.weightSelection) && (
+                {getCartWeightDisplay(item.weightLabel, item.weightSelection, item.occasion, locale) && (
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     <span className="text-xs text-[var(--muted-foreground)]">
                       {t("weightAndAge")}:
                     </span>
                     <span className="rounded-md border border-[var(--border)] bg-[var(--muted)]/50 px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
-                      {getWeightBandDisplayLabel(item.weightSelection, item.occasion, locale) ||
-                        item.weightLabel ||
-                        item.weightSelection}
+                      {getCartWeightDisplay(item.weightLabel, item.weightSelection, item.occasion, locale)}
                     </span>
                     {(item.occasion === "qurban" || item.occasion === "aqiqah") &&
                       item.product.includes("sheep") && (

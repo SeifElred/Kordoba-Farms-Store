@@ -32,26 +32,25 @@ export default async function LocaleLayout({
   ]);
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <NextIntlClientProvider messages={messages}>
         <DirLangSync />
         <LanguageOverlay />
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-0 flex-1 flex-col">
           <CartProvider>
             <div
-              className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+              className="flex min-h-0 min-w-0 flex-1 flex-col"
               data-locale={locale}
               data-theme={themeData.themeId}
             >
               <RamadanDecorations themeId={themeData.themeId} />
               <Header bannerText={themeData.bannerText ?? undefined} />
               <main
-                className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain touch-pan-y"
+                className="min-h-0 min-w-0 flex-1 overflow-x-hidden"
                 style={{
                   paddingInlineStart: "max(1rem, var(--safe-left))",
                   paddingInlineEnd: "max(1rem, var(--safe-right))",
                   paddingBottom: "max(1rem, var(--safe-bottom))",
-                  WebkitOverflowScrolling: "touch",
                 }}
               >
                 <div className="mx-auto w-full max-w-3xl min-w-0 px-4 pb-6 sm:px-6 sm:pb-8">

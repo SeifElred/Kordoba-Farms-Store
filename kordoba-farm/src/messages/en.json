@@ -181,6 +181,8 @@
     "title": "Checkout",
     "name": "Full Name",
     "email": "Email",
+    "emailRequired": "Please enter your email address.",
+    "invalidEmail": "Please enter a valid email address.",
     "phone": "Phone",
     "address": "Address",
     "addressPlaceholder": "Street, city, postcode, state",

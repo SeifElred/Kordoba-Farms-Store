@@ -13,6 +13,7 @@ const cartItemSchema = z.object({
   occasion: z.string().min(1),
   weightOptionId: z.string().uuid().optional(),
   weightSelection: z.string().optional(),
+  weightLabel: z.string().optional(),
   specialCutId: z.string(),
   specialCutLabel: z.string(),
   slaughterDate: z.string(),

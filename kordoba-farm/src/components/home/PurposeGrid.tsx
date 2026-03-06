@@ -20,12 +20,22 @@ const accentStyles: Record<AccentKey, string> = {
   gold: "bg-[#faf8f2] border-[var(--accent)]/30 text-[var(--accent-foreground)] hover:border-[var(--accent)]/50 hover:bg-[#f5f2e8] [&_.icon-wrap]:bg-[var(--accent)]/20 [&_.icon-wrap]:text-[var(--accent-foreground)]",
 };
 
+const ORDER_WIZARD_DRAFT_KEY = "kordoba_order_draft";
+
 export function PurposeGrid() {
   const t = useTranslations("purpose");
   const tCommon = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
   const [loadingPurpose, setLoadingPurpose] = useState<string | null>(null);
+
+  function clearOrderDraft() {
+    try {
+      window.sessionStorage.removeItem(ORDER_WIZARD_DRAFT_KEY);
+    } catch {
+      // ignore storage errors
+    }
+  }
 
   useEffect(() => {
     for (const item of purposes) {
@@ -50,7 +60,10 @@ export function PurposeGrid() {
                 prefetch
                 onMouseEnter={() => router.prefetch(href)}
                 onFocus={() => router.prefetch(href)}
-                onClick={() => setLoadingPurpose(item.slug)}
+                onClick={() => {
+                  clearOrderDraft();
+                  setLoadingPurpose(item.slug);
+                }}
                 aria-busy={isLoading}
                 className={`group flex min-h-[80px] items-center gap-4 rounded-2xl border-2 px-5 py-4 shadow-sm transition-all hover:shadow-md active:scale-[0.99] sm:min-h-[88px] sm:gap-5 sm:px-6 sm:py-5 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 ${styles} ${isLoading ? "pointer-events-none opacity-90" : ""}`}
               >

@@ -23,6 +23,7 @@ type CartItem = {
   productLabel?: string;
   occasion?: string;
   weightSelection?: string;
+  weightLabel?: string;
   specialCutId?: string;
   specialCutLabel?: string;
   slaughterDate?: string;
@@ -51,6 +52,28 @@ function formatMYR(cents: number) {
 
 function formatMYRPrice(price: number) {
   return `RM ${price.toFixed(2)}`;
+}
+
+function getStoredWeightDisplay(
+  weightLabel: string | undefined,
+  weightSelection: string | undefined,
+  occasion: string,
+  locale: string
+) {
+  const label = weightLabel?.trim();
+  if (label) return label;
+
+  const selection = weightSelection?.trim();
+  if (!selection) return "—";
+
+  const localizedBand = getWeightBandDisplayLabel(selection, occasion, locale);
+  if (localizedBand && localizedBand !== selection) return localizedBand;
+
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(selection)) {
+    return "—";
+  }
+
+  return selection;
 }
 
 function copyToClipboard(text: string, label: string) {
@@ -244,13 +267,12 @@ export function CartOrderDetailView({
                 <Row
                   label="Weight"
                   value={
-                    item.weightSelection
-                      ? getWeightBandDisplayLabel(
-                          item.weightSelection,
-                          item.occasion ?? "qurban",
-                          order.locale
-                        ) || item.weightSelection
-                      : "—"
+                    getStoredWeightDisplay(
+                      item.weightLabel,
+                      item.weightSelection,
+                      item.occasion ?? "qurban",
+                      order.locale
+                    )
                   }
                 />
                 <Row label="Slaughter" value={item.slaughterDate} />

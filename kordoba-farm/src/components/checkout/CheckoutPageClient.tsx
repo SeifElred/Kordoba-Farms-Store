@@ -17,6 +17,7 @@ type CartPayloadItem = {
   occasion: string;
   weightOptionId?: string;
   weightSelection?: string;
+  weightLabel?: string;
   specialCutId: string;
   specialCutLabel: string;
   slaughterDate: string;
@@ -35,6 +36,7 @@ function cartToPayload(items: CartLineItem[]): CartPayloadItem[] {
     occasion: item.occasion,
     ...(item.weightOptionId && { weightOptionId: item.weightOptionId }),
     weightSelection: item.weightSelection || undefined,
+    weightLabel: item.weightLabel || undefined,
     specialCutId: item.specialCutId,
     specialCutLabel: item.specialCutLabel,
     slaughterDate: item.slaughterDate,
@@ -164,8 +166,16 @@ export function CheckoutPageClient({
     e.preventDefault();
     setError(null);
     if (items.length === 0) return;
-    if (!form.address.trim()) {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
       setError(t("addressRequired"));
+      return;
+    }
+    if (!form.email.trim()) {
+      setError(t("emailRequired"));
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      setError(t("invalidEmail"));
       return;
     }
     const countryMeta =
@@ -237,9 +247,11 @@ export function CheckoutPageClient({
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("email")}
+              {!intentWhatsapp ? " *" : ""}
             </label>
             <input
               type="email"
+              required={!intentWhatsapp}
               className="input-base w-full"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
