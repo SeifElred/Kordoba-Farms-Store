@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Kordoba Farms – Premium Qurban & Aqiqah";
+export const alt = "Kordoba Farms – Aqiqah & Qurban Malaysia (Goat & Sheep)";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -23,7 +23,7 @@ export default async function OGImage() {
       >
         <div style={{ fontSize: 48, fontWeight: 700 }}>Kordoba Farms</div>
         <div style={{ fontSize: 24, marginTop: 16, color: "#C8A951" }}>
-          Premium Qurban & Aqiqah · Malaysia
+          Aqiqah & Qurban · Goat & Sheep · Malaysia
         </div>
       </div>
     ),

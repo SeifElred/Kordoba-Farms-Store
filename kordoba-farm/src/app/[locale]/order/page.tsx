@@ -6,6 +6,7 @@ import {
   getSpecialCuts,
   getSiteSettings,
 } from "@/lib/content";
+import { buildPageMetadata, getCoreSeoKeywords, SEO_BASE_URL } from "@/lib/seo";
 import { getProductLabel } from "@/lib/utils";
 import { OrderWizard } from "@/components/order/OrderWizard";
 import { HowItWorks } from "@/components/layout/HowItWorks";
@@ -17,31 +18,43 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (locale === "ar") {
-    return {
+    return buildPageMetadata({
+      locale,
+      pathname: "/order",
       title: "إتمام الطلب – أضحية، عقيقة أو لحم ضاني",
       description:
-        "إختر المناسبة، الوزن، طريقة التقطيع، وتاريخ الذبح لإنهاء طلب الأضحية أو العقيقة أو لحم الضاني مع مزارع قرطبة.",
-    };
+        "اختر المناسبة والوزن وطريقة التقطيع وتاريخ الذبح لإتمام طلب الأضحية أو العقيقة أو اللحم في ماليزيا وكوالالمبور مع خدمة إلى شيراس وأمبانغ وتامان ملاواتي وسردانغ وسري كمبانغان وسيبرجايا وبوتراجايا.",
+      keywords: getCoreSeoKeywords(locale),
+    });
   }
   if (locale === "ms") {
-    return {
-      title: "Buat pesanan – Korban, Aqiqah atau daging peribadi",
+    return buildPageMetadata({
+      locale,
+      pathname: "/order",
+      title: "Tempah Korban atau Aqiqah – Pesanan kambing & biri-biri",
       description:
-        "Pilih acara, julat berat, jenis potongan dan tarikh sembelihan untuk melengkapkan pesanan Korban, Aqiqah atau daging kambing peribadi anda.",
-    };
+        "Pilih kambing atau biri-biri, berat, potongan dan tarikh sembelihan. Kami hantar Korban dan Aqiqah ke KL, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya. Halal, boleh kesan.",
+      keywords: getCoreSeoKeywords(locale),
+    });
   }
   if (locale === "zh") {
-    return {
+    return buildPageMetadata({
+      locale,
+      pathname: "/order",
       title: "提交订单 – 古尔邦、阿奇卡或自用羊肉",
       description:
-        "选择场合、重量区间、切割方式和屠宰日期，完成您的古尔邦、阿奇卡或家庭自用清真羊肉订单。",
-    };
+        "选择场合、重量区间、切割方式和屠宰日期，完成您在马来西亚、吉隆坡及蕉赖、安邦、塔曼美拉瓦蒂、沙登、史里肯邦安、赛城和布城的古尔邦、阿奇卡或家庭自用清真羊肉订单。",
+      keywords: getCoreSeoKeywords(locale),
+    });
   }
-  return {
-    title: "Complete your order – Qurban, Aqiqah or personal lamb",
+  return buildPageMetadata({
+    locale,
+    pathname: "/order",
+    title: "Book Qurban or Aqiqah – Goat & Sheep order",
     description:
-      "Choose occasion, weight band, cut style and slaughter date to complete your Qurban, Aqiqah or personal lamb order with Kordoba Farms.",
-  };
+      "Choose goat or sheep, weight, cut style and slaughter date. We deliver Qurban and Aqiqah to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya. Halal, traceable.",
+    keywords: getCoreSeoKeywords(locale),
+  });
 }
 
 // All four products: half only for personal; whole for qurban, aqiqah, personal.
@@ -62,6 +75,25 @@ export default async function OrderPage({
   const { locale } = await params;
   const { step, occasion, edit, product: productParam } = await searchParams;
   setRequestLocale(locale);
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: `${SEO_BASE_URL}/${locale}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Order",
+        item: `${SEO_BASE_URL}/${locale}/order`,
+      },
+    ],
+  };
 
   const [specialCuts, productsMap, weightsByProduct, siteSettings] = await Promise.all([
     getSpecialCuts(locale),
@@ -88,6 +120,10 @@ export default async function OrderPage({
 
   return (
     <div className="min-h-[60vh]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <OrderWizard
         locale={locale}
         initialStep={step ? parseInt(step, 10) : undefined}

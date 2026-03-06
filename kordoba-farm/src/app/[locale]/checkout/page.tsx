@@ -1,9 +1,40 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getSiteSetting } from "@/lib/content";
+import { buildPageMetadata } from "@/lib/seo";
 import { CheckoutPageClient } from "@/components/checkout/CheckoutPageClient";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    pathname: "/checkout",
+    title:
+      locale === "ar"
+        ? "الدفع"
+        : locale === "ms"
+          ? "Bayaran"
+          : locale === "zh"
+            ? "结账"
+            : "Checkout",
+    description:
+      locale === "ar"
+        ? "إتمام الدفع لطلبك."
+        : locale === "ms"
+          ? "Lengkapkan pembayaran pesanan anda."
+          : locale === "zh"
+            ? "完成您的订单支付。"
+            : "Complete payment for your order.",
+    robots: { index: false, follow: false },
+  });
+}
 
 export default async function CheckoutPage({
   params,

@@ -1,13 +1,34 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
+import { PRIORITY_SERVICE_AREAS, SEO_BASE_URL, SEO_GBP_URL, SEO_WHATSAPP_URL } from "@/lib/seo";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: { default: "Kordoba Farms | Premium Qurban & Aqiqah", template: "%s | Kordoba Farms" },
+  title: {
+    default: "Aqiqah & Qurban Malaysia | Goat & Sheep – Kordoba Farms",
+    template: "%s | Kordoba Farms",
+  },
   description:
-    "Premium halal livestock for Qurban, Aqiqah, and personal consumption. Traceable, certified, delivered. Malaysia & Southeast Asia.",
-  openGraph: { type: "website" },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://kordobafarm.com"),
+    "Book Aqiqah and Qurban in Malaysia. Halal goat and sheep for Aqiqah, Qurban & personal meat. Delivery to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya. Traceable, Shariah-compliant.",
+  keywords: [
+    "aqiqah Malaysia",
+    "qurban Malaysia",
+    "korban Malaysia",
+    "halal goat Malaysia",
+    "halal sheep Malaysia",
+    "book aqiqah",
+    "book qurban",
+    "Cheras",
+    "Ampang",
+    "Serdang",
+    "Sri Kembangan",
+    "Cyberjaya",
+    "Putrajaya",
+  ],
+  openGraph: { type: "website", siteName: "Kordoba Farms" },
+  twitter: { card: "summary_large_image" },
+  metadataBase: new URL(SEO_BASE_URL),
 };
 
 export default function RootLayout({
@@ -15,30 +36,89 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const localeScript = `
-    (function(){
-      var seg = document.location.pathname.split('/').filter(Boolean);
-      var locale = (seg[0] && ['ar','en','ms','zh'].indexOf(seg[0])>=0) ? seg[0] : 'en';
-      document.documentElement.lang = locale;
-      document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
-      document.documentElement.setAttribute('data-locale', locale);
-    })();
-  `;
+  const headerStore = headers();
+  const locale = headerStore.get("x-locale") ?? "en";
+  const dir = headerStore.get("x-dir") ?? (locale === "ar" ? "rtl" : "ltr");
+
+  const sameAs = [SEO_GBP_URL].filter(Boolean);
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Kordoba Farms",
+    alternateName: "KORDOBA AGROTECH SDN. BHD.",
+    url: SEO_BASE_URL,
+    description:
+      "Kordoba Farms: Aqiqah and Qurban in Malaysia. Halal goat and sheep for Aqiqah, Qurban and personal meat. Delivery to Kuala Lumpur, Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
+    areaServed: [
+      { "@type": "Country", name: "Malaysia" },
+      { "@type": "City", name: "Kuala Lumpur" },
+      ...PRIORITY_SERVICE_AREAS.map((name) => ({ "@type": "City", name })),
+    ],
+    ...(sameAs.length ? { sameAs } : {}),
+    ...(SEO_WHATSAPP_URL
+      ? {
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              contactType: "customer support",
+              url: SEO_WHATSAPP_URL,
+              availableLanguage: ["en", "ms", "ar", "zh"],
+            },
+          ],
+        }
+      : {}),
+  };
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Kordoba Farms",
+    url: SEO_BASE_URL,
+    description: "Book Aqiqah and Qurban in Malaysia. Halal goat and sheep. Delivery to KL, Cheras, Ampang, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
+    inLanguage: ["en-MY", "ms-MY", "ar-MY", "zh-MY"],
+  };
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    name: "Kordoba Farms",
+    parentOrganization: {
+      "@type": "Organization",
+      name: "KORDOBA AGROTECH SDN. BHD.",
+    },
+    url: SEO_BASE_URL,
+    description: "Aqiqah and Qurban Malaysia. Goat and sheep for Aqiqah, Qurban and personal meat. Serving Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, Putrajaya.",
+    serviceArea: [
+      { "@type": "AdministrativeArea", name: "Kuala Lumpur" },
+      ...PRIORITY_SERVICE_AREAS.map((name) => ({
+        "@type": "AdministrativeArea",
+        name,
+      })),
+    ],
+    areaServed: [
+      { "@type": "Country", name: "Malaysia" },
+      ...PRIORITY_SERVICE_AREAS.map((name) => ({ "@type": "City", name })),
+    ],
+    ...(sameAs.length ? { sameAs } : {}),
+  };
   return (
-    <html lang="en" suppressHydrationWarning className="h-full">
+    <html lang={locale} dir={dir} suppressHydrationWarning className="h-full" data-locale={locale}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: localeScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Kordoba Farms",
-              alternateName: "KORDOBA AGROTECH SDN. BHD.",
-              url: process.env.NEXT_PUBLIC_APP_URL ?? "https://kordobafarm.com",
-              description: "Premium halal livestock for Qurban, Aqiqah, and personal consumption. Malaysia & Southeast Asia.",
-            }),
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessSchema),
           }}
         />
       </head>

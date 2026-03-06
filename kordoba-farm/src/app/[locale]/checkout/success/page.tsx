@@ -1,9 +1,40 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { buildPageMetadata } from "@/lib/seo";
 import { CheckoutSuccessClient } from "@/components/checkout/CheckoutSuccessClient";
 import { CheckCircle2, ArrowRight } from "lucide-react";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    pathname: "/checkout/success",
+    title:
+      locale === "ar"
+        ? "تم الدفع بنجاح"
+        : locale === "ms"
+          ? "Pembayaran berjaya"
+          : locale === "zh"
+            ? "支付成功"
+            : "Payment successful",
+    description:
+      locale === "ar"
+        ? "تم استلام طلبك بنجاح."
+        : locale === "ms"
+          ? "Pesanan anda telah diterima."
+          : locale === "zh"
+            ? "我们已收到您的订单。"
+            : "We have received your order.",
+    robots: { index: false, follow: false },
+  });
+}
 
 export default async function CheckoutSuccessPage({
   params,

@@ -11,6 +11,8 @@ import { Footer } from "@/components/layout/Footer";
 import { WhatsappFloat } from "@/components/WhatsappFloat";
 import { RamadanDecorations } from "@/components/RamadanDecorations";
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }

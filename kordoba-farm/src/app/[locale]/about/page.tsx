@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import { buildPageMetadata, getCoreSeoKeywords, getLocalizedAreaSentence, getAreaKeywordSentences } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -8,31 +9,43 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (locale === "ar") {
-    return {
+    return buildPageMetadata({
+      locale,
+      pathname: "/about",
       title: "عن مزارع قرطبة – الذبح الحلال من المزرعة إلى بيتك",
       description:
-        "تعرّف على مزارع قرطبة: أضاحي وعقائق وذبائح شخصية مع تتبّع كامل، ذبح شرعي، وفيديو إثبات واختيارات للتوصيل أو التبرع.",
-    };
+        "تعرّف على مزارع قرطبة في ماليزيا وكوالالمبور: أضاحي وعقائق وذبائح شخصية مع تتبّع كامل وذبح شرعي وخدمة موثوقة إلى شيراس وأمبانغ وتامان ملاواتي وسردانغ وسري كمبانغان وسيبرجايا وبوتراجايا.",
+      keywords: getCoreSeoKeywords(locale),
+    });
   }
   if (locale === "ms") {
-    return {
+    return buildPageMetadata({
+      locale,
+      pathname: "/about",
       title: "Tentang Kordoba Farms – Halal dari ladang ke rumah anda",
       description:
-        "Ketahui tentang Kordoba Farms: Korban, Aqiqah dan sembelihan peribadi dengan kebolehkesanan penuh, sembelihan halal dan pilihan video bukti.",
-    };
+        "Kenali Kordoba Farms di Malaysia dan Kuala Lumpur: Korban, Aqiqah dan sembelihan peribadi dengan kebolehkesanan penuh, sembelihan halal, video bukti dan perkhidmatan ke Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya dan Putrajaya.",
+      keywords: getCoreSeoKeywords(locale),
+    });
   }
   if (locale === "zh") {
-    return {
+    return buildPageMetadata({
+      locale,
+      pathname: "/about",
       title: "关于科尔多巴农场 – 从牧场到您家门口的清真屠宰",
       description:
-        "了解科尔多巴农场：提供古尔邦、阿奇卡和家庭自用清真羊肉，全程可追溯，遵循教法屠宰，并可提供屠宰视频证明。",
-    };
+        "了解位于马来西亚与吉隆坡市场的科尔多巴农场：提供古尔邦、阿奇卡和家庭自用清真羊肉，全程可追溯，遵循教法屠宰，并服务于蕉赖、安邦、塔曼美拉瓦蒂、沙登、史里肯邦安、赛城和布城。",
+      keywords: getCoreSeoKeywords(locale),
+    });
   }
-  return {
+  return buildPageMetadata({
+    locale,
+    pathname: "/about",
     title: "About Kordoba Farms – Halal from farm to home",
     description:
-      "Learn about Kordoba Farms: Qurban, Aqiqah and personal lamb with full traceability, Shariah-compliant slaughter and optional video proof.",
-  };
+      "Learn about Kordoba Farms in Malaysia and Kuala Lumpur: Qurban, Aqiqah and personal lamb with full traceability, Shariah-compliant slaughter, video proof, and dependable service in Cheras, Ampang, Taman Melawati, Serdang, Sri Kembangan, Cyberjaya, and Putrajaya.",
+    keywords: getCoreSeoKeywords(locale),
+  });
 }
 
 export default async function AboutPage({
@@ -149,6 +162,28 @@ export default async function AboutPage({
                   ? "• 可选择送货上门，或代表您进行慈善捐赠分发。"
                   : "• Options to deliver to your doorstep or to donate on your behalf."}
           </li>
+        </ul>
+      </section>
+
+      <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 sm:p-5">
+        <h2 className="text-lg font-semibold text-[var(--foreground)] sm:text-xl">
+          {isAr
+            ? "المناطق التي نخدمها أكثر"
+            : isMs
+              ? "Kawasan yang paling kerap kami layani"
+              : isZh
+                ? "我们重点服务的区域"
+                : "Areas we serve most often"}
+        </h2>
+        <p className="text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base">
+          {getLocalizedAreaSentence(locale)}
+        </p>
+        <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--muted-foreground)] sm:text-base" aria-label={isAr ? "مناطق التوصيل" : isMs ? "Kawasan penghantaran" : isZh ? "配送区域" : "Delivery areas"}>
+          {getAreaKeywordSentences(locale).map(({ area, sentence }) => (
+            <li key={area}>
+              <span className="font-medium text-[var(--foreground)]">{area}:</span> {sentence}
+            </li>
+          ))}
         </ul>
       </section>
     </div>
