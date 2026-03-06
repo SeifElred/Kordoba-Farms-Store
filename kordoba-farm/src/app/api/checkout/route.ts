@@ -38,16 +38,16 @@ export async function POST(req: Request) {
     }
     const data = parsed.data;
 
-    const animal = await prisma.animal.findUnique({
-      where: { id: data.animalId, status: "available" },
-    });
+    const [animal, existingUser] = await Promise.all([
+      prisma.animal.findUnique({ where: { id: data.animalId, status: "available" } }),
+      prisma.user.findUnique({ where: { email: data.email } }),
+    ]);
     if (!animal) {
       return NextResponse.json({ error: "Animal no longer available" }, { status: 409 });
     }
-
-    let user = await prisma.user.findUnique({ where: { email: data.email } });
-    if (!user) {
-      user = await prisma.user.create({
+    const user =
+      existingUser ??
+      (await prisma.user.create({
         data: {
           name: data.name,
           email: data.email,
@@ -55,8 +55,7 @@ export async function POST(req: Request) {
           country: data.country,
           language: data.language,
         },
-      });
-    }
+      }));
 
     const order = await prisma.order.create({
       data: {

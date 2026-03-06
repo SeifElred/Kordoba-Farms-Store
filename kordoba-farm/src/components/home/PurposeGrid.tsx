@@ -38,6 +38,7 @@ export function PurposeGrid() {
   }
 
   useEffect(() => {
+    router.prefetch(`/${locale}/order`);
     for (const item of purposes) {
       router.prefetch(`/${locale}/order?occasion=${item.slug}&step=2`);
     }

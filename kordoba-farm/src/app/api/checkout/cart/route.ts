@@ -3,7 +3,7 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import {
-  getCartLinePrices,
+  getCartLinePricesWithTx,
   type CartLineItemPayload,
 } from "@/lib/cart-price";
 
@@ -135,15 +135,6 @@ export async function POST(req: Request) {
     const { channel, name, email, phone, address, country, locale, items } =
       parsed.data;
 
-    const linePrices = await getCartLinePrices(items, prisma);
-    const totalMYR = linePrices.reduce((total, price) => total + price, 0);
-    if (totalMYR <= 0) {
-      return NextResponse.json(
-        { error: "Invalid cart: unable to compute total" },
-        { status: 400 }
-      );
-    }
-
     const isWhatsApp = channel === "whatsapp";
     const nameVal =
       (isWhatsApp ? (name?.trim() || "WhatsApp order (pending details)") : name!) as string;
@@ -157,20 +148,42 @@ export async function POST(req: Request) {
       ? (address?.trim() || "To be confirmed via WhatsApp")
       : (address ?? null);
 
-    const totalCents = Math.round(totalMYR * 100);
-    const cartOrder = await prisma.cartOrder.create({
-      data: {
-        name: nameVal,
-        email: emailVal,
-        phone: phoneVal,
-        address: addressVal,
-        country: country ?? "MY",
-        locale: locale ?? "en",
-        totalCents,
-        paymentStatus: "pending",
-        items: items as unknown as object,
-      },
-    });
+    let cartOrder: { id: string };
+    let linePrices: number[];
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        const prices = await getCartLinePricesWithTx(tx, items);
+        const totalMYR = prices.reduce((total, price) => total + price, 0);
+        if (totalMYR <= 0) {
+          throw new Error("Invalid cart: unable to compute total");
+        }
+        const totalCents = Math.round(totalMYR * 100);
+        const order = await tx.cartOrder.create({
+          data: {
+            name: nameVal,
+            email: emailVal,
+            phone: phoneVal,
+            address: addressVal,
+            country: country ?? "MY",
+            locale: locale ?? "en",
+            totalCents,
+            paymentStatus: "pending",
+            items: items as unknown as object,
+          },
+        });
+        return { cartOrder: order, linePrices: prices };
+      });
+      cartOrder = result.cartOrder;
+      linePrices = result.linePrices;
+    } catch (txErr) {
+      if (txErr instanceof Error && txErr.message === "Invalid cart: unable to compute total") {
+        return NextResponse.json(
+          { error: "Invalid cart: unable to compute total" },
+          { status: 400 }
+        );
+      }
+      throw txErr;
+    }
 
     if (isWhatsApp) {
       return NextResponse.json({ orderId: cartOrder.id });

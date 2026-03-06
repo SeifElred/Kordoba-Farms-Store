@@ -4,6 +4,9 @@
  */
 import type { PrismaClient } from "@prisma/client";
 
+/** Transaction client with only what we need for cart price lookup. */
+type TransactionLike = Pick<PrismaClient, "weightOption">;
+
 const QURBAN_AQIQAH_BANDS: { id: string; price: number }[] = [
   { id: "whole_28_30", price: 1020 },
   { id: "whole_31_33", price: 1120 },
@@ -75,6 +78,40 @@ export async function getCartLinePrices(
       ? new Map(
           (
             await prisma.weightOption.findMany({
+              where: { id: { in: uniqueWeightOptionIds } },
+              select: { id: true, price: true },
+            })
+          ).map((option) => [option.id, option.price])
+        )
+      : new Map<string, number>();
+
+  return items.map((item) => {
+    if (item.weightOptionId) {
+      const dbPrice = weightOptionPriceMap.get(item.weightOptionId);
+      if (dbPrice != null) return dbPrice;
+    }
+    return getLegacyCartLinePrice(item);
+  });
+}
+
+/** Same as getCartLinePrices but uses a transaction client (for single round-trip with create). */
+export async function getCartLinePricesWithTx(
+  tx: TransactionLike,
+  items: CartLineItemPayload[]
+): Promise<number[]> {
+  const uniqueWeightOptionIds = Array.from(
+    new Set(
+      items
+        .map((item) => item.weightOptionId)
+        .filter((id): id is string => typeof id === "string" && id.length > 0)
+    )
+  );
+
+  const weightOptionPriceMap =
+    uniqueWeightOptionIds.length > 0
+      ? new Map(
+          (
+            await tx.weightOption.findMany({
               where: { id: { in: uniqueWeightOptionIds } },
               select: { id: true, price: true },
             })

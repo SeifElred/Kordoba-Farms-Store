@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
 import { formatPriceRange, formatPrice } from "@/lib/utils";
 import { getWeightBandDisplayLabel } from "@/lib/weight-bands";
@@ -55,9 +56,14 @@ export function CartPageClient({
   const tAnimal = useTranslations("animal");
   const tProduct = useTranslations("product");
   const searchParams = useSearchParams();
+  const router = useRouter();
   const added = searchParams.get("added") === "1";
 
   const { items, removeItem } = useCart();
+
+  useEffect(() => {
+    if (items.length > 0) router.prefetch(`/${locale}/checkout`);
+  }, [items.length, locale, router]);
 
   const purposeLabels: Record<string, string> = {
     qurban: tPurpose("qurban"),

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { useCart } from "@/contexts/CartContext";
 import type { CartLineItem } from "@/contexts/CartContext";
 import { formatPrice, formatPriceRange, getLocalDateString } from "@/lib/utils";
@@ -128,6 +128,7 @@ export function OrderWizard({
   const tAnimal = useTranslations("animal");
   const tCommon = useTranslations("common");
   const router = useRouter();
+  const [isPendingNav, startTransition] = useTransition();
   const { addItem, updateItem, getItemById } = useCart();
 
   const hasInitialOccasion = !!initialOccasion && !editItemId;
@@ -150,8 +151,12 @@ export function OrderWizard({
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   useEffect(() => {
-    if (step >= 5) router.prefetch(`/${locale}/cart`);
+    if (step >= 1) router.prefetch(`/${locale}/cart`);
   }, [step, locale, router]);
+
+  useEffect(() => {
+    if (!isPendingNav && isAddingToCart) setIsAddingToCart(false);
+  }, [isPendingNav, isAddingToCart]);
   const [draftReady, setDraftReady] = useState(false);
   const [state, setState] = useState<WizardState>(() => {
     const s: WizardState = { ...defaultState, occasion: initialOccasion ?? "" };
@@ -374,7 +379,7 @@ export function OrderWizard({
 
   const handleAddToCart = useCallback(() => {
     const productType = stateToProduct(state);
-    if (!productType || !state.occasion || !state.specialCutId || isAddingToCart) return;
+    if (!productType || !state.occasion || !state.specialCutId || isAddingToCart || isPendingNav) return;
     setIsAddingToCart(true);
     const { minPrice, maxPrice, productLabel } = getPriceRange(
       productType,
@@ -407,9 +412,10 @@ export function OrderWizard({
       addItem(lineItem);
     }
     clearDraft();
-    router.push(`/${locale}/cart?added=1`);
-    setTimeout(() => setIsAddingToCart(false), 3000);
-  }, [state, productConfigs, weightOptionsByProduct, editItemId, addItem, updateItem, clearDraft, router, locale, isAddingToCart]);
+    startTransition(() => {
+      router.push(`/${locale}/cart?added=1`);
+    });
+  }, [state, productConfigs, weightOptionsByProduct, editItemId, addItem, updateItem, clearDraft, router, locale, isAddingToCart, isPendingNav, startTransition]);
 
   const stepTitles = [
     tWizard("step1Title"),
@@ -929,11 +935,11 @@ export function OrderWizard({
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={isAddingToCart}
+            disabled={isAddingToCart || isPendingNav}
             className="btn-primary flex w-full items-center justify-center gap-2"
-            aria-busy={isAddingToCart}
+            aria-busy={isAddingToCart || isPendingNav}
           >
-            {isAddingToCart ? (
+            {isAddingToCart || isPendingNav ? (
               <>
                 <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden />
                 {tWizard("addingToCart")}

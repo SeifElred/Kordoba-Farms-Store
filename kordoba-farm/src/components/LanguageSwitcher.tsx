@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTransition } from "react";
+import { useTransition, useEffect, useCallback } from "react";
 
 const locales = [
   { code: "en", label: "EN" },
@@ -10,6 +10,7 @@ const locales = [
   { code: "ms", label: "MS" },
   { code: "zh", label: "中文" },
 ] as const;
+const localeCodes = ["en", "ar", "ms", "zh"] as const;
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -18,17 +19,30 @@ export function LanguageSwitcher() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  const getPathForLocale = useCallback(
+    (nextLocale: string) => {
+      const segments = pathname.split("/").filter(Boolean);
+      const pathSegments =
+        segments[0] && localeCodes.includes(segments[0] as (typeof localeCodes)[number])
+          ? [nextLocale, ...segments.slice(1)]
+          : [nextLocale, ...segments];
+      const basePath = `/${pathSegments.filter(Boolean).join("/")}`;
+      const search = searchParams.toString();
+      return search ? `${basePath}?${search}` : basePath;
+    },
+    [pathname, searchParams]
+  );
+
+  useEffect(() => {
+    localeCodes.forEach((code) => {
+      if (code === locale) return;
+      router.prefetch(getPathForLocale(code));
+    });
+  }, [locale, pathname, getPathForLocale, router]);
+
   function onSelect(next: string) {
     if (next === locale) return;
-    const segments = pathname.split("/").filter(Boolean);
-    const localeCodes = ["en", "ar", "ms", "zh"];
-    const pathSegments =
-      segments[0] && localeCodes.includes(segments[0])
-        ? [next, ...segments.slice(1)]
-        : [next, ...segments];
-    const basePath = `/${pathSegments.filter(Boolean).join("/")}`;
-    const search = searchParams.toString();
-    const newPath = search ? `${basePath}?${search}` : basePath;
+    const newPath = getPathForLocale(next);
     startTransition(() => {
       router.push(newPath, { scroll: false });
     });
@@ -42,6 +56,7 @@ export function LanguageSwitcher() {
           type="button"
           disabled={isPending}
           onClick={() => onSelect(code)}
+          onMouseEnter={() => code !== locale && router.prefetch(getPathForLocale(code))}
           className={`rounded-md px-2 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 ${
             locale === code
               ? "bg-[var(--primary)] text-white"
